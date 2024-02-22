@@ -1,0 +1,2 @@
+Project 1:
+    Multiple versions (version 2 yet to be made) of Turing machines in C code. Version 1 done using hash tables and explicit characters. Version 2 (to be done) done using encodings of characters into bits (i.e compression) to save space and speed up. 

@@ -165,9 +165,11 @@ void add_confpath(confpath *P, config *add);
 tm_result *make_result(confpath *P, enum Result done);
 
 
-void print_tuple(path *P, enum Result done);
-
-void input(char *in);
+void print_tuple(tm_result *P);
+bool valid_string(char *chk);
+size_t steps(char *str);
+char *in_string(char *str);
+void run(TM *M);
 
 config *simulate_step(TM *M, config *curr_conf);
 tm_result *TM_interpreter(TM *M, char *string, size_t k);

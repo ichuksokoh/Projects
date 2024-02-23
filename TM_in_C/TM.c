@@ -376,22 +376,95 @@ char *conv(config *e) {
     return ret;
 }
 
-void print_tuple(path *P, enum Result done) {
+void print_tuple(tm_result* P) {
     char *val = calloc(sizeof(char), MAXLINE*(MAXLINE/2));
     strcat(val, "[");
-    for (path *i = P; i != NULL; i = i->next) {
+    for (path *i = P->ans->head; i != NULL; i = i->next) {
         char *add = conv(i->trail);
         strcat(val, add);
         free(add);
     }
     strcat(val, "]");
-    if (done == ACCEPT) strcat(val, " ACCEPT\n");
-    if (done == REJECT) strcat(val, " REJECT\n");
-    if (done == UNDETERMINED) strcat(val, " UNDETERMINED\n");
+    if (P->state == ACCEPT) strcat(val, " ACCEPT\n");
+    if (P->state == REJECT) strcat(val, " REJECT\n");
+    if (P->state == UNDETERMINED) strcat(val, " UNDETERMINED\n");
 
     printf("%s", val);
     printf("strlen of val; %lu\n", strlen(val));
     free(val);
 }
 
+bool valid_string(char *chk) {
+    if (chk == NULL) return false;
+    size_t len = strlen(chk);
+    if (len == 0) return false;
+    char *mid = strstr(chk, ",");
+    if (mid == NULL) return false;
 
+    size_t i = 0;
+    while ((chk+i) != mid) {
+        if (chk[i] != '1' && chk[i] != '0') {
+            return false;
+        }
+        i += 1;
+    }
+    mid +=1;
+    i = 0;
+    if (mid[i] != '0' && atoi(mid) == 0) {
+        return false;
+    }
+    return true;
+}
+
+size_t steps(char *str) {
+    char *find = strstr(str, ",");
+    find +=1;
+    return (size_t)atoi(find);
+}
+
+char *in_string(char *str) {
+    char *ret = calloc(sizeof(char), MAXLINE);
+    size_t i = 0;
+    while (str[i] != ',') {
+        ret[i] = str[i];
+        i += 1;
+    }
+    return ret;
+}
+
+
+void run(TM *M) {
+    char *test = calloc(sizeof(char), MAXLINE);
+    while(true) {
+        printf("Separate testcase and number of steps ran with ','\n");
+        printf("Input Test Case: ");
+        if (fgets(test,MAXLINE, stdin) == NULL) {
+            printf("%s\n", test);
+            printf("Error reading Test Case 1\n");
+            break;
+        }
+        test[strlen(test)-1] = '\0';
+        if (!valid_string(test)) {
+            printf("Error reading Test Case 2\n");
+            break;
+        }
+        char *input = in_string(test);
+        tm_result *res = TM_interpreter(M, input, steps(test));
+        free(input);
+        print_tuple(res);
+        memset(test, 0, MAXLINE);
+
+        printf("Continue?\nType [y/n]\n");
+        fgets(test, MAXLINE, stdin);
+        if (strcmp(test, "n\n") == 0 || strcmp(test, "N\n") == 0) {
+            free_result(res);
+            break;
+        }
+        free_result(res);
+
+        memset(test,0,MAXLINE);
+
+    }
+
+    free(test);
+}

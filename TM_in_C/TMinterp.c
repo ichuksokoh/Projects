@@ -41,6 +41,7 @@ tm_result *TM_interpreter(TM *M, char *string, size_t k) {
 int main() {
     entry *mappings = NULL;
     mappings = fill_fn();
+    char *test = calloc(sizeof(char), MAXLINE);
 
 
     char *Q = calloc(sizeof(char), MAXLINE);
@@ -52,18 +53,11 @@ int main() {
 
     TM *M = make_TM(Q, Sigma, Gamma,
         mappings, 20, "q_acc", "q_rej", "q0");
-    
 
-    tm_result *result = TM_interpreter(M, "10010011110011100011100011100000110110101010", 20000);
+    run(M);
 
-    if (result == NULL) {
-        free_TM(M);
-        return 0;
-    }
-    print_tuple(result->ans->head, result->state);
-
-    free_result(result);
     free_TM(M);
+    free(test);
 
 
     return 0;

@@ -518,11 +518,17 @@ bool in(void *value, void *find, enum type var) {
         char *state = calloc(sizeof(char), MAXLINE);
         char *sym =calloc(sizeof(char), MAXLINE);
         if (sscanf(find, "%s %s", state, sym) != 2) {
+            free(state);
+            free(sym);
             return false;
         }
         if (search_dict(D, state, sym) == NULL) {
+            free(state);
+            free(sym);
             return false;
         }
+        free(state);
+        free(sym);
     }
     return true;
 }

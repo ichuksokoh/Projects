@@ -9,39 +9,13 @@
 #define MAXLINE 2048
 
 
-tm_result *TM_interpreter(TM *M, char *string, size_t k) {
-    if (strlen(string) > 145) return NULL;
-    char *pass = calloc(sizeof(char), 2);
-    char *pass2 = calloc(sizeof(char), strlen(string)+2);
-    strcpy(pass2, string);
-    config *init = make_config(pass, M->q0, pass2);
-    free(pass);
-    free(pass2);
-    confpath *ret = create_confpath();
-    size_t count = 0;
-
-    while (true) {
-        add_confpath(ret, init);
-        if (strcmp(init->q, M->q_acc) == 0) {
-            return make_result(ret, ACCEPT);
-        }
-
-        if (strcmp(init->q, M->q_rej) == 0) {
-            return make_result(ret, REJECT);
-        }
-        if (count == k) {
-            return make_result(ret, UNDETERMINED);
-        }
-        init = simulate_step(M, init);
-        count += 1;
-    }
-}
-
-
 int main() {
     entry *mappings = NULL;
-    mappings = fill_fn();
-    char *test = calloc(sizeof(char), MAXLINE);
+    mappings = deltafromfile();
+    if (mappings == NULL) {
+        printf("Error, no such file exists\n");
+        return 0;
+    }
 
 
     char *Q = calloc(sizeof(char), MAXLINE);
@@ -57,7 +31,6 @@ int main() {
     run(M);
 
     free_TM(M);
-    free(test);
 
 
     return 0;

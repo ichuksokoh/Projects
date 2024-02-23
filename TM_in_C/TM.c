@@ -7,92 +7,9 @@
 #include <assert.h>
 
 #define MAXLINE 2048
+#define ITEMSIZE 25
 
 
-
-
-void assign(entry *fn, char *state, char *sym, char* q_new, char *new_sym, char dir) {
-    fn->dir = dir;
-    fn->sym = calloc(sizeof(char), strlen(sym)+2);
-    strcat(fn->sym, sym);
-    fn->q_new = calloc(sizeof(char), strlen(q_new)+2);
-    strcat(fn->q_new, q_new);
-    fn->state = calloc(sizeof(char), strlen(state)+2);
-    strcat(fn->state, state);
-    fn->sym_new = calloc(sizeof(char), strlen(new_sym)+2);
-    strcat(fn->sym_new, new_sym);
-}
-
-entry *fill_fn() {
-    entry *deltafn = malloc(sizeof(entry));
-    entry *tmp = deltafn;
-    assign(deltafn, "q0", "0", "q1", "#", 'R');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q0", "1", "q4", "1", 'R');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q0", "_", "q_acc", "_", 'R');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q0", "#", "q0", "#", 'R');
-    
-
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q1", "0", "q1", "0", 'R');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q1", "1", "q2", "#", 'L');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q1", "#", "q1", "#", 'R');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q1", "_", "q3", "_", 'L');
-
-
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q2", "0", "q2", "0", 'L');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q2", "1", "q2", "1", 'L');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q2", "#", "q2", "#", 'L');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q2", "_", "q0", "_", 'R');
-
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q3", "0", "q3", "0", 'L');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q3", "1", "q2", "#", 'L');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q3", "#", "q3", "#", 'L');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q3", "_", "q_rej", "_", 'R');
-
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q4", "0", "q1", "#", 'R');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q4", "1", "q4", "1", 'R');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q4", "#", "q4", "#", 'R');
-    tmp->next = malloc(sizeof(entry));
-    tmp = tmp->next;
-    assign(tmp, "q4", "_", "q_rej", "_", 'L');
-    tmp->next = NULL;
-    return deltafn;
-}
 
 
 
@@ -320,6 +237,35 @@ char *splice(char *a, char *b, int form) {
     return hold;
 }
 
+tm_result *TM_interpreter(TM *M, char *string, size_t k) {
+    if (strlen(string) > 145) return NULL;
+    if (!validate_TM(M)) return NULL;
+    char *pass = calloc(sizeof(char), 2);
+    char *pass2 = calloc(sizeof(char), strlen(string)+2);
+    strcpy(pass2, string);
+    config *init = make_config(pass, M->q0, pass2);
+    free(pass);
+    free(pass2);
+    confpath *ret = create_confpath();
+    size_t count = 0;
+
+    while (true) {
+        add_confpath(ret, init);
+        if (strcmp(init->q, M->q_acc) == 0) {
+            return make_result(ret, ACCEPT);
+        }
+
+        if (strcmp(init->q, M->q_rej) == 0) {
+            return make_result(ret, REJECT);
+        }
+        if (count == k) {
+            return make_result(ret, UNDETERMINED);
+        }
+        init = simulate_step(M, init);
+        count += 1;
+    }
+}
+
 config *simulate_step(TM *M, config *curr_conf) {
     char *u = curr_conf->u;
     char *q = curr_conf->q;
@@ -384,6 +330,8 @@ void print_tuple(tm_result* P) {
         strcat(val, add);
         free(add);
     }
+    val[strlen(val)-1] = '\0';
+    val[strlen(val)-1] = '\0';
     strcat(val, "]");
     if (P->state == ACCEPT) strcat(val, " ACCEPT\n");
     if (P->state == REJECT) strcat(val, " REJECT\n");
@@ -450,6 +398,11 @@ void run(TM *M) {
         }
         char *input = in_string(test);
         tm_result *res = TM_interpreter(M, input, steps(test));
+        if (res == NULL) {
+            free(input);
+            printf("Error: Invalid TM\n");
+            break;
+        }
         free(input);
         print_tuple(res);
         memset(test, 0, MAXLINE);
@@ -467,4 +420,167 @@ void run(TM *M) {
     }
 
     free(test);
+}
+
+entry *add_delta(entry *map, char *q0, char *sym, char *q1, char *nsym, char dir) {
+
+    entry *node = malloc(sizeof(entry));
+        node->state = strdup((const char*)q0);
+        node->sym = strdup((const char *)sym);
+        node->q_new = strdup((const char *)q1);
+        node->sym_new = strdup((const char*)nsym);
+        node->dir = dir;
+    if (map == NULL) {
+        map = node;
+        map->next = NULL;
+        map->prev = NULL;
+    }
+    else {
+        node->next = map;
+        map->prev = node;
+        node->prev = NULL;
+        map = node;
+    }
+    return map;
+}
+
+entry *deltafromfile() {
+    printf("Input file containing TM diagram\nof the format (q, sigma : q_new, sigma, direction)\n-->");
+    char *filename = calloc(sizeof(char), MAXLINE);
+    if (fgets(filename, MAXLINE, stdin) == NULL) {
+        free(filename);
+        printf("Error, no filename given\n");
+        return NULL;
+    }
+    filename[strlen(filename)-1] = '\0';
+
+    FILE *fd = fopen(filename, "r");
+    if (fd == NULL) {
+        free(filename);
+        return NULL;
+    }
+    free(filename);
+    char *line = calloc(sizeof(char), MAXLINE);
+
+    char *state = calloc(sizeof(char),ITEMSIZE);
+    char *sym = calloc(sizeof(char), ITEMSIZE);
+    char *q = calloc(sizeof(char), ITEMSIZE);
+    char *nsym = calloc(sizeof(char), ITEMSIZE);
+    char *dir = calloc(sizeof(char),ITEMSIZE);
+    entry *ret = NULL;
+    int success = 0;
+
+    while (fgets(line, MAXLINE, fd) != NULL) {
+        success = sscanf(line,"%s %1s : %s %s %s", state, sym, q, nsym, dir);
+        if (success != 5) {
+            success = -1;
+            printf("Error while parsing file for TM, format incorrect\n");
+            break;
+        }
+        ret = add_delta(ret, state, sym, q, nsym, dir[0]);
+        memset(state, 0, ITEMSIZE);
+        memset(sym, 0, ITEMSIZE);
+        memset(q, 0, ITEMSIZE);
+        memset(nsym, 0, ITEMSIZE);
+        memset(dir, 0, ITEMSIZE);
+        memset(line, 0, MAXLINE);
+    }
+
+
+    if (ret != NULL && success == -1) {
+        entry *tmp = ret;
+        while (tmp != NULL) {
+            entry *tmp2 =tmp->next;
+            free_entry(tmp);
+            tmp = tmp2;
+        }
+    }
+    free(line); free(state);
+    free(sym); free(q);
+    free(nsym); free(dir);
+
+    fclose(fd);
+
+    return ret;
+
+}
+
+bool in(void *value, void *find, enum type var) {
+    if (var == Q || var == SIGMA || var == GAMMA) {
+        char *states = (char*)value;
+        char *state = (char *)find;
+        if (strstr(states, state) == NULL) {
+            return false;
+        }
+    }
+    else {
+        dict *D = (dict *)value;
+        char *state = calloc(sizeof(char), MAXLINE);
+        char *sym =calloc(sizeof(char), MAXLINE);
+        if (sscanf(find, "%s %s", state, sym) != 2) {
+            return false;
+        }
+        if (search_dict(D, state, sym) == NULL) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+bool validate_TM(TM *M) {
+    if (M == NULL) return false;
+    if (M->Q == NULL) return false;
+    if (M->Sigma == NULL) return false;
+    if (M->Gamma == NULL) return false;
+    if (M->delta == NULL) return false;
+    if (M->q0 == NULL) return false;
+    if (M->q_acc == NULL) return false;
+    if (M->q_rej == NULL) return false;
+
+    size_t slen = strlen(M->Sigma);
+    size_t glen = strlen(M->Gamma);
+    size_t qlen = strlen(M->Q);
+    if (slen == 0 || glen == 0 || qlen == 0) return false;
+    if (strcmp(M->q_acc,M->q_rej) == 0) return false;
+    if (slen >= glen) return false;
+
+    if(strstr(M->Q,M->q0) == NULL || strstr(M->Q,M->q_acc) == NULL 
+        || strstr(M->Q,M->q_rej) == NULL) {
+        return false;
+    }
+
+    if(strstr(M->Gamma,M->Sigma) == NULL) return false;
+    if(strstr(M->Q, M->Gamma) != NULL) return false;
+
+    size_t i = 0;
+    char hold[ITEMSIZE];
+    char hold2[ITEMSIZE];
+    memset(hold, 0, ITEMSIZE);
+    memset(hold2, 0, ITEMSIZE);
+    strcat(hold, M->q_acc);
+    strcat(hold, M->q_rej);
+    strcat(hold, " ");
+    strcat(hold2, " ");
+    size_t len = strlen(hold);
+    size_t len2 = strlen(hold2);
+    size_t j = len;
+    size_t k = len2;
+    char *g = M->Gamma;
+    while (g[i] != '\0') {
+        if (g[i] == ' ') {
+            if (in((void*)M->delta, (void*)hold, DELTA)) return false;
+            if (in((void*)M->delta, (void*)hold, DELTA)) return false;
+            j = len;
+            k = len2;
+        }
+        else {
+            hold[j] = g[i];
+            hold2[k] = g[i];
+        }
+        i += 1;
+        j += 1;
+        k += 1;
+    }
+    return true;
 }

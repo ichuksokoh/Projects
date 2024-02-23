@@ -146,7 +146,6 @@ void free_result(tm_result *R);
 size_t hashfn(char *a, char *b, size_t len);
 
 char *splice(char *a, char *b, int form);
-entry *fill_fn();
 
 
 dict *make_dict(size_t dlen, entry *fn_map);
@@ -156,7 +155,7 @@ TM *make_TM(char *Q, char *Sigma, char *Gamma, entry* delta, size_t dlen, char *
 
 
 entry *search_dict(dict *D, char *state, char *sym);
-bool in(void *value, enum type var);
+bool in(void *value, void *find, enum type var);
 bool validate_TM(TM *M);
 
 
@@ -170,7 +169,9 @@ bool valid_string(char *chk);
 size_t steps(char *str);
 char *in_string(char *str);
 void run(TM *M);
+entry *deltafromfile();
 
 config *simulate_step(TM *M, config *curr_conf);
 tm_result *TM_interpreter(TM *M, char *string, size_t k);
+
 

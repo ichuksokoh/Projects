@@ -38,11 +38,19 @@ void free_dict(dict *D) {
     free(D);
 }
 
+void free_sets(sets *s) {
+    for (size_t i = 0; i < s->len; i++) {
+        free(s->set[i]);
+    }
+    free(s->set);
+    free(s);
+}
+
 void free_TM(TM *M) {
     free_dict(M->delta);
-    free(M->Q);
-    free(M->Sigma);
-    free(M->Gamma);
+    free_sets(M->Q);
+    free_sets(M->Sigma);
+    free_sets(M->Gamma);
     free(M);
 }
 
@@ -124,11 +132,43 @@ void insert_dict(dict *D, entry *add) {
     }
 }
 
+
+char **format(char *str) {
+    size_t count = 0;
+    size_t len = strlen(str);
+    for (size_t i = 0; i < len; i++) {
+        if (str[i] == ' ') count++;
+    }
+    if (str[len-1] != ' ') count++;
+    sets * ret = malloc(sizeof(sets));
+    ret->len = count;
+    char **s = calloc(sizeof(char*), count);
+    count = 0;
+    char hold[ITEMSIZE];
+    memset(hold, 0, ITEMSIZE);
+    for (size_t i = 0; i < len; i++) {
+        if (str[i] != ' ') {
+            
+        }
+        else {
+            s[count] = strdup(hold);
+            count += 1;
+            memset(hold, 0, ITEMSIZE);
+        }
+    }
+    s[ret->len-1] = hold;
+    ret->set = s;
+    return ret;
+}
+
 TM *make_TM(char *Q, char *Sigma, char *Gamma, entry* delta, size_t dlen, char *q_acc, char *q_rej, char *q0) {
     TM *res = malloc(sizeof(TM));
-    res->Q = Q;
-    res->Sigma = Sigma;
-    res->Gamma = Gamma;
+    res->Q = format(Q);
+    res->Sigma = format(Sigma);
+    res->Gamma = format(Gamma);
+    free(Q);
+    free(Sigma);
+    free(Gamma);
     res->delta = make_dict(dlen, delta);
     res->q_acc = q_acc;
     res->q_rej = q_rej;
@@ -507,11 +547,12 @@ entry *deltafromfile() {
 
 bool in(void *value, void *find, enum type var) {
     if (var == Q || var == SIGMA || var == GAMMA) {
-        char *states = (char*)value;
+        sets *states = (sets*)value;
         char *state = (char *)find;
-        if (strstr(states, state) == NULL) {
-            return false;
+        for (size_t i = 0; i < states->len; i++) {
+            if (strcmp(states->set[i], state) ==  0) return true;
         }
+        return false;
     }
     else {
         dict *D = (dict *)value;
@@ -543,50 +584,71 @@ bool validate_TM(TM *M) {
     if (M->q0 == NULL) return false;
     if (M->q_acc == NULL) return false;
     if (M->q_rej == NULL) return false;
+    
+    sets *Q = M->Q;
+    sets *S = M->Sigma;
+    sets *G= M->Gamma;
+    
+    if (Q->len == 0 || S->len == 0 || G->len == 0) return false;
+    if (strcmp(M->q_acc, M->q_rej) == 0) return false;
+    if (G->len <= S->len) return false;
 
-    size_t slen = strlen(M->Sigma);
-    size_t glen = strlen(M->Gamma);
-    size_t qlen = strlen(M->Q);
-    if (slen == 0 || glen == 0 || qlen == 0) return false;
-    if (strcmp(M->q_acc,M->q_rej) == 0) return false;
-    if (slen >= glen) return false;
+    size_t chk = 0;
+    for (size_t i = 0; i < Q->len; i++) {
+        if (strcmp(Q->set[i], M->q0) == 0) chk+=1;
+        if (strcmp(Q->set[i], M->q_acc) == 0) chk+=1;
+        if (strcmp(Q->set[i], M->q_rej) == 0)chk +=1;
+    }
+    if (chk != 3) return false;
 
-    if(strstr(M->Q,M->q0) == NULL || strstr(M->Q,M->q_acc) == NULL 
-        || strstr(M->Q,M->q_rej) == NULL) {
-        return false;
+    for (size_t i = 0; i < S->len; i++) {
+            if (!in((void*)G, (void*)S->set[i], GAMMA)) return false;
     }
 
-    if(strstr(M->Gamma,M->Sigma) == NULL) return false;
-    if(strstr(M->Q, M->Gamma) != NULL) return false;
+    bool chk2 = false;
+    for (size_t i = 0; i < G->len; i++) {
+        if (!in((void*)S, (void*)G->set[i], SIGMA)) chk2 = true;
+    }
+    if (!chk2) return false;
+    if (!in((void*)G, (void*)"_", GAMMA)) return false;
+    if (in((void*)S, (void*)"_", SIGMA)) return false;
 
-    size_t i = 0;
+    bool halt = false;
     char hold[ITEMSIZE];
-    char hold2[ITEMSIZE];
     memset(hold, 0, ITEMSIZE);
-    memset(hold2, 0, ITEMSIZE);
-    strcat(hold, M->q_acc);
-    strcat(hold, M->q_rej);
-    strcat(hold, " ");
-    strcat(hold2, " ");
-    size_t len = strlen(hold);
-    size_t len2 = strlen(hold2);
-    size_t j = len;
-    size_t k = len2;
-    char *g = M->Gamma;
-    while (g[i] != '\0') {
-        if (g[i] == ' ') {
-            if (in((void*)M->delta, (void*)hold, DELTA)) return false;
-            if (in((void*)M->delta, (void*)hold, DELTA)) return false;
-            j = len;
-            k = len2;
+    for (size_t i = 0; i < G->len; i++) {
+        for (size_t j = 0; j < S->len; j++) {
+            if (strcmp(S->set[j], M->q_acc) != 0 && strcmp(S->set[j], M->q_rej) != 0) {
+                sprintf(hold, "%s %s", S->set[j], G->set[i]);
+                if (in((void*)M->delta, (void*)hold, DELTA)) {
+                    entry *ent = search_dict(M->delta, S->set[j], G->set[i]);
+                    int count = -1;
+                    if (strcmp(M->q_acc, ent->q_new) == 0 || strcmp(M->q_rej, ent->q_new) == 0) halt = true;
+                    for (size_t i = 0; i < S->len; i++) {
+                        if (strcmp(S->set[j], ent->q_new) == 0) count = 1;
+                    }
+                    if (count == -1) return false;
+                    if (!in((void*)G->set[i], (void*)ent->sym_new, GAMMA)) return false;
+                    if (ent->dir != 'R' && ent->dir != 'L') return false;
+                }
+                else {
+                    return false;
+                }
+                memset(hold, 0, ITEMSIZE);
+            }
         }
-        else {
-            hold[j] = g[i];
-            hold2[k] = g[i];
-        }
-        i += 1;
-        j += 1;
-        k += 1;
     }
+    if (!halt && strcmp(M->q0, M->q_acc) !=0 && strcmp(M->q0, M->q_rej) != 0) return false;
+
+    memset(hold, 0, ITEMSIZE);
+    char hold2[ITEMSIZE];
+    memset(hold2, 0, ITEMSIZE);
+    for (size_t i = 0; i < G->len; i++) {
+        sprintf(hold, "%s %s", M->q_acc, G->set[i]);
+        sprintf(hold2, "%s %s", M->q_rej, G->set[i]);
+        if (in((void*)M->delta, (void*)hold, DELTA)) return false;
+        if (in((void*)M->delta, (void*)hold2, DELTA)) return false;
+    }
+
     return true;
 }

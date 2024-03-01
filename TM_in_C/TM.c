@@ -133,7 +133,7 @@ void insert_dict(dict *D, entry *add) {
 }
 
 
-char **format(char *str) {
+sets *format(char *str) {
     size_t count = 0;
     size_t len = strlen(str);
     for (size_t i = 0; i < len; i++) {
@@ -144,19 +144,22 @@ char **format(char *str) {
     ret->len = count;
     char **s = calloc(sizeof(char*), count);
     count = 0;
+    size_t count2 = 0;
     char hold[ITEMSIZE];
     memset(hold, 0, ITEMSIZE);
     for (size_t i = 0; i < len; i++) {
         if (str[i] != ' ') {
-            
+            hold[count] = str[i];
+            count +=1;
         }
         else {
-            s[count] = strdup(hold);
-            count += 1;
+            s[count2] = strdup(hold);
+            count2 += 1;
+            count = 0;
             memset(hold, 0, ITEMSIZE);
         }
     }
-    s[ret->len-1] = hold;
+    s[ret->len-1] = strdup(hold);
     ret->set = s;
     return ret;
 }
@@ -556,9 +559,10 @@ bool in(void *value, void *find, enum type var) {
     }
     else {
         dict *D = (dict *)value;
+        char *str = (char*)find;
         char *state = calloc(sizeof(char), MAXLINE);
         char *sym =calloc(sizeof(char), MAXLINE);
-        if (sscanf(find, "%s %s", state, sym) != 2) {
+        if (sscanf(str, "%s %s", state, sym) != 2) {
             free(state);
             free(sym);
             return false;
@@ -597,9 +601,10 @@ bool validate_TM(TM *M) {
     for (size_t i = 0; i < Q->len; i++) {
         if (strcmp(Q->set[i], M->q0) == 0) chk+=1;
         if (strcmp(Q->set[i], M->q_acc) == 0) chk+=1;
-        if (strcmp(Q->set[i], M->q_rej) == 0)chk +=1;
+        if (strcmp(Q->set[i], M->q_rej) == 0) chk +=1;
     }
     if (chk != 3) return false;
+  
 
     for (size_t i = 0; i < S->len; i++) {
             if (!in((void*)G, (void*)S->set[i], GAMMA)) return false;
@@ -617,18 +622,18 @@ bool validate_TM(TM *M) {
     char hold[ITEMSIZE];
     memset(hold, 0, ITEMSIZE);
     for (size_t i = 0; i < G->len; i++) {
-        for (size_t j = 0; j < S->len; j++) {
-            if (strcmp(S->set[j], M->q_acc) != 0 && strcmp(S->set[j], M->q_rej) != 0) {
-                sprintf(hold, "%s %s", S->set[j], G->set[i]);
+        for (size_t j = 0; j < Q->len; j++) {
+            if (strcmp(Q->set[j], M->q_acc) != 0 && strcmp(Q->set[j], M->q_rej) != 0) {
+                sprintf(hold, "%s %s", Q->set[j], G->set[i]);
                 if (in((void*)M->delta, (void*)hold, DELTA)) {
-                    entry *ent = search_dict(M->delta, S->set[j], G->set[i]);
+                    entry *ent = search_dict(M->delta, Q->set[j], G->set[i]);
                     int count = -1;
                     if (strcmp(M->q_acc, ent->q_new) == 0 || strcmp(M->q_rej, ent->q_new) == 0) halt = true;
-                    for (size_t i = 0; i < S->len; i++) {
-                        if (strcmp(S->set[j], ent->q_new) == 0) count = 1;
+                    for (size_t l = 0; l < Q->len; l++) {
+                        if (strcmp(Q->set[l], ent->q_new) == 0) count = 1;
                     }
                     if (count == -1) return false;
-                    if (!in((void*)G->set[i], (void*)ent->sym_new, GAMMA)) return false;
+                    if (!in((void*)G, (void*)ent->sym_new, GAMMA)) return false;
                     if (ent->dir != 'R' && ent->dir != 'L') return false;
                 }
                 else {
@@ -648,6 +653,8 @@ bool validate_TM(TM *M) {
         sprintf(hold2, "%s %s", M->q_rej, G->set[i]);
         if (in((void*)M->delta, (void*)hold, DELTA)) return false;
         if (in((void*)M->delta, (void*)hold2, DELTA)) return false;
+        memset(hold,0,ITEMSIZE);
+        memset(hold2,0,ITEMSIZE);
     }
 
     return true;

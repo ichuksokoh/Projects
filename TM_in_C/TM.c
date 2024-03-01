@@ -169,9 +169,6 @@ TM *make_TM(char *Q, char *Sigma, char *Gamma, entry* delta, size_t dlen, char *
     res->Q = format(Q);
     res->Sigma = format(Sigma);
     res->Gamma = format(Gamma);
-    free(Q);
-    free(Sigma);
-    free(Gamma);
     res->delta = make_dict(dlen, delta);
     res->q_acc = q_acc;
     res->q_rej = q_rej;
@@ -487,7 +484,8 @@ entry *add_delta(entry *map, char *q0, char *sym, char *q1, char *nsym, char dir
     return map;
 }
 
-entry *deltafromfile() {
+
+TM *tmfromfile() {
     printf("Input file containing TM diagram\nof the format (q, sigma : q_new, sigma, direction)\n-->");
     char *filename = calloc(sizeof(char), MAXLINE);
     if (fgets(filename, MAXLINE, stdin) == NULL) {
@@ -505,11 +503,40 @@ entry *deltafromfile() {
     free(filename);
     char *line = calloc(sizeof(char), MAXLINE);
 
-    char *state = calloc(sizeof(char),ITEMSIZE);
-    char *sym = calloc(sizeof(char), ITEMSIZE);
-    char *q = calloc(sizeof(char), ITEMSIZE);
-    char *nsym = calloc(sizeof(char), ITEMSIZE);
-    char *dir = calloc(sizeof(char),ITEMSIZE);
+    printf("symbols that should not be in Sigma\nSeparate with ' '\n--> ");
+    if (fgets(line,MAXLINE,stdin) == NULL) {
+        free(line);
+        fclose(fd);
+        printf("Error, at least '_' should not be in Sigma\n");
+        return NULL;
+    }
+    if (strstr(line, "_") == NULL) {
+        printf("Error, at least '_' should not be in Sigma\n");
+        fclose(fd);
+        free(line);
+        return NULL;
+    }
+
+    char Q[MAXLINE];
+    char Sigma[MAXLINE];
+    char Gamma[MAXLINE];
+    char minus[MAXLINE];
+    memset(Q, 0,MAXLINE);
+    memset(Sigma, 0,MAXLINE);
+    memset(Gamma, 0,MAXLINE);
+    memset(minus, 0,MAXLINE);
+    strcpy(minus,line);
+
+    char state[ITEMSIZE];
+    char sym[ITEMSIZE];
+    char q[ITEMSIZE];
+    char nsym[ITEMSIZE];
+    char dir[ITEMSIZE];
+    memset(state,0,ITEMSIZE);
+    memset(sym, 0, ITEMSIZE);
+    memset(q, 0, ITEMSIZE);
+    memset(nsym, 0, ITEMSIZE);
+    memset(dir,0,ITEMSIZE);
     entry *ret = NULL;
     int success = 0;
 
@@ -521,14 +548,27 @@ entry *deltafromfile() {
             break;
         }
         ret = add_delta(ret, state, sym, q, nsym, dir[0]);
-        memset(state, 0, ITEMSIZE);
-        memset(sym, 0, ITEMSIZE);
-        memset(q, 0, ITEMSIZE);
-        memset(nsym, 0, ITEMSIZE);
-        memset(dir, 0, ITEMSIZE);
-        memset(line, 0, MAXLINE);
+        if (strstr(Q, state) == NULL) {
+            strcat(Q, state);
+            strcat(Q, " ");
+        }
+        if (strstr(Q, q) == NULL) {
+            strcat(Q, q);
+            strcat(Q, " ");
+        }
+        if (strstr(Sigma, sym) == NULL && strstr(minus, sym) == NULL) {
+            strcat(Sigma, sym);
+            strcat(Sigma, " ");
+        }
+        if (strstr(Gamma, sym) == NULL) {
+            strcat(Gamma, sym);
+            strcat(Gamma, " ");
+        }
     }
-
+    Q[strlen(Q)-1] = '\0';
+    Sigma[strlen(Sigma)-1] = '\0';
+    Gamma[strlen(Gamma)-1] = '\0';
+    TM *M = NULL;
 
     if (ret != NULL && success == -1) {
         entry *tmp = ret;
@@ -538,13 +578,13 @@ entry *deltafromfile() {
             tmp = tmp2;
         }
     }
-    free(line); free(state);
-    free(sym); free(q);
-    free(nsym); free(dir);
-
+    else {
+        M = make_TM(Q, Sigma, Gamma, ret, 20, "q_acc", "q_rej","q0");
+    }
+    free(line); 
     fclose(fd);
 
-    return ret;
+    return M;
 
 }
 

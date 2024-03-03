@@ -10,10 +10,11 @@
 
 
 int main() {
+    printf("\n\n Weclome to TM tester!!! \n\n");
 
     TM *M = tmfromfile();
     if (M == NULL) {
-        printf("Error no such file exists\n");
+        printf("Error no such file exists or parameters not fufilled\n");
         return 0;
     }
 

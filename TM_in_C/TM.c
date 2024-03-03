@@ -451,6 +451,7 @@ void run(TM *M) {
         fgets(test, MAXLINE, stdin);
         if (strcmp(test, "n\n") == 0 || strcmp(test, "N\n") == 0) {
             free_result(res);
+            printf("\nGoodbye!! :)\n");
             break;
         }
         free_result(res);
@@ -486,7 +487,7 @@ entry *add_delta(entry *map, char *q0, char *sym, char *q1, char *nsym, char dir
 
 
 TM *tmfromfile() {
-    printf("Input file containing TM diagram\nof the format (q, sigma : q_new, sigma, direction)\n-->");
+    printf("Input file containing TM diagram\nof the format (q, sigma : q_new, sigma, direction)\nparantheses not included\n-->");
     char *filename = calloc(sizeof(char), MAXLINE);
     if (fgets(filename, MAXLINE, stdin) == NULL) {
         free(filename);
@@ -569,7 +570,7 @@ TM *tmfromfile() {
     Sigma[strlen(Sigma)-1] = '\0';
     Gamma[strlen(Gamma)-1] = '\0';
     TM *M = NULL;
-
+    
     if (ret != NULL && success == -1) {
         entry *tmp = ret;
         while (tmp != NULL) {

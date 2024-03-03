@@ -1,5 +1,6 @@
-Project 1: Turing Machine in C
-    Version 1:
+# Project 1: Turing Machine in C
+    ## Version 1:
+    '''
         Standard usage of characters to denote states (Q), alphabet (Sigma), and Tape alphabet (Gamma). In which sense use of string manipluation in C similar to python, slower runtimes but easier to look at
         Uses file I/O to implement free creation of a TM interperter for some arbitrary Turing Machine.
         Fill out a .txt file in this style:
@@ -11,3 +12,4 @@ Project 1: Turing Machine in C
          Turing Machine will be validated before running and user can run indefinite number of tests as they see fit through the command line
          
          Multiple versions (version 2 yet to be made) of Turing machines in C code. Version 1 done using hash tables and explicit characters. Version 2 (to be done) done using encodings of characters into bits (i.e compression) to save space and speed up. 
+    '''

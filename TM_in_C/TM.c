@@ -38,11 +38,19 @@ void free_dict(dict *D) {
     free(D);
 }
 
+void free_sets(sets *s) {
+    for (size_t i = 0; i < s->len; i++) {
+        free(s->set[i]);
+    }
+    free(s->set);
+    free(s);
+}
+
 void free_TM(TM *M) {
     free_dict(M->delta);
-    free(M->Q);
-    free(M->Sigma);
-    free(M->Gamma);
+    free_sets(M->Q);
+    free_sets(M->Sigma);
+    free_sets(M->Gamma);
     free(M);
 }
 
@@ -124,11 +132,43 @@ void insert_dict(dict *D, entry *add) {
     }
 }
 
+
+sets *format(char *str) {
+    size_t count = 0;
+    size_t len = strlen(str);
+    for (size_t i = 0; i < len; i++) {
+        if (str[i] == ' ') count++;
+    }
+    if (str[len-1] != ' ') count++;
+    sets * ret = malloc(sizeof(sets));
+    ret->len = count;
+    char **s = calloc(sizeof(char*), count);
+    count = 0;
+    size_t count2 = 0;
+    char hold[ITEMSIZE];
+    memset(hold, 0, ITEMSIZE);
+    for (size_t i = 0; i < len; i++) {
+        if (str[i] != ' ') {
+            hold[count] = str[i];
+            count +=1;
+        }
+        else {
+            s[count2] = strdup(hold);
+            count2 += 1;
+            count = 0;
+            memset(hold, 0, ITEMSIZE);
+        }
+    }
+    s[ret->len-1] = strdup(hold);
+    ret->set = s;
+    return ret;
+}
+
 TM *make_TM(char *Q, char *Sigma, char *Gamma, entry* delta, size_t dlen, char *q_acc, char *q_rej, char *q0) {
     TM *res = malloc(sizeof(TM));
-    res->Q = Q;
-    res->Sigma = Sigma;
-    res->Gamma = Gamma;
+    res->Q = format(Q);
+    res->Sigma = format(Sigma);
+    res->Gamma = format(Gamma);
     res->delta = make_dict(dlen, delta);
     res->q_acc = q_acc;
     res->q_rej = q_rej;
@@ -411,6 +451,7 @@ void run(TM *M) {
         fgets(test, MAXLINE, stdin);
         if (strcmp(test, "n\n") == 0 || strcmp(test, "N\n") == 0) {
             free_result(res);
+            printf("\nGoodbye!! :)\n");
             break;
         }
         free_result(res);
@@ -444,8 +485,9 @@ entry *add_delta(entry *map, char *q0, char *sym, char *q1, char *nsym, char dir
     return map;
 }
 
-entry *deltafromfile() {
-    printf("Input file containing TM diagram\nof the format (q, sigma : q_new, sigma, direction)\n-->");
+
+TM *tmfromfile() {
+    printf("Input file containing TM diagram\nof the format (q, sigma : q_new, sigma, direction)\nparantheses not included\n-->");
     char *filename = calloc(sizeof(char), MAXLINE);
     if (fgets(filename, MAXLINE, stdin) == NULL) {
         free(filename);
@@ -462,11 +504,40 @@ entry *deltafromfile() {
     free(filename);
     char *line = calloc(sizeof(char), MAXLINE);
 
-    char *state = calloc(sizeof(char),ITEMSIZE);
-    char *sym = calloc(sizeof(char), ITEMSIZE);
-    char *q = calloc(sizeof(char), ITEMSIZE);
-    char *nsym = calloc(sizeof(char), ITEMSIZE);
-    char *dir = calloc(sizeof(char),ITEMSIZE);
+    printf("symbols that should not be in Sigma\nSeparate with ' '\n--> ");
+    if (fgets(line,MAXLINE,stdin) == NULL) {
+        free(line);
+        fclose(fd);
+        printf("Error, at least '_' should not be in Sigma\n");
+        return NULL;
+    }
+    if (strstr(line, "_") == NULL) {
+        printf("Error, at least '_' should not be in Sigma\n");
+        fclose(fd);
+        free(line);
+        return NULL;
+    }
+
+    char Q[MAXLINE];
+    char Sigma[MAXLINE];
+    char Gamma[MAXLINE];
+    char minus[MAXLINE];
+    memset(Q, 0,MAXLINE);
+    memset(Sigma, 0,MAXLINE);
+    memset(Gamma, 0,MAXLINE);
+    memset(minus, 0,MAXLINE);
+    strcpy(minus,line);
+
+    char state[ITEMSIZE];
+    char sym[ITEMSIZE];
+    char q[ITEMSIZE];
+    char nsym[ITEMSIZE];
+    char dir[ITEMSIZE];
+    memset(state,0,ITEMSIZE);
+    memset(sym, 0, ITEMSIZE);
+    memset(q, 0, ITEMSIZE);
+    memset(nsym, 0, ITEMSIZE);
+    memset(dir,0,ITEMSIZE);
     entry *ret = NULL;
     int success = 0;
 
@@ -478,15 +549,28 @@ entry *deltafromfile() {
             break;
         }
         ret = add_delta(ret, state, sym, q, nsym, dir[0]);
-        memset(state, 0, ITEMSIZE);
-        memset(sym, 0, ITEMSIZE);
-        memset(q, 0, ITEMSIZE);
-        memset(nsym, 0, ITEMSIZE);
-        memset(dir, 0, ITEMSIZE);
-        memset(line, 0, MAXLINE);
+        if (strstr(Q, state) == NULL) {
+            strcat(Q, state);
+            strcat(Q, " ");
+        }
+        if (strstr(Q, q) == NULL) {
+            strcat(Q, q);
+            strcat(Q, " ");
+        }
+        if (strstr(Sigma, sym) == NULL && strstr(minus, sym) == NULL) {
+            strcat(Sigma, sym);
+            strcat(Sigma, " ");
+        }
+        if (strstr(Gamma, sym) == NULL) {
+            strcat(Gamma, sym);
+            strcat(Gamma, " ");
+        }
     }
-
-
+    Q[strlen(Q)-1] = '\0';
+    Sigma[strlen(Sigma)-1] = '\0';
+    Gamma[strlen(Gamma)-1] = '\0';
+    TM *M = NULL;
+    
     if (ret != NULL && success == -1) {
         entry *tmp = ret;
         while (tmp != NULL) {
@@ -495,29 +579,31 @@ entry *deltafromfile() {
             tmp = tmp2;
         }
     }
-    free(line); free(state);
-    free(sym); free(q);
-    free(nsym); free(dir);
-
+    else {
+        M = make_TM(Q, Sigma, Gamma, ret, 20, "q_acc", "q_rej","q0");
+    }
+    free(line); 
     fclose(fd);
 
-    return ret;
+    return M;
 
 }
 
 bool in(void *value, void *find, enum type var) {
     if (var == Q || var == SIGMA || var == GAMMA) {
-        char *states = (char*)value;
+        sets *states = (sets*)value;
         char *state = (char *)find;
-        if (strstr(states, state) == NULL) {
-            return false;
+        for (size_t i = 0; i < states->len; i++) {
+            if (strcmp(states->set[i], state) ==  0) return true;
         }
+        return false;
     }
     else {
         dict *D = (dict *)value;
+        char *str = (char*)find;
         char *state = calloc(sizeof(char), MAXLINE);
         char *sym =calloc(sizeof(char), MAXLINE);
-        if (sscanf(find, "%s %s", state, sym) != 2) {
+        if (sscanf(str, "%s %s", state, sym) != 2) {
             free(state);
             free(sym);
             return false;
@@ -543,50 +629,74 @@ bool validate_TM(TM *M) {
     if (M->q0 == NULL) return false;
     if (M->q_acc == NULL) return false;
     if (M->q_rej == NULL) return false;
+    
+    sets *Q = M->Q;
+    sets *S = M->Sigma;
+    sets *G= M->Gamma;
+    
+    if (Q->len == 0 || S->len == 0 || G->len == 0) return false;
+    if (strcmp(M->q_acc, M->q_rej) == 0) return false;
+    if (G->len <= S->len) return false;
 
-    size_t slen = strlen(M->Sigma);
-    size_t glen = strlen(M->Gamma);
-    size_t qlen = strlen(M->Q);
-    if (slen == 0 || glen == 0 || qlen == 0) return false;
-    if (strcmp(M->q_acc,M->q_rej) == 0) return false;
-    if (slen >= glen) return false;
+    size_t chk = 0;
+    for (size_t i = 0; i < Q->len; i++) {
+        if (strcmp(Q->set[i], M->q0) == 0) chk+=1;
+        if (strcmp(Q->set[i], M->q_acc) == 0) chk+=1;
+        if (strcmp(Q->set[i], M->q_rej) == 0) chk +=1;
+    }
+    if (chk != 3) return false;
+  
 
-    if(strstr(M->Q,M->q0) == NULL || strstr(M->Q,M->q_acc) == NULL 
-        || strstr(M->Q,M->q_rej) == NULL) {
-        return false;
+    for (size_t i = 0; i < S->len; i++) {
+            if (!in((void*)G, (void*)S->set[i], GAMMA)) return false;
     }
 
-    if(strstr(M->Gamma,M->Sigma) == NULL) return false;
-    if(strstr(M->Q, M->Gamma) != NULL) return false;
+    bool chk2 = false;
+    for (size_t i = 0; i < G->len; i++) {
+        if (!in((void*)S, (void*)G->set[i], SIGMA)) chk2 = true;
+    }
+    if (!chk2) return false;
+    if (!in((void*)G, (void*)"_", GAMMA)) return false;
+    if (in((void*)S, (void*)"_", SIGMA)) return false;
 
-    size_t i = 0;
+    bool halt = false;
     char hold[ITEMSIZE];
-    char hold2[ITEMSIZE];
     memset(hold, 0, ITEMSIZE);
-    memset(hold2, 0, ITEMSIZE);
-    strcat(hold, M->q_acc);
-    strcat(hold, M->q_rej);
-    strcat(hold, " ");
-    strcat(hold2, " ");
-    size_t len = strlen(hold);
-    size_t len2 = strlen(hold2);
-    size_t j = len;
-    size_t k = len2;
-    char *g = M->Gamma;
-    while (g[i] != '\0') {
-        if (g[i] == ' ') {
-            if (in((void*)M->delta, (void*)hold, DELTA)) return false;
-            if (in((void*)M->delta, (void*)hold, DELTA)) return false;
-            j = len;
-            k = len2;
+    for (size_t i = 0; i < G->len; i++) {
+        for (size_t j = 0; j < Q->len; j++) {
+            if (strcmp(Q->set[j], M->q_acc) != 0 && strcmp(Q->set[j], M->q_rej) != 0) {
+                sprintf(hold, "%s %s", Q->set[j], G->set[i]);
+                if (in((void*)M->delta, (void*)hold, DELTA)) {
+                    entry *ent = search_dict(M->delta, Q->set[j], G->set[i]);
+                    int count = -1;
+                    if (strcmp(M->q_acc, ent->q_new) == 0 || strcmp(M->q_rej, ent->q_new) == 0) halt = true;
+                    for (size_t l = 0; l < Q->len; l++) {
+                        if (strcmp(Q->set[l], ent->q_new) == 0) count = 1;
+                    }
+                    if (count == -1) return false;
+                    if (!in((void*)G, (void*)ent->sym_new, GAMMA)) return false;
+                    if (ent->dir != 'R' && ent->dir != 'L') return false;
+                }
+                else {
+                    return false;
+                }
+                memset(hold, 0, ITEMSIZE);
+            }
         }
-        else {
-            hold[j] = g[i];
-            hold2[k] = g[i];
-        }
-        i += 1;
-        j += 1;
-        k += 1;
     }
+    if (!halt && strcmp(M->q0, M->q_acc) !=0 && strcmp(M->q0, M->q_rej) != 0) return false;
+
+    memset(hold, 0, ITEMSIZE);
+    char hold2[ITEMSIZE];
+    memset(hold2, 0, ITEMSIZE);
+    for (size_t i = 0; i < G->len; i++) {
+        sprintf(hold, "%s %s", M->q_acc, G->set[i]);
+        sprintf(hold2, "%s %s", M->q_rej, G->set[i]);
+        if (in((void*)M->delta, (void*)hold, DELTA)) return false;
+        if (in((void*)M->delta, (void*)hold2, DELTA)) return false;
+        memset(hold,0,ITEMSIZE);
+        memset(hold2,0,ITEMSIZE);
+    }
+
     return true;
 }

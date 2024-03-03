@@ -53,12 +53,17 @@ struct dict {
     entry **mappings;
 };
 
+typedef struct sets sets;
+struct sets {
+    char **set;
+    size_t len;
+};
 
 typedef struct TM TM;
 struct TM {
-    char *Q;
-    char *Sigma;
-    char *Gamma;
+    sets *Q;
+    sets *Sigma;
+    sets *Gamma;
     dict *delta;
     char *q_acc;
     char *q_rej;
@@ -169,7 +174,7 @@ bool valid_string(char *chk);
 size_t steps(char *str);
 char *in_string(char *str);
 void run(TM *M);
-entry *deltafromfile();
+TM *tmfromfile();
 
 config *simulate_step(TM *M, config *curr_conf);
 tm_result *TM_interpreter(TM *M, char *string, size_t k);

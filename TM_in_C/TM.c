@@ -13,9 +13,6 @@
 
 
 
-
-
-
 void free_entry(entry *ent) {
     free(ent->state);
     free(ent->sym);
@@ -391,7 +388,6 @@ bool valid_string(char *chk, sets* gam) {
 
     size_t i = 0;
     while ((chk+i) != mid) {
-        //!in((void*)gam, (void*)(&chk[i]), CHAR)
         if (!in((void*)gam, (void*)(&chk[i]), CHAR)) {
             return false;
         }
@@ -606,10 +602,11 @@ bool in(void *value, void *find, enum type var) {
     else if (var == CHAR) {
         sets *states = (sets*)value;
         char *chg = (char*)find;
-        char val = chg[0];
-        assert(strlen(&val) == 1);
+        char val[2];
+        memset(val, 0, 2);
+        strncpy(val, chg, 1);
         for (size_t i = 0; i < states->len; i++) {
-            if (strcmp(states->set[i], &val) == 0) return true;
+            if (strcmp(states->set[i], val) == 0) return true;
         }
         return false;
     }
@@ -676,7 +673,6 @@ bool validate_TM(TM *M) {
     bool halt = false;
     char hold[ITEMSIZE];
     memset(hold, 0, ITEMSIZE);
-    printf("Gets here!\n");
     for (size_t i = 0; i < G->len; i++) {
         for (size_t j = 0; j < Q->len; j++) {
             if (strcmp(Q->set[j], M->q_acc) != 0 && strcmp(Q->set[j], M->q_rej) != 0) {

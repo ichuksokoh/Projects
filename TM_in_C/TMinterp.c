@@ -10,7 +10,7 @@
 
 
 int main() {
-    printf("\n\n Weclome to TM tester!!! \n\n");
+    printf("@@@@@@@@@@@@@@@@@\n\n Weclome to TM tester!!! \n\n@@@@@@@@@@@@@@@@@\n");
 
     TM *M = tmfromfile();
     if (M == NULL) {

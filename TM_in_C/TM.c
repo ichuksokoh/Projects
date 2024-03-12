@@ -382,7 +382,7 @@ void print_tuple(tm_result* P) {
     free(val);
 }
 
-bool valid_string(char *chk) {
+bool valid_string(char *chk, sets* gam) {
     if (chk == NULL) return false;
     size_t len = strlen(chk);
     if (len == 0) return false;
@@ -391,7 +391,8 @@ bool valid_string(char *chk) {
 
     size_t i = 0;
     while ((chk+i) != mid) {
-        if (chk[i] != '1' && chk[i] != '0') {
+        //!in((void*)gam, (void*)(&chk[i]), CHAR)
+        if (!in((void*)gam, (void*)(&chk[i]), CHAR)) {
             return false;
         }
         i += 1;
@@ -422,6 +423,10 @@ char *in_string(char *str) {
 
 
 void run(TM *M) {
+    if (!validate_TM(M)) {
+        printf("Error: Invalid TM\n");
+        return;
+    }
     char *test = calloc(sizeof(char), MAXLINE);
     while(true) {
         printf("Separate testcase and number of steps ran with ','\n");
@@ -432,8 +437,8 @@ void run(TM *M) {
             break;
         }
         test[strlen(test)-1] = '\0';
-        if (!valid_string(test)) {
-            printf("Error reading Test Case 2\n");
+        if (!valid_string(test,M->Gamma)) {
+            printf("Error: Invalid form of Test Case\n");
             break;
         }
         char *input = in_string(test);
@@ -504,7 +509,7 @@ TM *tmfromfile() {
     free(filename);
     char *line = calloc(sizeof(char), MAXLINE);
 
-    printf("symbols that should not be in Sigma\nSeparate with ' '\n--> ");
+    printf("IMPORTANT:\nInput symbols that should not be in Sigma\nSeparate with ' '\n--> ");
     if (fgets(line,MAXLINE,stdin) == NULL) {
         free(line);
         fclose(fd);
@@ -598,6 +603,16 @@ bool in(void *value, void *find, enum type var) {
         }
         return false;
     }
+    else if (var == CHAR) {
+        sets *states = (sets*)value;
+        char *chg = (char*)find;
+        char val = chg[0];
+        assert(strlen(&val) == 1);
+        for (size_t i = 0; i < states->len; i++) {
+            if (strcmp(states->set[i], &val) == 0) return true;
+        }
+        return false;
+    }
     else {
         dict *D = (dict *)value;
         char *str = (char*)find;
@@ -629,7 +644,6 @@ bool validate_TM(TM *M) {
     if (M->q0 == NULL) return false;
     if (M->q_acc == NULL) return false;
     if (M->q_rej == NULL) return false;
-    
     sets *Q = M->Q;
     sets *S = M->Sigma;
     sets *G= M->Gamma;
@@ -662,6 +676,7 @@ bool validate_TM(TM *M) {
     bool halt = false;
     char hold[ITEMSIZE];
     memset(hold, 0, ITEMSIZE);
+    printf("Gets here!\n");
     for (size_t i = 0; i < G->len; i++) {
         for (size_t j = 0; j < Q->len; j++) {
             if (strcmp(Q->set[j], M->q_acc) != 0 && strcmp(Q->set[j], M->q_rej) != 0) {

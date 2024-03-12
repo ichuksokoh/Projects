@@ -23,7 +23,8 @@ enum type {
     Q,
     SIGMA,
     GAMMA,
-    DELTA
+    DELTA,
+    CHAR
 };
 
 enum Result {
@@ -170,7 +171,7 @@ tm_result *make_result(confpath *P, enum Result done);
 
 
 void print_tuple(tm_result *P);
-bool valid_string(char *chk);
+bool valid_string(char *chk, sets *gam);
 size_t steps(char *str);
 char *in_string(char *str);
 void run(TM *M);

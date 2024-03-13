@@ -274,9 +274,8 @@ char *splice(char *a, char *b, int form) {
     return hold;
 }
 
-tm_result *TM_interpreter(TM *M, char *string, size_t k) {
-    if (strlen(string) > 145) return NULL;
-    if (!validate_TM(M)) return NULL;
+tm_result *TM_interpreter(TM *M, char *string, int k) {
+    if (strlen(string) > 400) return NULL;
     char *pass = calloc(sizeof(char), 2);
     char *pass2 = calloc(sizeof(char), strlen(string)+2);
     strcpy(pass2, string);
@@ -285,7 +284,6 @@ tm_result *TM_interpreter(TM *M, char *string, size_t k) {
     free(pass2);
     confpath *ret = create_confpath();
     size_t count = 0;
-
     while (true) {
         add_confpath(ret, init);
         if (strcmp(init->q, M->q_acc) == 0) {
@@ -384,7 +382,15 @@ bool valid_string(char *chk, sets* gam) {
     size_t len = strlen(chk);
     if (len == 0) return false;
     char *mid = strstr(chk, ",");
-    if (mid == NULL) return false;
+    if (mid == NULL) {
+        size_t len = strlen(chk);
+        for (size_t i = 0; i < len; i++) {
+            if (!in((void*)gam, (void*)(&chk[i]), CHAR)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     size_t i = 0;
     while ((chk+i) != mid) {
@@ -401,18 +407,28 @@ bool valid_string(char *chk, sets* gam) {
     return true;
 }
 
-size_t steps(char *str) {
+int steps(char *str) {
     char *find = strstr(str, ",");
+    if (find == NULL) return -1;
     find +=1;
-    return (size_t)atoi(find);
+    int ret = atoi(find);
+    return ret;
 }
 
 char *in_string(char *str) {
     char *ret = calloc(sizeof(char), MAXLINE);
     size_t i = 0;
-    while (str[i] != ',') {
-        ret[i] = str[i];
-        i += 1;
+    if (strstr(str, ",") != NULL) {
+        while (str[i] != ',') {
+            ret[i] = str[i];
+            i += 1;
+        }
+    }
+    else {
+        size_t len = strlen(str);
+        for (size_t j = 0; j < len; j++) {
+            ret[j] = str[j];
+        }
     }
     return ret;
 }
@@ -425,24 +441,28 @@ void run(TM *M) {
     }
     char *test = calloc(sizeof(char), MAXLINE);
     while(true) {
-        printf("Separate testcase and number of steps ran with ','\n");
-        printf("Input Test Case: ");
-        if (fgets(test,MAXLINE, stdin) == NULL) {
-            printf("%s\n", test);
-            printf("Error reading Test Case 1\n");
-            break;
-        }
-        test[strlen(test)-1] = '\0';
-        if (!valid_string(test,M->Gamma)) {
-            printf("Error: Invalid form of Test Case\n");
-            break;
-        }
+        L3:
+            printf("Input string as follows ex. '10011' if number of \nsteps, k, is not included");
+            printf("if number of steps k is included\n");
+            printf("Separate testcase and number of steps ran with ','; ex. '10011,251'\n");
+            printf("Input Test Case: ");
+            if (fgets(test,MAXLINE, stdin) == NULL) {
+                printf("%s\n", test);
+                printf("Error reading Test Case 1\n");
+                break;
+            }
+            test[strlen(test)-1] = '\0';
+            if (!valid_string(test,M->Gamma)) {
+                system("clear");
+                printf("Error: Invalid form of Test Case\n\n\n");
+                goto L3;
+            }
         char *input = in_string(test);
         tm_result *res = TM_interpreter(M, input, steps(test));
         if (res == NULL) {
             free(input);
-            printf("Error: Invalid TM\n");
-            break;
+            printf("Error: input string too long\n\n\n");
+            goto L3;
         }
         free(input);
         print_tuple(res);
@@ -488,36 +508,35 @@ entry *add_delta(entry *map, char *q0, char *sym, char *q1, char *nsym, char dir
 
 
 TM *tmfromfile() {
-    printf("Input file containing TM diagram\nof the format (q, sigma : q_new, sigma, direction)\nparantheses not included\n-->");
-    char *filename = calloc(sizeof(char), MAXLINE);
-    if (fgets(filename, MAXLINE, stdin) == NULL) {
-        free(filename);
-        printf("Error, no filename given\n");
-        return NULL;
-    }
+        char *filename = calloc(sizeof(char), MAXLINE);
+    L1:
+        printf("Input file containing TM diagram\nof the format (q, sigma : q_new, sigma, direction)\nparantheses not included\n-->");
+        if (fgets(filename, MAXLINE, stdin) == NULL) {
+            printf("ERROR: no filename given\n\n\n");
+            goto L1;
+        }
     filename[strlen(filename)-1] = '\0';
 
     FILE *fd = fopen(filename, "r");
     if (fd == NULL) {
-        free(filename);
-        return NULL;
+        system("clear");
+        printf("ERROR: no filename given or file does not exist\n\n\n");
+        goto L1;
     }
     free(filename);
     char *line = calloc(sizeof(char), MAXLINE);
-
-    printf("IMPORTANT:\nInput symbols that should not be in Sigma\nSeparate with ' '\n--> ");
-    if (fgets(line,MAXLINE,stdin) == NULL) {
-        free(line);
-        fclose(fd);
-        printf("Error, at least '_' should not be in Sigma\n");
-        return NULL;
-    }
-    if (strstr(line, "_") == NULL) {
-        printf("Error, at least '_' should not be in Sigma\n");
-        fclose(fd);
-        free(line);
-        return NULL;
-    }
+    L2:
+        printf("IMPORTANT:\nInput symbols that should not be in Sigma\nSeparate with ' '\n--> ");
+        if (fgets(line,MAXLINE,stdin) == NULL) {
+            system("clear");
+            printf("Error, at least '_' should not be in Sigma\n\n\n");
+            goto L2;
+        }
+        if (strstr(line, "_") == NULL) {
+            system("clear");
+            printf("Error, at least '_' should not be in Sigma\n\n\n");
+            goto L2;
+        }
 
     char Q[MAXLINE];
     char Sigma[MAXLINE];

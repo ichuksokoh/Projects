@@ -339,8 +339,9 @@ bool valid_string(char *chk, sets *gam);
  * @brief returns the number of steps client wants to run an input
  * obtained from the test case input
  * @param str test case from which number of steps are obtained
+ * @return number of steps if given if not -1
 */
-size_t steps(char *str);
+int steps(char *str);
 
 /**
  * @brief obtains the input string that is passed to the TM to run from a testcase
@@ -383,6 +384,6 @@ config *simulate_step(TM *M, config *curr_conf);
  * @param k number of steps to run TM M
  * @return result of running TM
 */
-tm_result *TM_interpreter(TM *M, char *string, size_t k);
+tm_result *TM_interpreter(TM *M, char *string, int k);
 
 

@@ -275,7 +275,7 @@ char *splice(char *a, char *b, int form) {
 }
 
 tm_result *TM_interpreter(TM *M, char *string, int k) {
-    if (strlen(string) > 400) return NULL;
+    if (strlen(string) > 175) return NULL;
     char *pass = calloc(sizeof(char), 2);
     char *pass2 = calloc(sizeof(char), strlen(string)+2);
     strcpy(pass2, string);

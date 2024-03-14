@@ -11,8 +11,6 @@
 
 
 
-
-
 void free_entry(entry *ent) {
     free(ent->state);
     free(ent->sym);

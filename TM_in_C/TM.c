@@ -9,6 +9,15 @@
 #define MAXLINE 2048
 #define ITEMSIZE 25
 
+#ifdef _WIN32
+    const char *clear = "cls";
+#elif __APPLE__
+    const char *clear = "clear";
+#elif __linux__
+    const char *clear = "clear";
+#elif __unix__
+    const char *clear = "clear";
+#endif
 
 
 void free_entry(entry *ent) {
@@ -451,7 +460,7 @@ void run(TM *M) {
             }
             test[strlen(test)-1] = '\0';
             if (!valid_string(test,M->Gamma)) {
-                system("clear");
+                system(clear);
                 printf("Error: Invalid form of Test Case\n\n\n");
                 goto L3;
             }
@@ -517,7 +526,7 @@ TM *tmfromfile() {
 
     FILE *fd = fopen(filename, "r");
     if (fd == NULL) {
-        system("clear");
+        system(clear);
         printf("ERROR: no filename given or file does not exist\n\n\n");
         goto L1;
     }
@@ -526,12 +535,12 @@ TM *tmfromfile() {
     L2:
         printf("IMPORTANT:\nInput symbols that should not be in Sigma\nSeparate with ' '\n--> ");
         if (fgets(line,MAXLINE,stdin) == NULL) {
-            system("clear");
+            system(clear);
             printf("Error, at least '_' should not be in Sigma\n\n\n");
             goto L2;
         }
         if (strstr(line, "_") == NULL) {
-            system("clear");
+            system(clear);
             printf("Error, at least '_' should not be in Sigma\n\n\n");
             goto L2;
         }

@@ -11,11 +11,7 @@
 
 #ifdef _WIN32
     const char *clear = "cls";
-#elif __APPLE__
-    const char *clear = "clear";
-#elif __linux__
-    const char *clear = "clear";
-#elif __unix__
+#else
     const char *clear = "clear";
 #endif
 

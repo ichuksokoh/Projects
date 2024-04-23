@@ -24,6 +24,7 @@
 
 using namespace std;
 
+    //config struct
     struct uqv {
         string u;
         string q;
@@ -31,6 +32,7 @@ using namespace std;
     };
 
 
+//class used to maintain visited configs
 class config {
     list<uqv> path;
     string result;
@@ -78,6 +80,8 @@ class config {
 
 };
 
+
+//class to maintain buckets in dictionary hash table when collisions occur
 class bucket {
     void format(string all) {
         const char *s = all.c_str();
@@ -136,6 +140,8 @@ class bucket {
         
 };
 
+
+//dictionary used to store delta mappings
 class dict {
         size_t hash(string str) {
             unsigned long hash = 5381;
@@ -203,7 +209,10 @@ class dict {
 
 };
 
-
+/**
+ * Turing machine class contains seven-tuple
+ * making up turing machines
+*/
 class TM {
 
     public:
@@ -375,6 +384,7 @@ bool valid_syms(string& str) {
     return true;
 }
 
+
 void tmfromfile(TM& m) {
     L3:
         cout << "File please!" << endl;
@@ -419,6 +429,7 @@ void run(TM& m) {
         cout << "Invalid TM fix and try again \n";
         return;
     }
+    //run TM interpreter until client is satisfied with test cases
     while(true) {
         L1:
             string input;

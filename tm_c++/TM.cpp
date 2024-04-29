@@ -18,6 +18,9 @@
 #include <stack>
 #include <assert.h>
 #include <algorithm>
+#include <chrono>
+#include <future>
+#include <thread>
 
 #define MAXLINE 1024
 #define TABLESIZE 30
@@ -58,10 +61,10 @@ class config {
             cout << "[";
             for (auto i :path) {
                 if (i.u != path.back().u and i.q != path.back().q and i.v != path.back().v) {
-                    cout << "(" << i.u + "," + i.q + "," + i.v << "), ";
+                    cout << "(" << i.u << "," << i.q + "," << i.v << "), ";
                 }
                 else {
-                    cout << "("+ i.u + "," + i.q + "," + i.v + ")";
+                    cout << "(" << i.u << "," + i.q << "," << i.v << ")";
                 }
             }
             cout << "] " << result << endl;
@@ -209,6 +212,7 @@ class dict {
 
 };
 
+
 /**
  * Turing machine class contains seven-tuple
  * making up turing machines
@@ -216,6 +220,7 @@ class dict {
 class TM {
 
     public:
+
         set<string> Q;
         set<string> sigma;
         set<string> gamma;
@@ -377,13 +382,22 @@ class TM {
         }
 };
 
+vector<future<void>> m_futures;
 
-bool valid_syms(string& str) {
+
+bool valid_syms(std::string& str) {
     if (str.empty()) return false;
     if (str.find('_') == string::npos) return false;
     return true;
 }
 
+static mutex add_tmMutex;
+
+static void add_tm(TM& m, string line) {
+    lock_guard<mutex> lock(add_tmMutex);
+    m.delta.insert(line);
+    m.setter(line);
+}
 
 void tmfromfile(TM& m) {
     L3:
@@ -402,10 +416,14 @@ void tmfromfile(TM& m) {
                 cout << "Symbols not in Sigma should at least contain '_' \n";
                 goto L2;
             }
+            auto start = chrono::high_resolution_clock::now();
             while(getline(f,line, '\n')) {
-                    m.delta.insert(line);
-                    m.setter(line);
+                    m_futures.push_back(std::async(launch::async,add_tm,std::ref(m),line));
             }
+            auto end = chrono::high_resolution_clock::now();
+            chrono::duration<double> duration = end - start;
+            cout << "\n...\n...\nExecution time to create TM from file: ";
+            cout << duration.count() << "\n...\n..." << endl;
         }
         else {
             cout << "File Not Found\n";
@@ -467,10 +485,7 @@ void run(TM& m) {
             });
             if (term.find(cont) != string::npos) return;
             else {
-                if (nterm.find(cont) != string::npos) {
-                    
-                }
-                else {
+                if (nterm.find(cont) == string::npos) {
                     cout << "Try Again\n";
                     goto L2;
                 }
@@ -484,6 +499,7 @@ void run(TM& m) {
 int main () {
 
 TM some;
+// std::this_thread::sleep_for(chrono::seconds(2));
 tmfromfile(some);
 run(some);
 cout << "Done ;)\n";

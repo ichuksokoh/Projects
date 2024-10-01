@@ -42,7 +42,7 @@ function MainPage({ goTo, chgState }) {
                         <div key={i} className="flex flex-col justify-start items-start"
                             onClick={() => {
                                 goTo(title);
-                                setTimeout(() => {chgState(2)}, 200);
+                                setTimeout(() => {chgState(2)}, 100);
                             }}
                         >
                             <span className="font-bold text-xl">{title}</span>

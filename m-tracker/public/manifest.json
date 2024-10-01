@@ -3,28 +3,29 @@
   "version": "1.0",
   "short_name": "Lzyt",
   "name": "Lazy Tracker",
-  "description": "A Chrome extension built with React.",
+  "description": "Manga/Manhwa Tracker for all your lazy needs! Please stay on series page initally so Tracker can Store manhwa",
   "action": {
     "default_popup": "index.html",
-    "default_title": "Manhwas!",
+    "default_title": "Manga/Manhwas!",
     "default_icon": {
-      "16": "favicon.ico",
-      "48": "logo192.png",
-      "128": "logo512.png"
+      "16": "LazyTrackerSym3.png",
+      "48": "LazyTrackerSym2.png",
+      "128": "LazyTrackerSym.png"
     }
   },
   "permissions": [
     "storage",
-    "activeTab",
-    "scripting",
-    "tabs"
+    "activeTab"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://asuracomic.net/*", 
+      "http://asuracomic.net/", "https://flamecomics.me/*", "http://flamecomics.me/*",
+      "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
+        "https://chapmanganato.to/*"],
       "js": ["content.js"]
     }
   ]

@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
 
-function Current({ Title }) {
+function Current({ Title, onDelete, chgState }) {
     const [selectedOption, setSelectedOption] = useState(''); // State to hold the selected option
     const [marked, setMarked] = useState(false);
     const [manhwa, setManhwa] = useState({});
@@ -15,11 +15,17 @@ function Current({ Title }) {
     const upload = () => {
         if (marked) {
             manhwa.chapters[selectedOption].read = true;
-            console.log(manhwa.chapters[selectedOption]);
             chrome.storage.local.set({ [manhwa.title]: manhwa });
             setMarked(false);
         }
     }
+
+    const toDelete = () => {
+        onDelete(manhwa.title);
+        setTimeout(() => {
+            chgState(0);
+        }, 10);
+    };
 
     const readChps = () =>  {
         let lastRead = 0;
@@ -31,6 +37,7 @@ function Current({ Title }) {
         return lastRead;
     }
     useEffect(() => {
+        console.log(Title);
         const fetchChps = async () => {
             const result = await new Promise((resolve) => {
                 chrome.storage.local.get([Title], (result) => {
@@ -40,7 +47,6 @@ function Current({ Title }) {
 
             if (result) {
                 setManhwa(result);
-                console.log(result);
             }
         };
         fetchChps();
@@ -58,8 +64,10 @@ function Current({ Title }) {
                 <span className="text-xl font-bold">{Title}</span>
                 <div className="flex flex-row items-start justify-center">
                     <img alt="Title for manhwa here..." className="max-w-48 max-h-96 rounded-md" src={manhwa.img}/>
-                    <div className='flex flex-col items-start'>
-                        <p className="text-xs text-left p-2">{manhwa.description}</p>
+                    <div className='flex flex-col items-start p-2'>
+                        <div className="overflow-y-scroll no-scrollbar max-h-32 bg-gray-600 text-white rounded-lg">
+                            <p className="text-xs text-left p-2">{manhwa.description}</p>
+                        </div>
                         <p className="text-xl text-white font-bold">Chapters Read: {chpsRead}</p>
                     </div>
                 </div>
@@ -86,14 +94,26 @@ function Current({ Title }) {
                     })
                 }
             </select>
-            {selectedOption && <p className="mt-2 text-white">You selected: {selectedOption}</p>}
-            <button
-                type="button"
-                className="rounded-md min-w-16 mt-2 min-h-8 duration-200 ease-out active:scale-90 hover:bg-stone-700 bg-stone-500"
-                onClick={upload}
-            >
-                Read
-            </button>
+            {selectedOption && <p className="mt-2 text-white">You selected: {manhwa?.chapters[selectedOption].chapter}</p>}
+            <div className="flex flex-col items-start p-2">
+                <button
+                    type="button"
+                    className="rounded-md min-w-16 mt-2 min-h-8 duration-200 ease-out active:scale-90 hover:bg-stone-700 bg-stone-500"
+                    onClick={upload}
+                >
+                    Read
+                </button>
+                <div className="flex justify-center min-w-[475px]">
+                    <button
+                        type="button"
+                        className="rounded-md bg-stone-500 hover:bg-stone-700 active:scale-90 ease-out duration-200
+                            min-w-16 min-h-8 font-bold"
+                        onClick={toDelete}
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

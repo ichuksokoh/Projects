@@ -213,12 +213,12 @@ const scrapeMangago = () => {
 
         //get title
         const titleElem = tempDiv.querySelector('div.w-title');
-        const manhwaTitle = titleElem ? titleElem.textContent : "";
+        const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
         //get number of chapters
         const chpNum = tempDiv.querySelectorAll('a.chico');
 
-        chpNum.forEach((chp) => {
+        chpNum?.forEach((chp) => {
             const chpNumElem = chp ? chp.textContent.trim() : null;
             if (chpNumElem) {
                 manhwaList.push({ chapter: chpNumElem, read: false });
@@ -226,9 +226,13 @@ const scrapeMangago = () => {
         })
 
         //get cover art
+        const primeImgElem = tempDiv.querySelector('div.left.cover');
         const imgElem = tempDiv.querySelector('img.loading');
         const imgElem2 = tempDiv.querySelector('img.loaded');
-        const imgUrl = imgElem ? imgElem.getAttribute('src') : imgElem2 ? imgElem2.getAttribute('src') : "";
+        const primeImg = primeImgElem ? primeImgElem.querySelector('img.loading') : null;
+        const primeImg2 = primeImgElem ? primeImgElem.querySelector('img.loaded') : null;
+        const flat = primeImg ? primeImg : primeImg2 ? primeImg2 : null;
+        const imgUrl = flat ? flat.getAttribute('src') : imgElem ? imgElem.getAttribute('src') : imgElem2 ? imgElem2.getAttribute('src') : "";
 
         //get description
         const descriptElem = tempDiv.querySelector('div.manga_summary');
@@ -253,8 +257,8 @@ const scrapeManganato = () => {
 
        //get title
        const containerTitle = tempDiv.querySelector('div.story-info-right');
-       const titleElem = containerTitle.querySelector('h1');
-       const manhwaTitle = titleElem ? titleElem.textContent.trim() : "";
+       const titleElem = containerTitle ? containerTitle.querySelector('h1') : null;
+       const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
        //get num of chpaters
        const ChpElems = tempDiv.querySelectorAll('a.chapter-name');
@@ -267,7 +271,7 @@ const scrapeManganato = () => {
 
        //get cover art
        const imgContainer = tempDiv.querySelector('span.info-image')
-       const imgElem = imgContainer.querySelector("img.img-loading");
+       const imgElem = imgContainer ? imgContainer.querySelector("img.img-loading") : null ;
        const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
        
        //get manhwa description
@@ -292,12 +296,11 @@ const scrapeReaperScans = () => {
 
        //get title
        const titleElem = tempDiv.querySelector('h1.text-xl.text-foreground.font-bold.text-center');
-       const manhwaTitle = titleElem ? titleElem.textContent.trim() : "";
+       const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
        //get number of chapters
        const chpElem = tempDiv.querySelectorAll("span.text-muted-foreground.line-clamp-1");
-       let chpnum =  0;
-       chpnum = Number(chpElem[1].textContent.trim());
+       let chpnum = chpElem ? Number(chpElem[1]?.textContent.trim()): 0;
        for (let i = 0; i < chpnum; i++ ) {
         manhwaList.push({ chapter: "Chapter " + String(i+1), read: false });
        }
@@ -324,8 +327,6 @@ const scrapeReaperScans = () => {
     // Run the scraping functions
     const domain = getDomain();
     const hostname = window.location.href;
-    console.log(hostname);    
-    console.log(hostname.length);    
 
 
     let title = "";

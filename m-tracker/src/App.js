@@ -4,6 +4,7 @@ import MainPage from './MainPage';
 import Current from './Current';
 import clsx from 'clsx';
 import Manhwa from './Manhwa';
+import Popup from './Components/Popup';
 
 function App() {
   
@@ -15,15 +16,51 @@ function App() {
   const [query, setQuery] =  useState("");
   const [select, setSelect] = useState(false);
   const [deleteList, setDList] = useState([]);
+  const [trigDel, setTrig] = useState(false);
+  const [confirm, setConfirm] = useState(false);
 
   const control = (n) => {
     if (n >= 0 && n <= 2) {
       setState(n);
     }
-  }
-
-
-
+  };  
+  
+  
+  useEffect(() => {
+    const fetchTitle = async () => {
+      return new Promise((resolve) => {
+        chrome.runtime.sendMessage({ type: 'getTitle' }, (response) => {
+          if (response && response.title) {
+            resolve(response.title);
+          } else {
+            resolve(""); // Resolve with empty string if no title is found
+          }
+        });
+      });
+    };
+  
+    const checkTitle = async (val) => {
+      return new Promise((resolve) => {
+        chrome.storage.local.get([val], (response) => {
+          if (Object.keys(response).length === 0) {
+            resolve(""); // Resolve with empty string if not found
+          } else {
+            resolve(val); // Resolve with the title if found
+          }
+        });
+      });
+    };
+  
+    const handleTitle = async () => {
+      const titleFromFetch = await fetchTitle();
+      const titleToCheck = titleFromFetch ? await checkTitle(titleFromFetch) : ""; // Check the title if it exists
+      setTitle(titleToCheck); // Set the title based on the check
+    };
+  
+    handleTitle();
+  }, []);
+  
+  
   useEffect(() => {
     const deleteTitle = async () => {
       const result = await new Promise((resolve) => {
@@ -33,9 +70,6 @@ function App() {
         });
         resolve(deleted);
       });
-      if (result) {
-        console.log("deleted: ", titleToDelete);
-      }
     };
 
     deleteTitle();
@@ -44,26 +78,51 @@ function App() {
     }
     setDelete("");
 
-  }, [titleToDelete,title])
+  }, [titleToDelete,title]);
 
 
   useEffect(() => {
-    const fetchTitle = async () => {
-      const result = await new Promise((resolve) => {
-        chrome.runtime.sendMessage({type: 'getTitle' }, (response) => {
-          if (response && response.title) {
-            resolve(response.title);
-          }
-        });
+    const deleteTitles = async () => {
+      const listOfDel = await new Promise((resolve) => {
+        let deletedTitles = [];
+        if (deleteList.length !== 0) {
+          let deletionPromises = deleteList.map((mtitle) => {
+            return new Promise((resDel) => {
+              chrome.storage.local.remove([mtitle], () => {
+                deletedTitles.push(mtitle);
+                resDel(); // Resolve the promise for each deletion
+              });
+            });
+          });
+  
+          // Wait for all deletions to complete
+          Promise.all(deletionPromises).then(() => {
+            resolve(deletedTitles);
+          });
+        } else {
+          resolve([]); // If no titles to delete
+        }
       });
-      if (result) {
-        setTitle(result);
+  
+      if (listOfDel.length > 0) {
+        if (listOfDel.includes(title)) {
+          setPsibl(true);
+        }
       }
+    };
+  
+    if (trigDel) {
+      deleteTitles();
+      setState(0);
     }
+  }, [trigDel]);
+  
 
-    fetchTitle();
-
-  },[])
+  useEffect(() => {
+    if (trigDel) {
+      setTrig(false);
+    }
+  },[select]);
 
 
   return (
@@ -103,6 +162,7 @@ function App() {
         </div>
       {state === 0 &&  
         <div className="bg-slate-500 p-4 flex flex-row space-x-8">
+          {confirm && <Popup toDelete={() => {setTrig(true); setSelect(false)}} setConfirm={setConfirm}/> }
           <input value={query} placeholder='Manga/Manhwa Name...' 
             className="min-w-64 min-h-8 text-white bg-gray-400 
               rounded-lg p-2 border-none placeholder:text-white focus:outline-none focus:shadow-md focus:shadow-stone-300"
@@ -120,6 +180,7 @@ function App() {
             className="rounded-md min-w-8 min-h-4 font-bold
              bg-red-900 text-white p-2 active:scale-90 hover:bg-red-950 ease-out duration-200
               transform translate-x-1/2"
+              onClick={() => {if (deleteList.length !== 0) setConfirm(true)}}
           >
             Delete
           </button>}
@@ -129,11 +190,11 @@ function App() {
       </div>
         <div className="flex-grow overflow-y-scroll no-scrollbar">
             {state === 0 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-            selected={select} toBeDeleted={deleteList} />}
+            selected={select} setDList={setDList} trigDel={trigDel} />}
 
             {state === 1 && !ifDelete && title !== "" && <Current Title={title} 
               onDelete={setDelete} chgState={setState}/>}
-              
+
             {state === 2 && <Manhwa Title={title2} onDelete={setDelete} chgState={setState}/>}
         </div>
     </div>

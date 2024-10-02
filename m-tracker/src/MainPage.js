@@ -1,12 +1,14 @@
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
+import Card from "./Components/Card";
+import clsx from "clsx";
 
 
 
-function MainPage({ goTo, chgState, query, selected, toBeDeleted }) {
-    // const [msg, setMsg] = useState("Stuff");
+function MainPage({ goTo, chgState, query, selected, setDList, trigDel }) {
     const [list, setList] = useState([]);
     const [filterOpts, setFilterOpts] = useState([]);
+    const [selectBoxes, setBoxes] = useState([]);
 
     useEffect(() => {
         setFilterOpts(list.filter((manhwa) => manhwa.title.toLowerCase().includes(query.toLowerCase())));
@@ -22,8 +24,8 @@ function MainPage({ goTo, chgState, query, selected, toBeDeleted }) {
 
             if (result) {
                 setList(result);
+                setBoxes([]);
                 setFilterOpts(result);
-                console.log(result);
             }
         };
         fetchManhwas();
@@ -32,7 +34,25 @@ function MainPage({ goTo, chgState, query, selected, toBeDeleted }) {
         }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [trigDel]);
+
+    useEffect(() => {
+        if (!selected) {
+            setDList([]);
+            setBoxes([]);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selected])
+
+    useEffect(() => {
+        if (selectBoxes.length !== 0) {
+            let psibls = []
+            selectBoxes.forEach((psiblDelete) => {
+                    psibls.push(psiblDelete);
+            })
+            setDList(psibls);
+        }
+    },[selectBoxes]);
 
 
 
@@ -41,31 +61,47 @@ function MainPage({ goTo, chgState, query, selected, toBeDeleted }) {
             <div className="flex min-h-[72.15vh] flex-col items-start justify-start text-white">
                 {filterOpts.length === 0 && "Go Read some Manhwa! (note go to Series Page first so extension can add it) Or type correctly..."}
                 {filterOpts.map((manhwa, i) => {
-                    const title = manhwa.title;
-                    const img = manhwa.img;
-                    const len = manhwa.description.length
-                    const description = manhwa.description.substring(0,Math.min(len,200));
+                    let inBoxes = selectBoxes.find(box => box === manhwa.title) !== undefined;
                     return (
-                        <div className="flex flex-row items-center">
-                            {selected &&
-                                <div className="rounded-3xl min-w-8 min-h-8 max-w-8 max-h-8 bg-gray-400
-                                ease-out duration-100 active:scale-95"></div>
-                            }
-                            <div key={i} className="flex flex-col justify-start items-start
-                            hover:bg-slate-700 ease-out duration-150 p-2 rounded-md active:scale-95"
-                                onClick={() => {
-                                    goTo(title);
-                                    setTimeout(() => {chgState(2)}, 100);
-                                }}
+                        <div key={i} className="flex flex-row items-center">
+                        {selected &&
+                            <div className="min-w-10 min-h-32 ease-out duration-100 
+                            hover:bg-gray-700 flex flex-row items-center justify-center rounded-md"
+                            onClick={() => setBoxes(prev => {
+                                let boxes = [...prev]; 
+                                if (boxes.find(box => box === manhwa.title) !== undefined) {
+                                    boxes = boxes.filter((elemt) => elemt !== manhwa.title);
+                                }
+                                else {
+                                    boxes.push(manhwa.title);
+                                }
+                                return boxes;})}
                             >
-                                <span className="font-bold text-xl">{title}</span>
-                                <div className="flex flex-row justify-start items-start">
-                                    <img alt="Title for manhwa is..." src={img} className="rounded-md max-w-16 max-h-32" />
-                                    <p className="text-xs text-left p-2">{description}{len <= 200 ? "": "..."}</p>
-                                </div>
+                                    <div className={clsx(
+                                        "rounded-3xl min-w-8 min-h-8 max-w-8 max-h-8",
+                                        "ease-out duration-100 active:scale-95 z-10",
+                                        {
+                                            "bg-blue-600" : inBoxes,
+                                            "bg-gray-400" : !inBoxes,
+                                        }
+                                    )}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setBoxes(prev => {
+                                        let boxes = [...prev]; 
+                                        if (boxes.find(box => box === manhwa.title) !== undefined) {
+                                            boxes = boxes.filter((elemt) => elemt !== manhwa.title);
+                                        }
+                                        else {
+                                            boxes.push(manhwa.title);
+                                        }
+                                        return boxes;})}}
+                                    ></div>
                             </div>
+                                   }
+                            <Card manhwa={manhwa} selected={selected} setBoxes={setBoxes} goTo={(arg) => !selected ? goTo(arg) : null } chgState={(arg) => !selected ? chgState(arg) : null}/>
                         </div>
-                    )
+                    );
                 })}
             </div>
        

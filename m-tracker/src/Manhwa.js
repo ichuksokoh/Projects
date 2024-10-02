@@ -61,11 +61,13 @@ function Manhwa({ Title, onDelete, chgState }) {
         if (manhwa.chapters) {
             setRead(readChps());
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [manhwa.chapters])
 
+
     return (
-        <div className="bg-slate-500 min-w-[95vh] min-h-[70vh] text-white p-2">
-            
+        <div className="bg-slate-500 min-w-[95vh] min-h-[95vh] text-white p-2">
+
             {confirm && <Popup toDelete={toDelete} setConfirm={setConfirm}/>}
             {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead}/>}
             {<Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>}

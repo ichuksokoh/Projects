@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 
 const manhwaList = [];
+var exist = false;
 
 const getDomain = () => {
     const hostname = window.location.href;
@@ -35,43 +36,38 @@ const getDomain = () => {
 }
 
 //in case on chapter and not series fetch title from chapter
-// const getTitle = () => {
-//     const domain = getDomain();
-//     const html = document.documentElement.innerHTML;
-//     const tempDiv = document.createElement('div');
-//     tempDiv.innerHTML = html;
-//     let title = "";
-//     if (domain.includes('asura')) {
-//         const titleElem = tempDiv.querySelector('span.cursor-pointer.pl-1')
-//         title = titleElem ? titleElem.textContent.trim() : "";
-//     }
-//     else if (domain.includes('flame')) {
-//         const titleContainer = tempDiv.querySelector('div.allc');
-//         const titleElem = titleContainer.querySelector('a');
-//         title = titleElem ? titleElem.textContent.trim() : "";
-//     }
+const getTitle = () => {
+    const domain = getDomain();
+    const html = document.documentElement.innerHTML;
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    let title = "";
+    if (domain.includes('asura')) {
+        const titleElem = tempDiv.querySelector('span.cursor-pointer.pl-1')
+        title = titleElem ? titleElem.textContent.trim() : "";
+    }
+    else if (domain.includes('flame')) {
+        const titleContainer = tempDiv.querySelector('div.allc');
+        const titleElem = titleContainer ? titleContainer.querySelector('a') : null ;
+        title = titleElem ? titleElem.textContent.trim() : "";
+    }
     
-//     else if (domain.includes('reaperscans')) {
-//         const titleElem = tempDiv.querySelector('h2.font-semibold.font-sans.text-muted-foreground.text-xxs')
-//         title = titleElem ? titleElem.textContent.trim() : "";
-//     }
-//     else if (domain.includes('manganato')) {
-//         const titleElem = tempDiv.querySelectorAll('a.a-h')
-//         title = titleElem[1] ? titleElem[1].textContent.trim() : "";
-//     }
-//     else if (domain.includes('mangago')) {
-//         const titleElem = tempDiv.querySelector('#series')
-//         title = titleElem ? titleElem.textContent.trim() : "";
-//     }
+    else if (domain.includes('reaperscans')) {
+        const titleElem = tempDiv.querySelector('h2.font-semibold.font-sans.text-muted-foreground.text-xxs')
+        title = titleElem ? titleElem.textContent.trim() : "";
+    }
+    else if (domain.includes('manganato')) {
+        const titleElem = tempDiv.querySelectorAll('a.a-h')
+        title = titleElem[1] ? titleElem[1].textContent.trim() : "";
+    }
+    else if (domain.includes('mangago')) {
+        const titleElem = tempDiv.querySelector('#series')
+        title = titleElem ? titleElem.textContent.trim() : "";
+    }
 
-//     chrome.storage.local.get([title], (result) => {
-//         if (result === null) {
-//             title = "";
-//         }
-//     })
-
-//     return title;
-// };
+   
+    return title;
+};
 
 const update =  (manhwaTitle, newChapters, Manhwa) => {
         chrome.storage.local.get([manhwaTitle], (result) => {
@@ -87,9 +83,11 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
                     }
                 });
                 existingManhwa.chapters = updatedChapters;
-                chrome.storage.local.set({ [manhwaTitle]: existingManhwa })
+                chrome.storage.local.set({ [manhwaTitle]: existingManhwa });
+                exist = true;
             }
-            else {
+            else if (newChapters.length !== 0) {
+                exist = true; //it will exist
                 Manhwa.chapters = newChapters;
                 chrome.storage.local.set({ [manhwaTitle] : Manhwa });
             }
@@ -109,50 +107,17 @@ const scrapeAsuraScans = () => {
 
 
         // Adjust selectors to target the right elements in the DOM
-        const elements = tempDiv.querySelectorAll('div');
         const titleElem = tempDiv.querySelector('span.text-xl.font-bold'); 
-        const manhwaTitle = titleElem ? titleElem.textContent.trim() : "";
+        const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
         //Get chapters for manipulation
-        elements.forEach(element => {
-            const chapter = element.textContent;
-
-
-            const regex2 = /Chapter\s+\d+/;
-            if (regex2.test(chapter) && chapter.length <= 200) {
-                manhwaList.push({ chapter });
+        const elems = tempDiv.querySelectorAll('h3.text-sm.text-white.font-medium');
+        elems.forEach((header) => {
+            const href = header.querySelector('a.block');
+            if (href) {
+                manhwaList.push({chapter : href.textContent.trim().replace('Chapter', '').trim(), read : false});
             }
         });
-
-        const chapterRegex = /Chapter\s+(\d+)/;
-        const dateRegex = /(\w+\s+\d{1,2}(?:th|st|nd|rd)?\s+\d{4})$/;
-    
-        const results = manhwaList.map(item => {
-            const chpMatch = item.chapter.match(chapterRegex);
-            const dateMatch = item.chapter.match(dateRegex);
-            const res = {};
-            if (chpMatch) {
-                res.chapter = chpMatch[1];
-            }
-            if (dateMatch) {
-                res.date = dateMatch[1];
-            }
-            res.read = false;
-            return res;
-        }).filter(item => item.chapter !== undefined && item.date !== undefined)
-        .map((item, _) => {
-            return {chapter: item.chapter, read: item.read}
-        });
-
-        const results2 = results.filter((item, index, self) => 
-            index === self.findIndex((t) => (
-                t.chapter === item.chapter && t.read === item.read
-            ))
-        ).reverse();
-        
-
-
-
 
 
         //get cover art
@@ -171,16 +136,14 @@ const scrapeAsuraScans = () => {
         
         const combinedDescription = descriptions.join(' ');
 
+      
         
         //Entire Manhwa stored as one object
         const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl};
 
-        update(manhwaTitle, results2, Manhwa);
+        update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
-        // Save to Chrome Storage
-        // if (manhwaList.length !== 0) {
-        //     chrome.storage.local.set({ [manhwaTitle]: Manhwa });
-        // }
+ 
         return manhwaTitle;
     } catch (error) {
         console.error('Error scraping the site:', error.message);
@@ -201,7 +164,8 @@ const scrapeFlameScans = () => {
 
     //get manhwa title
     const titleElem = tempDiv.querySelector("h1.entry-title");
-    const manhwaTitle = titleElem ? titleElem.textContent.trim() : "";
+    // const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
+    const manhwaTitle = getTitle() === "" ? (titleElem ?  titleElem.textContent.trim() : "") : getTitle();
 
     //get chapters
     elems.forEach((elem) => {
@@ -225,9 +189,7 @@ const scrapeFlameScans = () => {
         dis.push(p.textContent.trim());
     })
     const combinedDescription = dis.join(' ');
-
-
-
+    
     //Entire manhwa stored as one object
     const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl};
 
@@ -321,7 +283,6 @@ const scrapeManganato = () => {
 }
 
 const scrapeReaperScans = () => {
-        console.log("Called reaperscans");
               //Get html content from page
        const html = document.documentElement.innerHTML;
 
@@ -362,7 +323,9 @@ const scrapeReaperScans = () => {
 
     // Run the scraping functions
     const domain = getDomain();
-    console.log(domain);    
+    const hostname = window.location.href;
+    console.log(hostname);    
+    console.log(hostname.length);    
 
 
     let title = "";
@@ -370,7 +333,7 @@ const scrapeReaperScans = () => {
     if (domain.includes('asura') && domain.includes('series')) {
         title = scrapeAsuraScans();
     }
-    else if (domain.includes('flame') && domain.includes('series')) {
+    else if (domain.includes('flame') && hostname.length > 23) {
         title = scrapeFlameScans();
     }
     
@@ -387,7 +350,7 @@ const scrapeReaperScans = () => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'getTitle') {
-        sendResponse({ title: title });
+        sendResponse({ title : exist ?  title : "" });
     }
     return true; // Allows the async response
 });

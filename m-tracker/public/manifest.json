@@ -8,9 +8,9 @@
     "default_popup": "index.html",
     "default_title": "Manga/Manhwas!",
     "default_icon": {
-      "16": "LazyTrackerSym3.png",
-      "48": "LazyTrackerSym2.png",
-      "128": "LazyTrackerSym.png"
+      "16": "images/LazyTrackerSym3.png",
+      "48": "images/LazyTrackerSym2.png",
+      "128": "images/LazyTrackerSym.png"
     }
   },
   "permissions": [
@@ -26,7 +26,10 @@
       "http://asuracomic.net/", "https://flamecomics.me/*", "http://flamecomics.me/*",
       "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
         "https://chapmanganato.to/*"],
-      "js": ["content.js"]
+      "js": [
+              "content.js"
+            ],
+      "type": "module"
     }
   ]
 }

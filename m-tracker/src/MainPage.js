@@ -4,15 +4,29 @@ import Card from "./Components/Card";
 import clsx from "clsx";
 
 
-
-function MainPage({ goTo, chgState, query, selected, setDList, trigDel }) {
+function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs }) {
     const [list, setList] = useState([]);
     const [filterOpts, setFilterOpts] = useState([]);
     const [selectBoxes, setBoxes] = useState([]);
 
     useEffect(() => {
-        setFilterOpts(list.filter((manhwa) => manhwa.title.toLowerCase().includes(query.toLowerCase())));
+        if (!Favs) {
+            setFilterOpts(list.filter((manhwa) => manhwa.title.toLowerCase().includes(query.toLowerCase())));
+        }
+        else {
+            setFilterOpts(list.filter((manhwa) => 
+                    manhwa.fav && (manhwa.title.toLowerCase().includes(query.toLowerCase()))));
+        }
     }, [query])
+
+    useEffect(() => {
+        if (Favs) {
+            setFilterOpts(list.filter((manhwa) => manhwa.fav))
+        }
+        else {
+            setFilterOpts(list);
+        }
+    }, [Favs])
 
     useEffect(() => {
         const fetchManhwas = async () => {
@@ -52,6 +66,7 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel }) {
             })
             setDList(psibls);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectBoxes]);
 
 
@@ -59,7 +74,8 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel }) {
     return (
         <div className="min-w-[95vh] bg-slate-500 p-4">
             <div className="flex min-h-[72.15vh] flex-col items-start justify-start text-white">
-                {filterOpts.length === 0 && "Go Read some Manhwa! (note go to Series Page first so extension can add it) Or type correctly..."}
+                {!Favs && filterOpts.length === 0 && "Go Read some Manhwa! (note go to Series Page first so extension can add it) Or type correctly..."}
+                {Favs && filterOpts.length === 0 && "You don't like anything smh"}
                 {filterOpts.map((manhwa, i) => {
                     let inBoxes = selectBoxes.find(box => box === manhwa.title) !== undefined;
                     return (

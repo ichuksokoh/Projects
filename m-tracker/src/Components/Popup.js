@@ -5,7 +5,7 @@ function Popup ({ setConfirm, toDelete }) {
     
 
     return (
-        <div className="inset-0 bg-opacity-35 bg-black backdrop-blur-sm absolute rounded-md z-20"
+        <div className="inset-0 bg-opacity-35 bg-black backdrop-blur-sm absolute rounded-md z-50"
             onClick={() => setConfirm(false)}
         >
             <div

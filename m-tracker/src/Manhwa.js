@@ -10,19 +10,20 @@ function Manhwa({ Title, onDelete, chgState }) {
     const [manhwa, setManhwa] = useState({});
     const [chpsRead, setRead] = useState(0);
     const [confirm, setConfirm] = useState(false);
+    // const [addfav, setFav] = useState(manhwa.fav);
 
     const handleChange = (event) => {
         setSelectedOption(event.target.value); // Update state with the selected value
-        setMarked(true);
     };
     
     
 
     const upload = () => {
-        if (marked) {
-            manhwa.chapters[selectedOption].read = true;
+        if (selectedOption !== '') {
+            let chgRead = manhwa.chapters[selectedOption].read;
+            manhwa.chapters[selectedOption].read = !chgRead;
             chrome.storage.local.set({ [manhwa.title]: manhwa });
-            setMarked(false);
+            setMarked(!marked);
         }
     }
 
@@ -55,14 +56,19 @@ function Manhwa({ Title, onDelete, chgState }) {
             }
         };
         fetchChps();
-    },[Title, marked])
+    },[Title])
 
     useEffect(() => {
         if (manhwa.chapters) {
             setRead(readChps());
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [manhwa.chapters])
+    }, [manhwa.chapters, marked])
+
+    // useEffect(() => {
+    //     manhwa.fav = !manhwa.fav;
+    //     chrome.storage.local.set({ [manhwa.title]: manhwa });
+    // }, [addfav])
 
 
     return (
@@ -71,16 +77,24 @@ function Manhwa({ Title, onDelete, chgState }) {
             {confirm && <Popup toDelete={toDelete} setConfirm={setConfirm}/>}
             {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead}/>}
             {<Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>}
-            {selectedOption && <p className="mt-2 text-white">You selected: {manhwa?.chapters[selectedOption].chapter}</p>}
 
             <div className="flex flex-col items-start p-2">
-                <button
-                    type="button"
-                    className="rounded-md min-w-16 mt-2 min-h-8 duration-200 ease-out active:scale-90 hover:bg-stone-700 bg-stone-500"
-                    onClick={upload}
-                >
-                    Read
-                </button>
+                <div className="flex flex-row space-x-12">
+                    <button
+                        type="button"
+                        className="rounded-md min-w-16 mt-2 min-h-8 duration-200 ease-out active:scale-90 hover:bg-stone-700 bg-stone-500"
+                        onClick={upload}
+                    >
+                        {selectedOption !== '' && manhwa.chapters[selectedOption].read ? "Unread" : "Read"}
+                    </button>
+                    {/* <button
+                        type="button"
+                        className="rounded-md min-w-20 min-h-8 duration-200 ease-out active:scale-90 hover:bg-stone-700 bg-stone-500"
+                        onClick={() => setFav(!addfav)}
+                    >
+                        {!addfav ? "Add to Favorites" : "Remove from Favorites"}
+                    </button> */}
+                </div>
                 <div className="flex justify-center min-w-[475px]">
                     <button
                         type="button"

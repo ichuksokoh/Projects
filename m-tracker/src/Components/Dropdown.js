@@ -22,7 +22,9 @@ function Dropdown ({ selectedOption, handleChange, manhwa }) {
 
                         return (
                             <option key={i + (i+1)*23} value={i}>
-                                {chp.chapter}
+                               {chp.read && 
+                                    <img alt="check?" src={process.env.PUBLIC_URL + '/images/check.png'}></img>}
+                                    {chp.chapter}
                             </option>
                         )
                     })

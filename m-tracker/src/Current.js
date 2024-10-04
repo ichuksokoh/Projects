@@ -67,7 +67,6 @@ function Current({ Title, onDelete, chgState }) {
             {confirm && <Popup toDelete={toDelete} setConfirm={setConfirm}/>}
             {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead}/>}
             {<Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>}
-            {selectedOption && <p className="mt-2 text-white">You selected: {manhwa?.chapters[selectedOption].chapter}</p>}
             
             <div className="flex flex-col items-start p-2">
                 <button

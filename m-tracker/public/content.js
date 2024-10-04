@@ -36,7 +36,7 @@ const getDomain = () => {
 }
 
 //in case on chapter and not series fetch title from chapter
-const getTitle = () => {
+  const getTitle = () => {
     const domain = getDomain();
     const html = document.documentElement.innerHTML;
     const tempDiv = document.createElement('div');
@@ -69,7 +69,7 @@ const getTitle = () => {
     return title;
 };
 
-const update =  (manhwaTitle, newChapters, Manhwa) => {
+  const update =  (manhwaTitle, newChapters, Manhwa) => {
         chrome.storage.local.get([manhwaTitle], (result) => {
             if (result[manhwaTitle]) {
                 const existingManhwa = result[manhwaTitle];
@@ -94,7 +94,6 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
         });
 };
 
-
 const scrapeAsuraScans = () => {
     try {
         // Get the entire page's HTML content
@@ -115,7 +114,7 @@ const scrapeAsuraScans = () => {
         elems.forEach((header) => {
             const href = header.querySelector('a.block');
             if (href) {
-                manhwaList.push({chapter : href.textContent.trim().replace('Chapter', '').trim(), read : false});
+                manhwaList.push({chapter : href.childNodes[0].textContent.trim().replace('Chapter', '').trim(), read : false});
             }
         });
 
@@ -139,7 +138,7 @@ const scrapeAsuraScans = () => {
       
         
         //Entire Manhwa stored as one object
-        const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl};
+        const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false};
 
         update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
@@ -149,7 +148,6 @@ const scrapeAsuraScans = () => {
         console.error('Error scraping the site:', error.message);
     }
 };
-
 
 const scrapeFlameScans = () => {
     //Get html content from page
@@ -191,16 +189,14 @@ const scrapeFlameScans = () => {
     const combinedDescription = dis.join(' ');
     
     //Entire manhwa stored as one object
-    const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl};
+    const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false};
 
     update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
-    // Save to Chrome Storage
-    // if (manhwaList.length !== 0) {
-    //     chrome.storage.local.set({ [manhwaTitle]: Manhwa });
-    // }
+
     return manhwaTitle
 };
+
 
 
 const scrapeMangago = () => {
@@ -239,7 +235,7 @@ const scrapeMangago = () => {
         const description = descriptElem ? descriptElem.textContent.trim() : "";
         
 
-        const Manhwa = {title: manhwaTitle, description: description, chapters: [], img: imgUrl };
+        const Manhwa = {title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false };
 
         update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
@@ -278,7 +274,7 @@ const scrapeManganato = () => {
        const descriptElem = tempDiv.querySelector('div.panel-story-info-description')
        const description = descriptElem ? descriptElem.textContent.trim() : "";
 
-       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl };
+       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false };
        
        update(manhwaTitle, manhwaList.reverse(), Manhwa);
     
@@ -315,11 +311,13 @@ const scrapeReaperScans = () => {
 
 
 
-       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl };
+       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false };
 
        update(manhwaTitle, manhwaList.reverse(), Manhwa);
     return manhwaTitle;
 }
+
+
 
 
 

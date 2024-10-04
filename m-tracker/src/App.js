@@ -18,6 +18,7 @@ function App() {
   const [deleteList, setDList] = useState([]);
   const [trigDel, setTrig] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [showFav, setFav] = useState(false);
 
   const control = (n) => {
     if (n >= 0 && n <= 2) {
@@ -127,9 +128,10 @@ function App() {
 
   return (
     <div className="max-w-[500px] min-w-[500px] min-h-[500px] max-h-[500px] flex flex-col">
+      {confirm && <Popup toDelete={() => {setTrig(true); setSelect(false)}} setConfirm={setConfirm}/> }
       <div className="flex flex-col bg-slate-500">
         <div
-          className=" flex flex-row p-2 sticky top-0 z-10"
+          className=" flex flex-row p-2 sticky top-0 z-10 mb-1"
         >
           <button
              className={clsx(
@@ -160,9 +162,9 @@ function App() {
             </button>
           }
         </div>
-      {state === 0 &&  
+      {state === 0 &&
+      <div className="flex flex-col items-start p-2 mb-2">
         <div className="bg-slate-500 p-4 flex flex-row space-x-8">
-          {confirm && <Popup toDelete={() => {setTrig(true); setSelect(false)}} setConfirm={setConfirm}/> }
           <input value={query} placeholder='Manga/Manhwa Name...' 
             className="min-w-64 min-h-8 text-white bg-gray-400 
               rounded-lg p-2 border-none placeholder:text-white focus:outline-none focus:shadow-md focus:shadow-stone-300"
@@ -185,12 +187,27 @@ function App() {
             Delete
           </button>}
         </div>
+        <button
+          type="button"
+          className={clsx(
+            "ease-out duration-100 active:scale-90 hover:bg-gray-600 rounded-md w-20 min-h-6",
+            " font-bold p-2 ml-4",
+            {
+              "bg-gray-300 text-white border-2 border-white" : showFav,
+              "bg-slate-500 text-black border-2 border-black" : !showFav
+            }
+          )}
+          onClick={() => setFav(!showFav)}
+        >
+          Favorites
+        </button>
+      </div>  
       }
 
       </div>
         <div className="flex-grow overflow-y-scroll no-scrollbar">
             {state === 0 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-            selected={select} setDList={setDList} trigDel={trigDel} />}
+            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} />}
 
             {state === 1 && !ifDelete && title !== "" && <Current Title={title} 
               onDelete={setDelete} chgState={setState}/>}

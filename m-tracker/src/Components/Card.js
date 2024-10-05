@@ -21,6 +21,11 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected }) {
         return lastRead;
     }
 
+    const lastChp = () => {
+        let len = manhwa.chapters.length
+        return manhwa.chapters[len-1].chapter
+    }
+
     const handleFav = (e, manhwa) => {
         e.stopPropagation();
         manhwa.fav = !manhwa.fav;
@@ -59,7 +64,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected }) {
                 <div className="flex flex-row w-full">
                     <div className="flex flex-col items-start justify-start pb-2 space-y-1">
                         <span className="font-bold text-xl">{title}</span>
-                        <span className="text-xs text-white">Chps read {readChps()}</span>
+                        <span className="text-xs text-white">Chps read {readChps()}/{lastChp()}</span>
                     </div>
                         {manhwa.fav && <img alt="favstar" src={process.env.PUBLIC_URL + '/images/darkfullstar.png'} className="ml-auto max-h-8 max-w-8 z-20"
                             onClick={(e) => handleFav(e,manhwa)}></img>}

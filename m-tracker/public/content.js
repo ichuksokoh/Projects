@@ -298,7 +298,7 @@ const scrapeReaperScans = () => {
        const chpElem = tempDiv.querySelectorAll("span.text-muted-foreground.line-clamp-1");
        let chpnum = chpElem ? Number(chpElem[1]?.textContent.trim()): 0;
        for (let i = 0; i < chpnum; i++ ) {
-        manhwaList.push({ chapter: "Chapter " + String(i+1), read: false });
+        manhwaList.push({ chapter: String(i+1), read: false });
        }
 
        //get cover art
@@ -313,7 +313,7 @@ const scrapeReaperScans = () => {
 
        const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false };
 
-       update(manhwaTitle, manhwaList.reverse(), Manhwa);
+       update(manhwaTitle, manhwaList, Manhwa);
     return manhwaTitle;
 }
 

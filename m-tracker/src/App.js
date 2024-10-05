@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import { useEffect, useState } from 'react';
 import MainPage from './MainPage';
-import Current from './Current';
 import clsx from 'clsx';
 import Manhwa from './Manhwa';
 import Popup from './Components/Popup';
@@ -209,7 +208,7 @@ function App() {
             {state === 0 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
             selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} />}
 
-            {state === 1 && !ifDelete && title !== "" && <Current Title={title} 
+            {state === 1 && !ifDelete && title !== "" && <Manhwa Title={title} 
               onDelete={setDelete} chgState={setState}/>}
 
             {state === 2 && <Manhwa Title={title2} onDelete={setDelete} chgState={setState}/>}

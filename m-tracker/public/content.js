@@ -95,7 +95,6 @@ const getDomain = () => {
 };
 
 const scrapeAsuraScans = () => {
-    try {
         // Get the entire page's HTML content
         const html = document.documentElement.innerHTML;
 
@@ -144,9 +143,6 @@ const scrapeAsuraScans = () => {
 
  
         return manhwaTitle;
-    } catch (error) {
-        console.error('Error scraping the site:', error.message);
-    }
 };
 
 const scrapeFlameScans = () => {
@@ -176,7 +172,7 @@ const scrapeFlameScans = () => {
     });
 
     //get cover art
-    const imgElem = tempDiv.querySelector('img[src*="flamecomics.me/wp-content/uploads/"]');
+    const imgElem = tempDiv.querySelector('img[src*="flamecomics.xyz/wp-content/uploads/"]');
     const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
 
     //Get manhwa description
@@ -298,7 +294,7 @@ const scrapeReaperScans = () => {
        const chpElem = tempDiv.querySelectorAll("span.text-muted-foreground.line-clamp-1");
        let chpnum = chpElem ? Number(chpElem[1]?.textContent.trim()): 0;
        for (let i = 0; i < chpnum; i++ ) {
-        manhwaList.push({ chapter: String(i+1), read: false });
+        manhwaList.push({ chapter: String(i), read: false });
        }
 
        //get cover art

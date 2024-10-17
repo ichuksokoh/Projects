@@ -23,7 +23,7 @@
   "content_scripts": [
     {
       "matches": ["https://asuracomic.net/*", 
-      "http://asuracomic.net/", "https://flamecomics.me/*", "http://flamecomics.me/*",
+      "http://asuracomic.net/", "https://flamecomics.xyz/*", "http://flamecomics.xyz/*",
       "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
         "https://chapmanganato.to/*"],
       "js": [

@@ -78,7 +78,7 @@ const getDomain = () => {
                 const updatedChapters = [...existingChapters];
     
                 newChapters.forEach(newChapter => {
-                    if (!existingChapters.some(existingChapter => existingChapter.chapter === newChapter.chapter)) {
+                    if (!existingChapters.some(existingChapter => existingChapter.chapter === newChapter.chapter && newChapter.chapter !== '')) {
                         updatedChapters.push(newChapter);
                     }
                 });

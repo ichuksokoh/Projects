@@ -78,7 +78,7 @@ const getDomain = () => {
                 const updatedChapters = [...existingChapters];
     
                 newChapters.forEach(newChapter => {
-                    if (!existingChapters.some(existingChapter => existingChapter.chapter === newChapter.chapter && newChapter.chapter !== '')) {
+                    if (!existingChapters.some(existingChapter => existingChapter.chapter === newChapter.chapter)) {
                         updatedChapters.push(newChapter);
                     }
                 });
@@ -113,7 +113,11 @@ const scrapeAsuraScans = () => {
         elems.forEach((header) => {
             const href = header.querySelector('a.block');
             if (href) {
-                manhwaList.push({chapter : href.childNodes[0].textContent.trim().replace('Chapter', '').trim(), read : false});
+                let chpname = href.textContent.replace('Chapter', '').trim();
+                // console.log("chpname before: ", chpname);Z
+                chpname = chpname.match(/^\d+/)[0];
+                // console.log("CHPNAME after: " ,chpname);  
+                manhwaList.push({chapter : chpname, read : false});
             }
         });
 

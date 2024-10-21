@@ -141,7 +141,7 @@ const scrapeAsuraScans = () => {
       
         
         //Entire Manhwa stored as one object
-        const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false, rating : 1};
+        const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false, rating: 0};
 
         update(manhwaTitle, manhwaList.reverse(), Manhwa);
 

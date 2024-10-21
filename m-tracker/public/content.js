@@ -141,7 +141,7 @@ const scrapeAsuraScans = () => {
       
         
         //Entire Manhwa stored as one object
-        const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false};
+        const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false, rating : 1};
 
         update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
@@ -189,7 +189,7 @@ const scrapeFlameScans = () => {
     const combinedDescription = dis.join(' ');
     
     //Entire manhwa stored as one object
-    const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false};
+    const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false, rating: 0};
 
     update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
@@ -235,7 +235,7 @@ const scrapeMangago = () => {
         const description = descriptElem ? descriptElem.textContent.trim() : "";
         
 
-        const Manhwa = {title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false };
+        const Manhwa = {title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false, rating: 0 };
 
         update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
@@ -274,7 +274,7 @@ const scrapeManganato = () => {
        const descriptElem = tempDiv.querySelector('div.panel-story-info-description')
        const description = descriptElem ? descriptElem.textContent.trim() : "";
 
-       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false };
+       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false, rating: 0 };
        
        update(manhwaTitle, manhwaList.reverse(), Manhwa);
     
@@ -311,7 +311,7 @@ const scrapeReaperScans = () => {
 
 
 
-       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false };
+       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false, rating: 0 };
 
        update(manhwaTitle, manhwaList, Manhwa);
     return manhwaTitle;

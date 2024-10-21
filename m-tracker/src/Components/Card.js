@@ -65,6 +65,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected }) {
                     <div className="flex flex-col items-start justify-start pb-2 space-y-1">
                         <span className="font-bold text-xl">{title}</span>
                         <span className="text-xs text-white">Chps read {readChps()}/{lastChp()}</span>
+                        <span className="text-xs text-white">Rating: {manhwa.rating !== undefined ? manhwa.rating : 0}/10 </span>
                     </div>
                         {manhwa.fav && <img alt="favstar" src={process.env.PUBLIC_URL + '/images/darkfullstar.png'} className="ml-auto max-h-8 max-w-8 z-20"
                             onClick={(e) => handleFav(e,manhwa)}></img>}

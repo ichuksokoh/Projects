@@ -125,6 +125,12 @@ function App() {
   },[select]);
 
 
+  useEffect(() => {
+    if (title !== "") {
+      control(1);
+    }
+  }, [title])
+
   return (
     <div className="max-w-[500px] min-w-[500px] min-h-[500px] max-h-[500px] flex flex-col">
       {confirm && <Popup toDelete={() => {setTrig(true); setSelect(false)}} setConfirm={setConfirm}/> }

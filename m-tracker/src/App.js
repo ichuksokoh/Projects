@@ -18,6 +18,7 @@ function App() {
   const [trigDel, setTrig] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [showFav, setFav] = useState(false);
+  const [selectAllBut, setButton] = useState(false);
 
   const control = (n) => {
     if (n >= 0 && n <= 2) {
@@ -133,7 +134,7 @@ function App() {
 
   return (
     <div className="max-w-[500px] min-w-[500px] min-h-[500px] max-h-[500px] flex flex-col">
-      {confirm && <Popup toDelete={() => {setTrig(true); setSelect(false)}} setConfirm={setConfirm}/> }
+      {confirm && <Popup deleteList={deleteList} toDelete={() => {setTrig(true); setSelect(false)}} setConfirm={setConfirm}/> }
       <div className="flex flex-col bg-slate-500">
         <div
           className=" flex flex-row p-2 sticky top-0 z-10 mb-1"
@@ -192,27 +193,43 @@ function App() {
             Delete
           </button>}
         </div>
-        <button
-          type="button"
-          className={clsx(
-            "ease-out duration-100 active:scale-90 hover:bg-gray-600 rounded-md w-20 min-h-6",
-            " font-bold p-2 ml-4",
-            {
-              "bg-gray-300 text-white border-2 border-white" : showFav,
-              "bg-slate-500 text-black border-2 border-black" : !showFav
-            }
-          )}
-          onClick={() => setFav(!showFav)}
-        >
-          Favorites
-        </button>
+        <div className='flex flex-row space-x-4 items-center'>
+          <button
+            type="button"
+            className={clsx(
+              "ease-out duration-100 active:scale-90 hover:bg-gray-600 rounded-md w-20 min-h-6",
+              " font-bold p-2 ml-4",
+              {
+                "bg-gray-300 text-white border-2 border-white" : showFav,
+                "bg-slate-500 text-black border-2 border-black" : !showFav
+              }
+            )}
+            onClick={() => setFav(!showFav)}
+          >
+            Favorites
+          </button>
+         {select && <button
+            className={clsx(
+              "rounded-md min-w-8 min-h-4 font-bold hover:bg-cyan-900",
+              "duration-200 ease-out p-2",
+              {
+                "bg-cyan-700 text-white border-2 border-white" : selectAllBut,
+                "bg-slate-500 text-black border-2 border-black": !selectAllBut
+              }
+            )}
+            onClick={() => setButton(!selectAllBut)}
+            >
+            Select All
+          </button>}
+          <span className='text-white font-bold text-xl' > {deleteList.length > 0 && "Selected: " + deleteList.length} </span>
+        </div>
       </div>  
       }
 
       </div>
         <div className="flex-grow overflow-y-scroll no-scrollbar">
             {state === 0 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} />}
+            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} />}
 
             {state === 1 && !ifDelete && title !== "" && <Manhwa Title={title} 
               onDelete={setDelete} chgState={setState}/>}

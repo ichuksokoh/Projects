@@ -33,8 +33,11 @@ const getDomain = () => {
     if (hostname.includes("mangakakalot")) {
         domain += "mangakakalot"
     }
-    if (hostname.includes("manga")) {
-        domain += " manga";
+    if (hostname.includes("/manga")) {
+        domain += " /manga";
+    }
+    if (hostname.includes("read-")) {
+        domain += " read-"
     }
  
     return domain;
@@ -129,7 +132,7 @@ const getDomain = () => {
     else if (domain.includes('reaperscans') && domain.includes('series')) {
         title = scrapeReaperScans(update, getTitle, manhwaList);
     }
-    else if (domain.includes('mangakakalot') && domain.includes("manga")) {
+    else if (domain.includes('mangakakalot') && (domain.includes("/manga") || domain.includes("read-"))) {
         title = scrapeMangakakalot(update, getTitle, manhwaList);
     }
     

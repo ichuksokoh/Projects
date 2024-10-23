@@ -4,7 +4,7 @@ import Card from "./Components/Card";
 import clsx from "clsx";
 
 
-function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs }) {
+function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, selectAll }) {
     const [list, setList] = useState([]);
     const [filterOpts, setFilterOpts] = useState([]);
     const [selectBoxes, setBoxes] = useState([]);
@@ -66,8 +66,28 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs }) 
             })
             setDList(psibls);
         }
+        else {
+            setDList([]);
+        }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectBoxes]);
+
+    useEffect(() => {
+
+        if (selectAll) {
+            let psibls = []
+            filterOpts.forEach((manhwa) => {
+                psibls.push(manhwa.title);
+            })
+            setDList(psibls);
+            setBoxes(psibls);
+        }
+        else {
+            setDList([]);
+            setBoxes([]);
+        }
+
+    }, [selectAll])
 
 
 

@@ -26,7 +26,7 @@
       "http://asuracomic.net/", "https://flamecomics.xyz/*", "http://flamecomics.xyz/*",
       "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
         "https://chapmanganato.to/*", "https://mangakakalot.com/manga/*",
-         "https://mangakakalot.com/chapter/*"],
+         "https://mangakakalot.com/chapter/*", "https://mangakakalot.com/read-*"],
       "js": [
               "scrapers/scrapeAsuraScans.js",
               "scrapers/scrapeFlameScans.js",

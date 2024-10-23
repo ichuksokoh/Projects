@@ -79,7 +79,7 @@ function Manhwa({ Title, onDelete, chgState }) {
     return (
         <div className="bg-slate-500 min-w-[95vh] min-h-[95vh] text-white p-2">
 
-            {confirm && <Popup toDelete={toDelete} setConfirm={setConfirm}/>}
+            {confirm && <Popup deleteList={null} toDelete={toDelete} setConfirm={setConfirm}/>}
             {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead}/>}
             {<Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>}
 

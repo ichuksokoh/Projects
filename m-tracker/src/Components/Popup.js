@@ -1,7 +1,7 @@
 
 
 
-function Popup ({ setConfirm, toDelete }) {
+function Popup ({ deleteList, setConfirm, toDelete }) {
     
 
     return (
@@ -12,10 +12,16 @@ function Popup ({ setConfirm, toDelete }) {
                 className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-2/3 
                 space-y-8 min-w-96 min-h-64 rounded-lg bg-stone-500 flex flex-col justify-center items-center" 
             >
+                {deleteList && <span className="text-white text-xs ">Delete selected ({deleteList.length}): </span>}
+                <div className="overflow-y-scroll no-scrollbar max-h-16 rounded-md text-white flex flex-col text-xs">
+                     {
+                       deleteList && deleteList.map((e,i) => <span key={i}>{e}</span>)
+                    }
+                </div>
                 <div className="text-white text-2xl font-bold">
                     Are You Sure?
                 </div>
-                <div className="flex flex-row space-x-8">
+                <div className="flex flex-row space-x-8 text-white">
                     <button
                         type="button"
                         className="ease-out duration-200 active:scale-90 bg-blue-800 hover:bg-blue-900

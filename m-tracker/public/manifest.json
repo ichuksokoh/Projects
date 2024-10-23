@@ -25,8 +25,15 @@
       "matches": ["https://asuracomic.net/*", 
       "http://asuracomic.net/", "https://flamecomics.xyz/*", "http://flamecomics.xyz/*",
       "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
-        "https://chapmanganato.to/*"],
+        "https://chapmanganato.to/*", "https://mangakakalot.com/manga/*",
+         "https://mangakakalot.com/chapter/*"],
       "js": [
+              "scrapers/scrapeAsuraScans.js",
+              "scrapers/scrapeFlameScans.js",
+              "scrapers/scrapeMangago.js",
+              "scrapers/scrapeManganato.js",
+              "scrapers/scrapeReaperScans.js",
+              "scrapers/scrapeMangakakalot.js",
               "content.js"
             ]
     }

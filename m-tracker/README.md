@@ -19,8 +19,13 @@ page.
 Added an option to favorite a manga/manhwa, filter out manhwas not in favorites and add or remove from both manhwa page
 and current manhwa page. Also added a chapter count for chapters read on Manhwas page for ease of use to quickly see how mnay chapters have been read. Fixed minor bugs with manhwa not showing up on some chapter pages
 
+## Version 2.2 (prototype)
+Additional Support added for [Mangakakalot][def6]. New feature for rating manhwas (half step increments or input number of your choice, must be a number). Refactored scraper logic into their own files to reduce file size of content.js.
+Fixed asurascans bug for chapters not being updated properly due to links not loading.
+
 [def]: https://asuracomic.net/
-[def2]: https://flamecomics.me/
+[def2]: https://flamecomics.xyz/
 [def3]: https://www.mangago.me/
 [def4]: https://manganato.com/
 [def5]: https://reaperscans.com/
+[def6]: https://mangakakalot.com/

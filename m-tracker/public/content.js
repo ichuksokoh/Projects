@@ -30,6 +30,12 @@ const getDomain = () => {
     if (hostname.includes('manga-')) {
         domain += " manga-"
     }
+    if (hostname.includes("mangakakalot")) {
+        domain += "mangakakalot"
+    }
+    if (hostname.includes("manga")) {
+        domain += " manga";
+    }
  
     return domain;
 
@@ -64,6 +70,11 @@ const getDomain = () => {
         const titleElem = tempDiv.querySelector('#series')
         title = titleElem ? titleElem.textContent.trim() : "";
     }
+    else if (domain.includes('mangakakalot')) {
+        const titleElement = document.querySelector('span[itemprop="itemListElement"] a[itemprop="item"]');
+        title = titleElement ? titleElement.getAttribute('title') : "";
+
+    }
 
    
     return title;
@@ -94,233 +105,6 @@ const getDomain = () => {
         });
 };
 
-const scrapeAsuraScans = () => {
-        // Get the entire page's HTML content
-        const html = document.documentElement.innerHTML;
-
-        // Create a temporary DOM element to parse the HTML
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-
-
-
-        // Adjust selectors to target the right elements in the DOM
-        const titleElem = tempDiv.querySelector('span.text-xl.font-bold'); 
-        const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
-
-        //Get chapters for manipulation
-        const elems = tempDiv.querySelectorAll('h3.text-sm.text-white.font-medium');
-        elems.forEach((header) => {
-            const href = header.querySelector('a.block');
-            if (href) {
-                let chpname = href.textContent.replace('Chapter', '').trim();
-                // console.log("chpname before: ", chpname);Z
-                chpname = chpname.match(/^\d+/)[0];
-                // console.log("CHPNAME after: " ,chpname);  
-                manhwaList.push({chapter : chpname, read : false});
-            }
-        });
-
-
-        //get cover art
-        const imgElem = document.querySelector('img[alt="poster"]');
-        const imgUrl =  imgElem ? imgElem.getAttribute('src') : "";
-
-        //get description (Asura makes it difficult smh)
-        const spanElems = document.querySelectorAll('span.font-medium.text-sm');
-        let descriptions = [];
-
-        //loop through span elems with text (again why Asura)
-        spanElems.forEach(span => {
-            // Get the text content of the span, trim it, and push it to the array
-            descriptions.push(span.textContent.trim());
-        });
-        
-        const combinedDescription = descriptions.join(' ');
-
-      
-        
-        //Entire Manhwa stored as one object
-        const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false, rating: 0};
-
-        update(manhwaTitle, manhwaList.reverse(), Manhwa);
-
- 
-        return manhwaTitle;
-};
-
-const scrapeFlameScans = () => {
-    //Get html content from page
-    const html = document.documentElement.innerHTML;
-
-    //store content in temporary DOM element
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-
-    //target correct DOM elements
-    const elems = tempDiv.querySelectorAll("#chapterlist li");
-
-    //get manhwa title
-    const titleElem = tempDiv.querySelector("h1.entry-title");
-    // const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
-    const manhwaTitle = getTitle() === "" ? (titleElem ?  titleElem.textContent.trim() : "") : getTitle();
-
-    //get chapters
-    elems.forEach((elem) => {
-        const chapterNumElement = elem.querySelector('span.chapternum');
-
-        const chapter = chapterNumElement ? chapterNumElement.textContent.trim().replace("Chapter\n", "").trim() : null;
-        if (chapter) {
-            manhwaList.push({ chapter: chapter, read: false });
-        }
-    });
-
-    //get cover art
-    const imgElem = tempDiv.querySelector('img[src*="flamecomics.xyz/wp-content/uploads/"]');
-    const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
-
-    //Get manhwa description
-    const descriptElem = tempDiv.querySelector('div.entry-content.entry-content-single');
-    const descripts = descriptElem.querySelectorAll('p')
-    let dis = []
-    descripts.forEach(p => {
-        dis.push(p.textContent.trim());
-    })
-    const combinedDescription = dis.join(' ');
-    
-    //Entire manhwa stored as one object
-    const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false, rating: 0};
-
-    update(manhwaTitle, manhwaList.reverse(), Manhwa);
-
-
-    return manhwaTitle
-};
-
-
-
-const scrapeMangago = () => {
-        //Get html content from page
-        const html = document.documentElement.innerHTML;
-
-        //store content in temporary DOM element
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-
-        //get title
-        const titleElem = tempDiv.querySelector('div.w-title');
-        const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
-
-        //get number of chapters
-        const chpNum = tempDiv.querySelectorAll('a.chico');
-
-        chpNum?.forEach((chp) => {
-            const chpNumElem = chp ? chp.textContent.trim() : null;
-            if (chpNumElem) {
-                manhwaList.push({ chapter: chpNumElem, read: false });
-            }
-        })
-
-        //get cover art
-        const primeImgElem = tempDiv.querySelector('div.left.cover');
-        const imgElem = tempDiv.querySelector('img.loading');
-        const imgElem2 = tempDiv.querySelector('img.loaded');
-        const primeImg = primeImgElem ? primeImgElem.querySelector('img.loading') : null;
-        const primeImg2 = primeImgElem ? primeImgElem.querySelector('img.loaded') : null;
-        const flat = primeImg ? primeImg : primeImg2 ? primeImg2 : null;
-        const imgUrl = flat ? flat.getAttribute('src') : imgElem ? imgElem.getAttribute('src') : imgElem2 ? imgElem2.getAttribute('src') : "";
-
-        //get description
-        const descriptElem = tempDiv.querySelector('div.manga_summary');
-        const description = descriptElem ? descriptElem.textContent.trim() : "";
-        
-
-        const Manhwa = {title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false, rating: 0 };
-
-        update(manhwaTitle, manhwaList.reverse(), Manhwa);
-
-        return manhwaTitle
-}
-
-
-const scrapeManganato = () => {
-       //Get html content from page
-       const html = document.documentElement.innerHTML;
-
-       //store content in temporary DOM element
-       const tempDiv = document.createElement('div');
-       tempDiv.innerHTML = html;
-
-       //get title
-       const containerTitle = tempDiv.querySelector('div.story-info-right');
-       const titleElem = containerTitle ? containerTitle.querySelector('h1') : null;
-       const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
-
-       //get num of chpaters
-       const ChpElems = tempDiv.querySelectorAll('a.chapter-name');
-       ChpElems.forEach((elem) => {
-            const chpNumElem = elem ? elem.textContent.trim() : null;
-            if (chpNumElem) {
-                manhwaList.push({ chapter: chpNumElem, read: false });
-            }
-       })
-
-       //get cover art
-       const imgContainer = tempDiv.querySelector('span.info-image')
-       const imgElem = imgContainer ? imgContainer.querySelector("img.img-loading") : null ;
-       const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
-       
-       //get manhwa description
-       const descriptElem = tempDiv.querySelector('div.panel-story-info-description')
-       const description = descriptElem ? descriptElem.textContent.trim() : "";
-
-       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false, rating: 0 };
-       
-       update(manhwaTitle, manhwaList.reverse(), Manhwa);
-    
-
-    return manhwaTitle;
-}
-
-const scrapeReaperScans = () => {
-              //Get html content from page
-       const html = document.documentElement.innerHTML;
-
-       //store content in temporary DOM element
-       const tempDiv = document.createElement('div');
-       tempDiv.innerHTML = html;
-
-       //get title
-       const titleElem = tempDiv.querySelector('h1.text-xl.text-foreground.font-bold.text-center');
-       const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
-
-       //get number of chapters
-       const chpElem = tempDiv.querySelectorAll("span.text-muted-foreground.line-clamp-1");
-       let chpnum = chpElem ? Number(chpElem[1]?.textContent.trim()): 0;
-       for (let i = 0; i < chpnum; i++ ) {
-        manhwaList.push({ chapter: String(i), read: false });
-       }
-
-       //get cover art
-       const imgElem = tempDiv.querySelector("img.w-full.h-full.object-fit.rounded-lg");
-       const imgUrl = imgElem ? "https://reaperscans.com" + imgElem.getAttribute("src") : "";
-
-       //get Manhwa description
-       const descriptElem = tempDiv.querySelector("div.text-muted-foreground");
-       const description = descriptElem ? descriptElem.innerText ||  descriptElem.textContent : "";
-
-
-
-       const Manhwa = { title: manhwaTitle, description: description, chapters: [], img: imgUrl, fav: false, rating: 0 };
-
-       update(manhwaTitle, manhwaList, Manhwa);
-    return manhwaTitle;
-}
-
-
-
-
-
 
     // Run the scraping functions
     const domain = getDomain();
@@ -330,20 +114,23 @@ const scrapeReaperScans = () => {
     let title = "";
     // chrome.runtime.sendMessage({ domain });
     if (domain.includes('asura') && domain.includes('series')) {
-        title = scrapeAsuraScans();
+        title = scrapeAsuraScans(update, getTitle, manhwaList);
     }
     else if (domain.includes('flame') && hostname.length > 23) {
-        title = scrapeFlameScans();
+        title = scrapeFlameScans(update, getTitle, manhwaList);
     }
     
     else if (domain.includes('mangago') && domain.includes('read-manga')) {
-       title = scrapeMangago();
+       title = scrapeMangago(update, getTitle, manhwaList);
     }
     else if (domain.includes('manganato') && domain.includes('manga-')) {
-            title = scrapeManganato();
+            title = scrapeManganato(update, getTitle, manhwaList);
     }
     else if (domain.includes('reaperscans') && domain.includes('series')) {
-        title = scrapeReaperScans();
+        title = scrapeReaperScans(update, getTitle, manhwaList);
+    }
+    else if (domain.includes('mangakakalot') && domain.includes("manga")) {
+        title = scrapeMangakakalot(update, getTitle, manhwaList);
     }
     
 

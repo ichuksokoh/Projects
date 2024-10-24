@@ -10,5 +10,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true;
   }
 });
-  
+
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.storage.local.set({ isFirstOpen: true });
+  });
+    
   

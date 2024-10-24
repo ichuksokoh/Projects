@@ -1,9 +1,11 @@
 /* eslint-disable no-undef */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MainPage from './MainPage';
 import clsx from 'clsx';
 import Manhwa from './Manhwa';
 import Popup from './Components/Popup';
+import DeleteInfo from './Components/DeleteInfo';
+import SupportInfo from './SupportInfo';
 
 function App() {
   
@@ -17,14 +19,30 @@ function App() {
   const [deleteList, setDList] = useState([]);
   const [trigDel, setTrig] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [confirm2, setConfirm2] = useState(false);
   const [showFav, setFav] = useState(false);
   const [selectAllBut, setButton] = useState(false);
+
+  const infoButtonRef = useRef(null);
 
   const control = (n) => {
     if (n >= 0 && n <= 2) {
       setState(n);
     }
   };  
+
+
+  useEffect(() => {
+    chrome.storage.local.get('isFirstOpen', (result) => {
+      if (result.isFirstOpen) {
+        // Simulate Info button click if first open
+        if (infoButtonRef.current) {
+          infoButtonRef.current.click();
+        }
+        chrome.storage.local.set({ isFirstOpen: false }); // Reset the flag
+      }
+    });
+  }, []);
   
   
   useEffect(() => {
@@ -134,7 +152,11 @@ function App() {
 
   return (
     <div className="max-w-[500px] min-w-[500px] min-h-[500px] max-h-[500px] flex flex-col">
-      {confirm && <Popup deleteList={deleteList} toDelete={() => {setTrig(true); setSelect(false)}} setConfirm={setConfirm}/> }
+      {confirm && <Popup setConfirm={setConfirm}
+       popupInfo={<DeleteInfo deleteList={deleteList} 
+        toDelete={() => {setTrig(true); setSelect(false)}} 
+        setConfirm={setConfirm}/>}/> }
+        {confirm2 && <Popup setConfirm={setConfirm2} popupInfo={<SupportInfo setConfirm={setConfirm2}/>}/>}
       <div className="flex flex-col bg-slate-500">
         <div
           className=" flex flex-row p-2 sticky top-0 z-10 mb-1"
@@ -167,6 +189,20 @@ function App() {
               Current
             </button>
           }
+           <img 
+              ref={infoButtonRef}
+              onClick={() => setConfirm2(true)}
+              src={process.env.PUBLIC_URL + '/images/Info-icon.png'} alt='Info' 
+              className='max-h-5 max-w-5 ml-auto ease-out duration-200 active:scale-90 cursor-pointer'
+              />
+          {/* <button
+            ref={infoButtonRef} 
+            className="rounded-lg text-white duration-200 ease-out active:scale-90
+            bg-slate-500 hover:bg-slate-700 ml-auto"
+            onClick={() => setConfirm2(true)}
+          >
+             Info
+          </button> */}
         </div>
       {state === 0 &&
       <div className="flex flex-col items-start p-2 mb-2">

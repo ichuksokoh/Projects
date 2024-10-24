@@ -119,7 +119,7 @@ const getDomain = () => {
     if (domain.includes('asura') && domain.includes('series')) {
         title = scrapeAsuraScans(update, getTitle, manhwaList);
     }
-    else if (domain.includes('flame') && hostname.length > 23) {
+    else if (domain.includes('flame') && hostname.length > 24) {
         title = scrapeFlameScans(update, getTitle, manhwaList);
     }
     

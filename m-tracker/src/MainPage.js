@@ -32,7 +32,7 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
         const fetchManhwas = async () => {
             const result = await new Promise((resolve) => {
                 chrome.storage.local.get(null, (result) => {
-                    resolve(Object.values(result));
+                    resolve(Object.values(result).filter(psiblmanhwa => psiblmanhwa.title !== undefined));
                 });
             });
 

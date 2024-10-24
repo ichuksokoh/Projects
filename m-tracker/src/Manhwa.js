@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Popup from './Components/Popup';
 import Dropdown from './Components/Dropdown';
 import Display from './Components/Display';
+import DeleteInfo from './Components/DeleteInfo';
 
 function Manhwa({ Title, onDelete, chgState }) {
     const [selectedOption, setSelectedOption] = useState(''); // State to hold the selected option
@@ -79,7 +80,8 @@ function Manhwa({ Title, onDelete, chgState }) {
     return (
         <div className="bg-slate-500 min-w-[95vh] min-h-[95vh] text-white p-2">
 
-            {confirm && <Popup deleteList={null} toDelete={toDelete} setConfirm={setConfirm}/>}
+            {confirm && <Popup setConfirm={setConfirm}
+                popupInfo={<DeleteInfo deleteList={null} toDelete={toDelete} setConfirm={setConfirm}/>}/>}
             {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead}/>}
             {<Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>}
 

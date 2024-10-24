@@ -1,8 +1,7 @@
 
 
 
-function Popup ({ deleteList, setConfirm, toDelete }) {
-    
+function Popup ({ deleteList, setConfirm, toDelete, popupInfo }) {
 
     return (
         <div className="inset-0 bg-opacity-35 bg-black backdrop-blur-sm absolute rounded-md z-50"
@@ -11,8 +10,10 @@ function Popup ({ deleteList, setConfirm, toDelete }) {
             <div
                 className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-2/3 
                 space-y-8 min-w-96 min-h-64 rounded-lg bg-stone-500 flex flex-col justify-center items-center" 
+                onClick={(e) => e.stopPropagation()}
             >
-                {deleteList && <span className="text-white text-xs ">Delete selected ({deleteList.length}): </span>}
+                {popupInfo}
+                {/* {deleteList && <span className="text-white text-xs ">Delete selected ({deleteList.length}): </span>}
                 <div className="overflow-y-scroll no-scrollbar max-h-16 rounded-md text-white flex flex-col text-xs">
                      {
                        deleteList && deleteList.map((e,i) => <span key={i}>{e}</span>)
@@ -38,7 +39,7 @@ function Popup ({ deleteList, setConfirm, toDelete }) {
                     >
                         No
                     </button>
-                </div>
+                </div> */}
             </div>
         </div>
     );

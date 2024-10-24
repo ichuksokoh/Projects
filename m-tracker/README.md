@@ -21,7 +21,7 @@ and current manhwa page. Also added a chapter count for chapters read on Manhwas
 
 ## Version 2.2 (prototype)
 Additional Support added for [Mangakakalot][def6]. New feature for rating manhwas (half step increments or input number of your choice, must be a number). Refactored scraper logic into their own files to reduce file size of content.js.
-Fixed asurascans bug for chapters not being updated properly due to links not loading. Added select all button when deleting items as well as total number of selected items on main page and popup confirmation for delete.
+Fixed asurascans bug for chapters not being updated properly due to links not loading. Added select all button when deleting items as well as total number of selected items on main page and popup confirmation for delete. Added an info page for supported sites (with clickable links to sites)
 
 [def]: https://asuracomic.net/
 [def2]: https://flamecomics.xyz/

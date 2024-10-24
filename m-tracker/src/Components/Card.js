@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 
 function Card ({ goTo, chgState, manhwa, setBoxes, selected }) {
-    console.log(manhwa);
     const title = manhwa.title;
     const img = manhwa.img;
     const len = manhwa.description.length

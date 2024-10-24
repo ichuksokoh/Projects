@@ -154,7 +154,7 @@ function App() {
     <div className="max-w-[500px] min-w-[500px] min-h-[500px] max-h-[500px] flex flex-col">
       {confirm && <Popup setConfirm={setConfirm}
        popupInfo={<DeleteInfo deleteList={deleteList} 
-        toDelete={() => {setTrig(true); setSelect(false)}} 
+        toDelete={() => {setTrig(true); setSelect(false); setConfirm(false)}} 
         setConfirm={setConfirm}/>}/> }
         {confirm2 && <Popup setConfirm={setConfirm2} popupInfo={<SupportInfo setConfirm={setConfirm2}/>}/>}
       <div className="flex flex-col bg-slate-500">

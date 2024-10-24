@@ -1,16 +1,21 @@
+/* eslint-disable no-undef */
 import clsx from "clsx";
 
 
 
 export default function SupportInfo ({ setConfirm }) {
     var supportedSites = [
-        "Asura Scans",
-        "Flame Comics",
-        "Reaper Scans",
-        "Manganato",
-        "Mangago",
-        "Mangakakalot"
-    ].sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+        { name: "Asura Scans", link: "https://asuracomic.net/"},
+       { name: "Flame Comics", link: "https://flamecomics.xyz/"},
+        { name: "Reaper Scans", link: "https://reaperscans.com/"},
+       { name: "Manganato", link:  "https://manganato.com/"},
+       { name: "Mangago", link: "https://www.mangago.me/"},
+        { name: "Mangakakalot", link: "https://mangakakalot.com/"}
+    ].sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+
+    const openLink = (link) => {
+        chrome.tabs.create(({url: link}))
+    };
 
     return (
         <div className="flex flex-col">
@@ -18,7 +23,10 @@ export default function SupportInfo ({ setConfirm }) {
                 Supported Sites:
             </span>
             <div className="flex flex-col overflow-y-scroll no-scrollbar items-center">
-                {supportedSites.map((e,i) => <span className="text-white" key={i}>{e}</span>)}
+                {supportedSites.map((elem,i) => <span 
+                className="text-white cursor-pointer duration-150 ease-out hover:text-sky-500
+                            active:scale-90" 
+                    onClick={() => openLink(elem.link)} key={i} >{elem.name}</span>)}
             </div>
             <button
                 className={clsx(

@@ -20,8 +20,8 @@ const scrapeAsuraScans = (update, getTitle, manhwaList) => {
         elems.forEach((header) => {
             const href = header.querySelector('a.block');
             if (href) {
-                let chpname = href.textContent.replace('Chapter', '').trim();
-                // console.log("chpname before: ", chpname);Z
+                // let chpname = href.textContent.replace('Chapter', '');
+                console.log("chpname before: ", chpname);
                 chpname = chpname.match(/^\d+/)[0];
                 // console.log("CHPNAME after: " ,chpname);  
                 manhwaList.push({chapter : chpname, read : false});

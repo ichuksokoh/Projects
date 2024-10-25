@@ -10,6 +10,7 @@ function Manhwa({ Title, onDelete, chgState }) {
     const [marked, setMarked] = useState(false);
     const [manhwa, setManhwa] = useState({});
     const [chpsRead, setRead] = useState(0);
+    const [lastChp, setLastChp] = useState(0);
     const [confirm, setConfirm] = useState(false);
     const [addfav, setFav] = useState(false);
 
@@ -44,6 +45,11 @@ function Manhwa({ Title, onDelete, chgState }) {
         }
         return lastRead;
     }
+
+    const finalChp = () => {
+        let len = manhwa.chapters.length
+        return manhwa.chapters[len-1].chapter
+    }
     useEffect(() => {
         const fetchChps = async () => {
             const result = await new Promise((resolve) => {
@@ -62,6 +68,7 @@ function Manhwa({ Title, onDelete, chgState }) {
     useEffect(() => {
         if (manhwa.chapters) {
             setRead(readChps());
+            setLastChp(finalChp());
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [manhwa.chapters, marked])
@@ -82,7 +89,7 @@ function Manhwa({ Title, onDelete, chgState }) {
 
             {confirm && <Popup setConfirm={setConfirm}
                 popupInfo={<DeleteInfo deleteList={null} toDelete={toDelete} setConfirm={setConfirm}/>}/>}
-            {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead}/>}
+            {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead} lastChp={lastChp}/>}
             {<Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>}
 
             <div className="flex flex-col items-start p-2">

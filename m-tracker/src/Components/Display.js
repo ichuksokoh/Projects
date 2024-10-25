@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 
-function Display ({ manhwa, chpsRead, Title }) {
+function Display ({ manhwa, chpsRead, lastChp, Title }) {
 
     const [rating, setRating] = useState("");
 
@@ -33,7 +33,7 @@ function Display ({ manhwa, chpsRead, Title }) {
                     <div className="overflow-y-scroll no-scrollbar max-h-36 bg-gray-600 text-white rounded-lg">
                         <p className="text-xs text-left p-2">{manhwa.description}</p>
                     </div>
-                    <p className="text-xl text-white font-bold">Chapters Read: {chpsRead}</p>
+                    <p className="text-base text-white font-bold">Chapters Read: {chpsRead}/{lastChp}</p>
                     <p className="text-white">Current Rating: {manhwa.rating}/10</p>
                     <div className="flex flex-row justify-start items-center space-x-3">
                         <span className="text-white">Rating:</span>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 
-function Card ({ goTo, chgState, manhwa, setBoxes, selected }) {
+function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
     const title = manhwa.title;
     const img = manhwa.img;
     const len = manhwa.description.length
@@ -30,6 +30,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected }) {
         manhwa.fav = !manhwa.fav;
         chrome.storage.local.set({ [manhwa.title]: manhwa });
         setFaved(!faved);
+        setChgFav(prev => !prev)
     }
 
     useEffect(() => {

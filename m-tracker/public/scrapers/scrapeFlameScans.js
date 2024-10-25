@@ -21,7 +21,7 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
     elems.forEach((elem) => {
         const chapterNumElement = elem.querySelector('span.chapternum');
 
-        const chapter = chapterNumElement ? chapterNumElement.textContent.trim().replace("Chapter\n", "").trim() : null;
+        const chapter = chapterNumElement ? chapterNumElement.textContent.trim().replace("Chapter", "").trim() : null;
         if (chapter) {
             manhwaList.push({ chapter: chapter, read: false });
         }

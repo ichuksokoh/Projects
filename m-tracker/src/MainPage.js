@@ -8,6 +8,18 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
     const [list, setList] = useState([]);
     const [filterOpts, setFilterOpts] = useState([]);
     const [selectBoxes, setBoxes] = useState([]);
+    const [chgFav, setChgFav] = useState(false);
+    const [favCount, setFavCount] = useState(0);
+
+    const numFavs = () => {
+        let count = 0;
+        for (const obj of filterOpts) {
+            if(obj.fav) {
+                count += 1;
+            }
+        }
+        return count;
+    }
 
     useEffect(() => {
         if (!Favs) {
@@ -17,7 +29,7 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
             setFilterOpts(list.filter((manhwa) => 
                     manhwa.fav && (manhwa.title.toLowerCase().includes(query.toLowerCase()))));
         }
-    }, [query])
+    }, [query, favCount])
 
     useEffect(() => {
         if (Favs) {
@@ -89,6 +101,10 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
 
     }, [selectAll])
 
+    useEffect(() => {
+        setFavCount(numFavs());
+    }, [chgFav])
+
 
 
     return (
@@ -135,7 +151,10 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
                                     ></div>
                             </div>
                                    }
-                            <Card manhwa={manhwa} selected={selected} setBoxes={setBoxes} goTo={(arg) => !selected ? goTo(arg) : null } chgState={(arg) => !selected ? chgState(arg) : null}/>
+                            <Card manhwa={manhwa} selected={selected} setBoxes={setBoxes} 
+                                    goTo={(arg) => !selected ? goTo(arg) : null } 
+                                    chgState={(arg) => !selected ? chgState(arg) : null}
+                                    setChgFav={setChgFav}/>
                         </div>
                     );
                 })}

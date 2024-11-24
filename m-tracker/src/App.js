@@ -21,7 +21,7 @@ function App() {
   const [confirm, setConfirm] = useState(false);
   const [confirm2, setConfirm2] = useState(false);
   const [showFav, setFav] = useState(false);
-  const [selectAllBut, setButton] = useState(false);
+  const [selectAllBut, setButton] = useState(false);  
 
   const infoButtonRef = useRef(null);
 

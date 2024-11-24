@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-const manhwaList = [];
+var manhwaList = [];
 var exist = false;
 
 const getDomain = () => {
@@ -39,6 +39,9 @@ const getDomain = () => {
     if (hostname.includes("read-")) {
         domain += " read-"
     }
+    if (hostname.includes("chapmanganato")) {
+        domain += "chapmanganato"
+    }
  
     return domain;
 
@@ -56,9 +59,9 @@ const getDomain = () => {
         title = titleElem ? titleElem.textContent.trim() : "";
     }
     else if (domain.includes('flame')) {
-        const titleContainer = tempDiv.querySelector('div.allc');
-        const titleElem = titleContainer ? titleContainer.querySelector('a') : null ;
-        title = titleElem ? titleElem.textContent.trim() : "";
+        const titleContainer2 = tempDiv.querySelector('p.mantine-Text-root[data-line-clamp="true"]');
+        const titleElem = titleContainer2 ? titleContainer2.textContent.trim() : "";
+        title = titleElem;
     }
     
     else if (domain.includes('reaperscans')) {
@@ -90,7 +93,7 @@ const getDomain = () => {
                 const existingChapters = existingManhwa?.chapters || [];
     
                 const updatedChapters = [...existingChapters];
-    
+              
                 newChapters.forEach(newChapter => {
                     if (!existingChapters.some(existingChapter => existingChapter.chapter === newChapter.chapter)) {
                         updatedChapters.push(newChapter);
@@ -110,35 +113,58 @@ const getDomain = () => {
 
 
     // Run the scraping functions
-    const domain = getDomain();
-    const hostname = window.location.href;
-
-
     let title = "";
-    // chrome.runtime.sendMessage({ domain });
-    if (domain.includes('asura') && domain.includes('series')) {
-        title = scrapeAsuraScans(update, getTitle, manhwaList);
+    const domainPrime = getDomain();
+    const hostnamePrime = window.location.href;
+
+
+    const updateSite = (domain, hostname) => {
+        if (domain.includes('asura') && domain.includes('series')) {
+            title = scrapeAsuraScans(update, getTitle, manhwaList);
+        }
+        else if (domain.includes('flame') && hostname.length > 24) {
+            title = scrapeFlameScans(update, getTitle, manhwaList);
+        }
+        
+        else if (domain.includes('mangago') && domain.includes('read-manga')) {
+           title = scrapeMangago(update, getTitle, manhwaList);
+        }
+        else if ((domain.includes('manganato') && domain.includes('manga-'))
+            || domain.includes("chapmanganato")) {
+                title = scrapeManganato(update, getTitle, manhwaList);
+        }
+        else if (domain.includes('reaperscans') && domain.includes('series')) {
+            title = scrapeReaperScans(update, getTitle, manhwaList);
+        }
+        else if (domain.includes('mangakakalot') && (domain.includes("/manga") || domain.includes("read-"))) {
+            title = scrapeMangakakalot(update, getTitle, manhwaList);
+        }
     }
-    else if (domain.includes('flame') && hostname.length > 24) {
-        title = scrapeFlameScans(update, getTitle, manhwaList);
-    }
+
     
-    else if (domain.includes('mangago') && domain.includes('read-manga')) {
-       title = scrapeMangago(update, getTitle, manhwaList);
-    }
-    else if (domain.includes('manganato') && domain.includes('manga-')) {
-            title = scrapeManganato(update, getTitle, manhwaList);
-    }
-    else if (domain.includes('reaperscans') && domain.includes('series')) {
-        title = scrapeReaperScans(update, getTitle, manhwaList);
-    }
-    else if (domain.includes('mangakakalot') && (domain.includes("/manga") || domain.includes("read-"))) {
-        title = scrapeMangakakalot(update, getTitle, manhwaList);
-    }
+    updateSite(domainPrime, hostnamePrime);
+
+    const observer = new MutationObserver(() => {
+        const currentURL = window.location.href;
     
+        // Check if the URL matches a series page pattern
+
+        if (currentURL.includes("series")) {
+            let domain = getDomain();
+            updateSite(domain, currentURL);
+            manhwaList = [];
+        }
+    });
+    
+    // Start observing changes in the DOM
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'getTitle') {
+        // console.log("Value of title in content.js: ", title);
+        // console.log("Value of exist in content.js: ", exist);
         sendResponse({ title : exist ?  title : "" });
     }
     return true; // Allows the async response

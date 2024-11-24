@@ -18,13 +18,12 @@ const scrapeAsuraScans = (update, getTitle, manhwaList) => {
         //Get chapters for manipulation
         const elems = tempDiv.querySelectorAll('h3.text-sm.text-white.font-medium');
         elems.forEach((header) => {
-            const href = header.querySelector('a.block');
+            const href = header.querySelector('a.flex.flex-row');
             if (href) {
                 let chpname = href.textContent;
                 let children = href.childNodes
                 let chp = null;
                 if (children && children[0] != null && (children[0].textContent.trim() !== "Chapter" && children[0].textContent !== undefined)) {
-                    console.log("Value of children: ",children[0].textContent)
                     chp = children[0].textContent.replace("Chapter", "").trim();
                 }
                 else {
@@ -56,7 +55,6 @@ const scrapeAsuraScans = (update, getTitle, manhwaList) => {
         
         //Entire Manhwa stored as one object
         const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false, rating: 0};
-
         update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
  

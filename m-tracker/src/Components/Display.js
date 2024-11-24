@@ -15,9 +15,6 @@ function Display ({ manhwa, chpsRead, lastChp, Title }) {
     const chgRating = () => {
         if (rating !== "" && !isNaN(rating) && Number(rating) <= 10) {
             let rate = Number(rating);
-            console.log("Manhwa Title: ", manhwa.title);
-            console.log("Manhwa current rating: ",manhwa.rating);
-            console.log("rating value: ", rating)
             manhwa.rating = rate;
             chrome.storage.local.set({[manhwa.title] : manhwa});
             setRating("");

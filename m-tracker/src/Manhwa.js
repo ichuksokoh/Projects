@@ -24,6 +24,12 @@ function Manhwa({ Title, onDelete, chgState }) {
         if (selectedOption !== '') {
             let chgRead = manhwa.chapters[selectedOption].read;
             manhwa.chapters[selectedOption].read = !chgRead;
+            let readTill = parseInt(selectedOption, 10);
+            if (readTill !== 0 && !chgRead) {
+                for (let i = 0; i < readTill; i++) {
+                    manhwa.chapters[i].read = true;
+                }
+            }
             chrome.storage.local.set({ [manhwa.title]: manhwa });
             setMarked(!marked);
         }

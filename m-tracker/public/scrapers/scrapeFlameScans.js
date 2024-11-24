@@ -10,35 +10,37 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
     tempDiv.innerHTML = html;
 
     //target correct DOM elements
-    const elems = tempDiv.querySelectorAll("#chapterlist li");
+    const elems = tempDiv.querySelectorAll(".ChapterCard_chapterWrapper__j8pBx");
 
     //get manhwa title
-    const titleElem = tempDiv.querySelector("h1.entry-title");
+    const titleElem = tempDiv.querySelector("h1.m_8a5d1357.mantine-Title-root");
     // const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
-    const manhwaTitle = getTitle() === "" ? (titleElem ?  titleElem.textContent.trim() : "") : getTitle();
+
+    console.log("Title Element: ", titleElem);
+    const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
     //get chapters
     elems.forEach((elem) => {
-        const chapterNumElement = elem.querySelector('span.chapternum');
+        const chapterNumElement = elem.querySelector('p.m_b6d8b162');
 
         const chapter = chapterNumElement ? chapterNumElement.textContent.trim().replace("Chapter", "").trim() : null;
         if (chapter) {
-            manhwaList.push({ chapter: chapter, read: false });
+            manhwaList.push({ chapter: parseInt(chapter, 10), read: false });
         }
     });
 
     //get cover art
-    const imgElem = tempDiv.querySelector('img[src*="flamecomics.xyz/wp-content/uploads/"]');
+    const imgElem = tempDiv.querySelector('img[alt="Cover"]');
     const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
 
     //Get manhwa description
-    const descriptElem = tempDiv.querySelector('div.entry-content.entry-content-single');
-    const descripts = descriptElem.querySelectorAll('p')
-    let dis = []
-    descripts.forEach(p => {
-        dis.push(p.textContent.trim());
-    })
-    const combinedDescription = dis.join(' ');
+    const descriptElem = tempDiv.querySelector('p.m_b6d8b162[data-line-clamp="true"]');
+    let combinedDescription = descriptElem ? descriptElem.textContent.trim() : "";
+    if (combinedDescription !== "") {
+        let tmp = combinedDescription.split("&nbsp");
+        combinedDescription = tmp[0];
+    }
+    
     
     //Entire manhwa stored as one object
     const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], img: imgUrl, fav: false, rating: 0};
@@ -46,5 +48,5 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
     update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
 
-    return manhwaTitle
+    return manhwaTitle;
 };

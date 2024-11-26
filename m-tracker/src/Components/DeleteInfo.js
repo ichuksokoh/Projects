@@ -4,11 +4,18 @@
 export default function DeleteInfo ({ deleteList, setConfirm, toDelete }) {
 
     return (
-        <div>
+        <div className="flex flex-col justify-center items-center">
             {deleteList && <span className="text-white text-xs ">Delete selected ({deleteList.length}): </span>}
-            <div className="overflow-y-scroll no-scrollbar max-h-16 rounded-md text-white flex flex-col text-xs">
+            <div className="overflow-y-scroll relative no-scrollbar max-h-28 rounded-md 
+                text-white text-center space-y-1 flex flex-col items-center text-xs p-2">
                     {
-                    deleteList && deleteList.map((e,i) => <span key={i}>{e}</span>)
+                    deleteList && deleteList.map((e,i) => {return (
+                            <div className="transform hover:-translate-y-1" key={i}>
+                                <span className="hover:bg-stone-300 hover:text-black ease-out duration-150 p-1 rounded-md"
+                                >{e}</span>
+                            </div>
+                            )
+                        })
                 }
             </div>
             <div className="text-white text-2xl font-bold">

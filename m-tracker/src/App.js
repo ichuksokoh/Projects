@@ -25,10 +25,9 @@ function App() {
 
   const infoButtonRef = useRef(null);
 
-  const control = (n) => {
-    if (n >= 0 && n <= 2) {
-      setState(n);
-    }
+  const control = (n, fav) => {
+    setState(n);
+    setFav(fav);
   };  
 
 
@@ -150,6 +149,12 @@ function App() {
     }
   }, [title])
 
+  useEffect(() => {
+    console.log("Value of showFav: ", showFav);
+    console.log("Value of state: ", state);
+
+  }, [state, showFav]);
+
   return (
     <div className="max-w-[500px] min-w-[500px] min-h-[500px] max-h-[500px] flex flex-col">
       {confirm && <Popup setConfirm={setConfirm}
@@ -166,13 +171,26 @@ function App() {
               'appearance-none relative z-0 flex justify-center items-center w-1/2 h-[5vh] cursor-pointer',
               'text-center rounded-full transition-colors ease-out duration-300 select-none text-xl font-bold',
               {
-                'dark:hover:bg-gray-400': state === 1,
-                'text-white': state === 0,
+                'dark:hover:bg-gray-400': state === 1 || showFav,
+                'text-white': state === 0 && !showFav,
               },
             )}
-            onClick={() => control(0)}
+            onClick={() => control(0,false)}
           >
             Manhwas
+          </button>
+          <button
+            className={clsx(
+              'appearance-none relative z-0 flex justify-center items-center w-1/2 h-[5vh] cursor-pointer',
+              'text-center rounded-full transition-colors ease-out duration-300 select-none text-xl font-bold',
+              {
+                'dark:hover:bg-gray-400': state === 1 || !showFav,
+                'text-white': state === 0 && showFav
+              },
+            )}
+            onClick={() => control(0,true)}
+            >
+              Favorites
           </button>
           {title !== "" && !ifDelete &&
             <button
@@ -184,7 +202,7 @@ function App() {
                   'text-white': state === 1,
                 },
               )}
-              onClick={() => control(1)}
+              onClick={() => control(1,false)}
             >
               Current
             </button>
@@ -195,14 +213,6 @@ function App() {
               src={process.env.PUBLIC_URL + '/images/Info-icon.png'} alt='Info' 
               className='max-h-5 max-w-5 ml-auto ease-out duration-200 active:scale-90 cursor-pointer'
               />
-          {/* <button
-            ref={infoButtonRef} 
-            className="rounded-lg text-white duration-200 ease-out active:scale-90
-            bg-slate-500 hover:bg-slate-700 ml-auto"
-            onClick={() => setConfirm2(true)}
-          >
-             Info
-          </button> */}
         </div>
       {state === 0 &&
       <div className="flex flex-col items-start p-2 mb-2">
@@ -216,7 +226,7 @@ function App() {
             className="rounded-md min-w-8 min-h-4 font-bold
              bg-cyan-900 text-white p-2 active:scale-90 hover:bg-cyan-950 ease-out duration-200
              transform translate-x-1/2"
-             onClick={() => setSelect(!select)}
+             onClick={() => {setSelect(!select); setButton(false)}}
           >
             Edit
           </button>
@@ -230,24 +240,10 @@ function App() {
           </button>}
         </div>
         <div className='flex flex-row space-x-4 items-center'>
-          <button
-            type="button"
-            className={clsx(
-              "ease-out duration-100 active:scale-90 hover:bg-gray-600 rounded-md w-20 min-h-6",
-              " font-bold p-2 ml-4",
-              {
-                "bg-gray-300 text-white border-2 border-white" : showFav,
-                "bg-slate-500 text-black border-2 border-black" : !showFav
-              }
-            )}
-            onClick={() => setFav(!showFav)}
-          >
-            Favorites
-          </button>
          {select && <button
             className={clsx(
               "rounded-md min-w-8 min-h-4 font-bold hover:bg-cyan-900",
-              "duration-200 ease-out p-2",
+              "duration-200 ease-out p-2 ml-4",
               {
                 "bg-cyan-700 text-white border-2 border-white" : selectAllBut,
                 "bg-slate-500 text-black border-2 border-black": !selectAllBut

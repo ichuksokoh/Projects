@@ -95,35 +95,46 @@ function Manhwa({ Title, onDelete, chgState }) {
 
             {confirm && <Popup setConfirm={setConfirm}
                 popupInfo={<DeleteInfo deleteList={null} toDelete={toDelete} setConfirm={setConfirm}/>}/>}
-            {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead} lastChp={lastChp}/>}
-            {<Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>}
+            {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead} lastChp={lastChp} handleF={handleFav}/>}
 
-            <div className="flex flex-col items-start p-2">
-                <div className="flex flex-row w-full">
+            <div className="flex flex-col items-start p-2 space-y-5">
+                <div className="flex flex-row w-full items-center">
+                    <Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>
                     <button
                         type="button"
-                        className="rounded-md min-w-16 mt-2 min-h-8 duration-200 ease-out active:scale-90 hover:bg-stone-700 bg-stone-500"
+                        className="rounded-md min-w-16 mt-5 duration-200 ease-out min-h-9
+                            active:scale-90 ml-auto hover:bg-stone-700 bg-stone-500"
                         onClick={upload}
                     >
                         {selectedOption !== '' && manhwa.chapters[selectedOption].read ? "Unread" : "Read"}
                     </button>
-                    <button
+                    {/* <button
                         type="button"
                         className="rounded-md min-w-16 min-h-8 ml-auto mt-2 p-2 duration-200 ease-out active:scale-90 hover:bg-stone-700 bg-stone-500"
                         onClick={handleFav}
                     >
                         {!manhwa.fav ? "Add to Favorites" : "Remove from Favorites"}
-                    </button>
+                    </button> */}
                 </div>
-                <div className="flex justify-center min-w-[475px]">
+                <div className="flex flex-row justify-center min-w-[475px] space-x-60">
+                    <button
+                         type="button"
+                         className="rounded-md bg-stone-500 hover:bg-stone-700 active:scale-90 ease-out duration-200
+                             min-w-16 min-h-8 font-bold"
+                        onClick={() => chgState(0)}
+                    >
+                        Back
+                    </button>
+
                     <button
                         type="button"
-                        className="rounded-md bg-stone-500 hover:bg-stone-700 active:scale-90 ease-out duration-200
+                        className="rounded-md bg-red-900 hover:bg-red-950 active:scale-90 ease-out duration-200
                             min-w-16 min-h-8 font-bold"
                         onClick={() => setConfirm(true)}
                     >
                         Delete
                     </button>
+
                 </div>
             </div>
         </div>

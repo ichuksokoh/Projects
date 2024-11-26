@@ -4,22 +4,12 @@ import Card from "./Components/Card";
 import clsx from "clsx";
 
 
-function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, selectAll }) {
+function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, selectAll, favList }) {
     const [list, setList] = useState([]);
     const [filterOpts, setFilterOpts] = useState([]);
     const [selectBoxes, setBoxes] = useState([]);
     const [chgFav, setChgFav] = useState(false);
-    const [favCount, setFavCount] = useState(0);
 
-    const numFavs = () => {
-        let count = 0;
-        for (const obj of filterOpts) {
-            if(obj.fav) {
-                count += 1;
-            }
-        }
-        return count;
-    }
 
     useEffect(() => {
         if (!Favs) {
@@ -29,11 +19,13 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
             setFilterOpts(list.filter((manhwa) => 
                     manhwa.fav && (manhwa.title.toLowerCase().includes(query.toLowerCase()))));
         }
-    }, [query, favCount])
+    }, [query, chgFav])
 
     useEffect(() => {
+        console.log("Value of Favs in Mainpage:", Favs);
         if (Favs) {
-            setFilterOpts(list.filter((manhwa) => manhwa.fav))
+            console.log("Enters Here");
+            setFilterOpts(list.filter((manhwa) => manhwa.fav));
         }
         else {
             setFilterOpts(list);
@@ -51,7 +43,12 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
             if (result) {
                 setList(result);
                 setBoxes([]);
-                setFilterOpts(result);
+                if (!Favs) {
+                    setFilterOpts(result);
+                }
+                else {
+                    setFilterOpts(result.filter(manhwas => manhwas.fav))
+                }
             }
         };
         fetchManhwas();
@@ -101,15 +98,13 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
 
     }, [selectAll])
 
-    useEffect(() => {
-        setFavCount(numFavs());
-    }, [chgFav])
+
 
 
 
     return (
         <div className="min-w-[95vh] bg-slate-500 p-4">
-            <div className="flex min-h-[72.15vh] flex-col items-start justify-start text-white">
+            <div className="flex min-h-[72.15vh] flex-col items-start justify-start text-white relative">
                 {!Favs && filterOpts.length === 0 && "Go Read some Manhwa! (note go to Series Page first so extension can add it) Or type correctly..."}
                 {Favs && filterOpts.length === 0 && "You don't like anything smh"}
                 {filterOpts.map((manhwa, i) => {
@@ -151,10 +146,12 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
                                     ></div>
                             </div>
                                    }
-                            <Card manhwa={manhwa} selected={selected} setBoxes={setBoxes} 
-                                    goTo={(arg) => !selected ? goTo(arg) : null } 
-                                    chgState={(arg) => !selected ? chgState(arg) : null}
-                                    setChgFav={setChgFav}/>
+                            <div className="transform hover:-translate-y-1">
+                                <Card manhwa={manhwa} selected={selected} setBoxes={setBoxes} 
+                                        goTo={(arg) => !selected ? goTo(arg) : null } 
+                                        chgState={(arg) => !selected ? chgState(arg) : null}
+                                        setChgFav={setChgFav}/>    
+                            </div>
                         </div>
                     );
                 })}

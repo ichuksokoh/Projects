@@ -6,9 +6,9 @@ function Dropdown ({ selectedOption, handleChange, manhwa }) {
 
 
     return (
-        <div>
+        <div className="w-3/4">
             <label htmlFor="myDropdown" className="mb-2 text-sm font-medium">
-                Select an option:
+               Select Chapter
             </label>
             <select
                 id="myDropdown"
@@ -16,7 +16,7 @@ function Dropdown ({ selectedOption, handleChange, manhwa }) {
                 onChange={handleChange} // Handle change event
                 className="block w-full p-2 border border-gray-300 rounded-md text-black"
             >
-                <option className="text-black"  value="">-- Please choose an option --</option>
+                <option className="text-black"  value="">-- Choose Chapter --</option>
                 {
                     manhwa.chapters?.map((chp,i) => {
 

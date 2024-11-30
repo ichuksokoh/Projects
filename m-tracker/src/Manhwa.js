@@ -65,6 +65,15 @@ function Manhwa({ Title, onDelete, chgState }) {
             });
 
             if (result) {
+                var nextRead = -1;
+                for (let i = 0; i < result.chapters?.length; i++) {
+                    if (!result.chapters[result.chapters?.length - i - 1].read) {
+                        nextRead = result.chapters?.length - i - 1;
+                    }
+                }
+                if (nextRead !== -1) {
+                    setSelectedOption(String(nextRead));
+                }
                 setManhwa(result);
             }
         };

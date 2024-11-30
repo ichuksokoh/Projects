@@ -5,6 +5,7 @@ var exist = false;
 
 const getDomain = () => {
     const hostname = window.location.href;
+    console.log("hostname: ", hostname);
     let domain = "";
     if (hostname.includes('asura')) {
         domain += "asura";
@@ -41,6 +42,30 @@ const getDomain = () => {
     }
     if (hostname.includes("chapmanganato")) {
         domain += "chapmanganato"
+    }
+    if (hostname.includes("drake")) {
+        domain += "drake"
+    }
+    if (hostname.includes("hive")) {
+        domain += "void";
+    }
+    if (hostname.includes("astra")) {
+        domain += "astra";
+    }
+    if (hostname.includes("nights")) {
+        domain += "nights";
+    }
+    if (hostname.includes("rizz")) {
+        domain += "rizz";
+    }
+    if (hostname.includes("bato")) {
+        domain += "bato";
+        if (hostname.includes("series")) {
+            domain += "series";
+        }
+        if (hostname.includes("chapter")) {
+            domain += "chapter";
+        }
     }
  
     return domain;
@@ -81,12 +106,26 @@ const getDomain = () => {
         title = titleElement ? titleElement.getAttribute('title') : "";
 
     }
+    else if (domain.includes("astra") || 
+        domain.includes("drake") || domain.includes("void")
+        || domain.includes("nights") || domain.includes("rizz")) {
+        const titleElement = document.querySelector("div.allc a");
+        title = titleElement ? titleElement.textContent.trim() : "";
+    }
+
+   else if (domain.includes("bato")) {
+        const titleElement = document.querySelector('h3.nav-title a');
+        title = titleElement ? titleElement.textContent.trim() : "";
+   }
+
+
 
    
     return title;
 };
 
   const update =  (manhwaTitle, newChapters, Manhwa) => {
+        console.log("manhwaTitle: ", manhwaTitle);
         chrome.storage.local.get([manhwaTitle], (result) => {
             if (result[manhwaTitle]) {
                 const existingManhwa = result[manhwaTitle];
@@ -106,6 +145,7 @@ const getDomain = () => {
             else if (newChapters.length !== 0) {
                 exist = true; //it will exist
                 Manhwa.chapters = newChapters;
+                console.log("Psibl New Manhwa: ", Manhwa);
                 chrome.storage.local.set({ [manhwaTitle] : Manhwa });
             }
         });
@@ -116,6 +156,8 @@ const getDomain = () => {
     let title = "";
     const domainPrime = getDomain();
     const hostnamePrime = window.location.href;
+
+    console.log("hostnamePrime: ", hostnamePrime);
 
 
     const updateSite = (domain, hostname) => {
@@ -139,25 +181,55 @@ const getDomain = () => {
         else if (domain.includes('mangakakalot') && (domain.includes("/manga") || domain.includes("read-"))) {
             title = scrapeMangakakalot(update, getTitle, manhwaList);
         }
+        else if (domain.includes('astra') || domain.includes('drake') || domain.includes('void')
+            || domain.includes('nights') || domain.includes('rizz')) {
+            title = scrapeAstraDrakeAndMoreScans(update, getTitle, manhwaList);
+        }
+        else if(domain.includes("bato") &&
+             (domain.includes("series") || domain.includes("chapter"))) {
+            title = scrapeBatoScans(update, getTitle, manhwaList);
+        }
     }
 
     
-    updateSite(domainPrime, hostnamePrime);
+    window.addEventListener('load', () => updateSite(domainPrime, hostnamePrime));
+    // updateSite(domainPrime, hostnamePrime);
 
     const observer = new MutationObserver(() => {
         const currentURL = window.location.href;
     
         // Check if the URL matches a series page pattern
 
-        if (currentURL.includes("series")) {
+        if (currentURL.includes("series") && (currentURL.includes("reaper") || currentURL.includes("flame"))) {
             let domain = getDomain();
             updateSite(domain, currentURL);
             manhwaList = [];
         }
+
     });
     
     // Start observing changes in the DOM
     observer.observe(document.body, { childList: true, subtree: true });
+
+
+
+    // const observer2 = new MutationObserver((mutationsList) => {
+    //     for (const mutation of mutationsList) {
+    //         if (mutation.type === 'childList') {
+    //             const chapters = document.querySelectorAll('li.wp-manga-chapter a');
+    //             if (chapters.length > 0) {
+    //                 updateSite(domainPrime, hostnamePrime);
+    //                 manhwaList = [];
+    //                 observer.disconnect(); // Stop observing once found
+    //             }
+    //         }
+    //     }
+    // });
+    
+    // observer2.observe(document.body, { childList: true, subtree: true });
+    
+
+
     
 
 

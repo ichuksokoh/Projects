@@ -8,7 +8,8 @@ const scrapeAsuraScans = (update, getTitle, manhwaList) => {
         // Create a temporary DOM element to parse the HTML
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
-
+        // 
+        // const tempDiv = document.documentElement
 
 
         // Adjust selectors to target the right elements in the DOM

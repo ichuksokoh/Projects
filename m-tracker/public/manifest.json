@@ -26,7 +26,10 @@
       "http://asuracomic.net/", "https://flamecomics.xyz/*", "http://flamecomics.xyz/*",
       "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
         "https://chapmanganato.to/*", "https://mangakakalot.com/manga/*",
-         "https://mangakakalot.com/chapter/*", "https://mangakakalot.com/read-*"],
+         "https://mangakakalot.com/chapter/*", "https://mangakakalot.com/read-*",
+          "https://drakecomic.org/*", "https://hivetoon.com/*", "https://astrascans.org/*"
+          ,"https://nightsup.net/*", "https://rizzfables.com/*", 
+          "https://bato.to/series/*", "https://bato.to/chapter/*"],
       "js": [
               "scrapers/scrapeAsuraScans.js",
               "scrapers/scrapeFlameScans.js",
@@ -34,6 +37,8 @@
               "scrapers/scrapeManganato.js",
               "scrapers/scrapeReaperScans.js",
               "scrapers/scrapeMangakakalot.js",
+              "scrapers/scrapeAstraDrakeAndMoreScans.js",
+              "scrapers/scrapeBatoScans.js",
               "content.js"
             ]
     }

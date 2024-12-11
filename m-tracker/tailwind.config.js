@@ -6,5 +6,14 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        '.text-xxs': {
+          fontSize: '0.65rem',
+          lineHeight: '0.85rem',
+        },
+      });
+    },
+  ],
 }

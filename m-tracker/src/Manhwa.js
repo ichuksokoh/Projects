@@ -21,6 +21,13 @@ function Manhwa({ Title, onDelete, chgState }) {
     
     
     const upload = () => {
+
+        if (selectedOption !== '' && Number(selectedOption) <= manhwa.chapters.length - 1) {
+            let chpIdx = Number(selectedOption);
+            if (!manhwa.chapters[chpIdx].read) {
+                manhwa.status = 1;
+            }
+        }
         if (selectedOption !== '') {
             let chgRead = manhwa.chapters[selectedOption].read;
             manhwa.chapters[selectedOption].read = !chgRead;
@@ -66,13 +73,23 @@ function Manhwa({ Title, onDelete, chgState }) {
 
             if (result) {
                 var nextRead = -1;
+                var noneRead = result.chapters.map(elem => elem.read).reduce((prev, curr) => prev && !curr, true);
+                
                 for (let i = 0; i < result.chapters?.length; i++) {
-                    if (!result.chapters[result.chapters?.length - i - 1].read) {
-                        nextRead = result.chapters?.length - i - 1;
+                    if (i === 0 && result.chapters[result.chapters?.length - i - 1].read) {
+                        break;
+                    }
+                    if (result.chapters[result.chapters?.length - i - 1].read) {
+                        nextRead = result.chapters?.length - i;
+                        break;
                     }
                 }
                 if (nextRead !== -1) {
                     setSelectedOption(String(nextRead));
+                }
+                if (noneRead) {
+                    nextRead = 0;
+                    setSelectedOption(String(nextRead))
                 }
                 setManhwa(result);
             }

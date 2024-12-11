@@ -9,6 +9,8 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
     const len = manhwa.description.length
     const description = manhwa.description.substring(0,Math.min(len,200));
     const [faved, setFaved] = useState(false)
+    // const statuses = ["Plan To Read", "Reading", "Completed", "Dropped"];
+    // const status = manhwa.status !== undefined ? manhwa.status : 0;
 
     const readChps = () =>  {
         let lastRead = 0;
@@ -57,7 +59,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
                     }
                     else {
                         goTo(title);
-                        setTimeout(() => {chgState(2)}, 100);
+                        setTimeout(() => {chgState(7)}, 100);
                     }
                 }}
             >   
@@ -66,6 +68,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
                         <span className="font-bold text-xl">{title}</span>
                         <span className="text-xs text-white">Chps read: {readChps()}/{lastChp()}</span>
                         <span className="text-xs text-white">Rating: {manhwa.rating !== undefined ? manhwa.rating : 0}/10 </span>
+                        {/* <span className="text-xs text-white">Status: {statuses[status]}</span> */}
                     </div>
                         {manhwa.fav && <img alt="favstar" src={process.env.PUBLIC_URL + '/images/darkfullstar.png'} className="ml-auto max-h-8 max-w-8 z-20"
                             onClick={(e) => handleFav(e,manhwa)}></img>}

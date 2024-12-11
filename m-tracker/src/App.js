@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
 import { useEffect, useRef, useState } from 'react';
 import MainPage from './MainPage';
@@ -6,6 +8,66 @@ import Manhwa from './Manhwa';
 import Popup from './Components/Popup';
 import DeleteInfo from './Components/DeleteInfo';
 import SupportInfo from './SupportInfo';
+
+const Button = ({ text, control, state, value }) => {
+  return (
+    <button
+    className={clsx(
+      'appearance-none relative z-0 flex justify-center items-center w-1/2  p-1 h-[5vh] cursor-pointer',
+      'text-center rounded-full transition-colors ease-out duration-300 select-none text-xl font-bold',
+      {
+        'dark:hover:bg-gray-400': state !== value,
+        'text-white': state === value,
+      },
+    )}
+    onClick={() => value === 1 ? control(value,true) : control(value)}
+    >
+      {text}
+  </button>
+  )
+}
+const MainDropDown = ({ setStatus, status }) => {
+  var options = {0 : "Plan To Read", 1: "Reading", 2: "Completed", 3: "Dropped", 4: "All"};
+  var o1 = Object.values(options);
+  var options2 = Object.keys(options).map((e,i) => {return {status: Number(e), title: o1[i]}});
+
+  const [open, setOpen] = useState(false);
+  return (
+    <div className='flex flex-col items-center relative'>
+      <button 
+      onClick={() => setOpen(prev => !prev)}
+      onBlur={() => setTimeout(() => setOpen(_ => false), 150)}
+      className='text-center text-xs font-bold bg-gray-600 min-w-20 text-white'
+      > { options[status] }</button>
+      <div
+        className={clsx(
+          'absolute mt-5 min-w-20 rounded-md overflow-auto no-scrollbar bg-gray-600',
+          'ease-out duration-300 z-10',
+          'transform transition-all origin-top flex flex-col',
+          {
+            'max-h-32 scale-100 visible': open,
+            'max-h-0 invisible': !open,
+          }
+        )}
+      >
+        {options2.map((elem, i) => {
+          return (
+            <button key={i} className={clsx(
+              "text-black text-center text-xs font-bold ease-out duration-150 hover:text-white",
+              {
+                "hover:text-black": status !== elem.status,
+                "text-white": status === elem.status,
+              }
+            )}
+              onClick={() => setStatus(elem.status)}
+            >{elem.title}</button>
+          );
+        })}
+      </div>
+
+    </div>
+  )
+}
 
 function App() {
   
@@ -22,10 +84,11 @@ function App() {
   const [confirm2, setConfirm2] = useState(false);
   const [showFav, setFav] = useState(false);
   const [selectAllBut, setButton] = useState(false);  
+  const [status, setStatus] = useState(4);
 
   const infoButtonRef = useRef(null);
 
-  const control = (n, fav) => {
+  const control = (n, fav = false) => {
     setState(n);
     setFav(fav);
   };  
@@ -145,7 +208,7 @@ function App() {
 
   useEffect(() => {
     if (title !== "") {
-      control(1);
+      control(6);
     }
   }, [title])
 
@@ -164,48 +227,12 @@ function App() {
         {confirm2 && <Popup setConfirm={setConfirm2} popupInfo={<SupportInfo setConfirm={setConfirm2}/>}/>}
       <div className="flex flex-col bg-slate-500">
         <div
-          className=" flex flex-row p-2 sticky top-0 z-10 mb-1"
-        >
-          <button
-             className={clsx(
-              'appearance-none relative z-0 flex justify-center items-center w-1/2 h-[5vh] cursor-pointer',
-              'text-center rounded-full transition-colors ease-out duration-300 select-none text-xl font-bold',
-              {
-                'dark:hover:bg-gray-400': state === 1 || showFav,
-                'text-white': state === 0 && !showFav,
-              },
-            )}
-            onClick={() => control(0,false)}
+          className="flex flex-row p-2 sticky top-0 z-10 mb-1  rounded-lg"
           >
-            Manhwas
-          </button>
-          <button
-            className={clsx(
-              'appearance-none relative z-0 flex justify-center items-center w-1/2 h-[5vh] cursor-pointer',
-              'text-center rounded-full transition-colors ease-out duration-300 select-none text-xl font-bold',
-              {
-                'dark:hover:bg-gray-400': state === 1 || !showFav,
-                'text-white': state === 0 && showFav
-              },
-            )}
-            onClick={() => control(0,true)}
-            >
-              Favorites
-          </button>
+          <Button text={"Manhwas"} control={control} state={state} value={0}/>
+          <Button text={"Favorites"} control={control} state={state} value={1}/>
           {title !== "" && !ifDelete &&
-            <button
-              className={clsx(
-                'appearance-none relative z-0 flex justify-center items-center w-1/2 h-[5vh] cursor-pointer',
-                'text-center rounded-full transition-colors ease-out duration-300 select-none text-xl font-bold',
-                {
-                  'dark:hover:bg-gray-400': state === 0,
-                  'text-white': state === 1,
-                },
-              )}
-              onClick={() => control(1,false)}
-            >
-              Current
-            </button>
+            <Button text={"Current"} control={control} state={state} value={6}/>
           }
            <img 
               ref={infoButtonRef}
@@ -214,26 +241,28 @@ function App() {
               className='max-h-5 max-w-5 ml-auto ease-out duration-200 active:scale-90 cursor-pointer'
               />
         </div>
-      {state === 0 &&
-      <div className="flex flex-col items-start p-2 mb-2">
-        <div className="bg-slate-500 p-4 flex flex-row space-x-8">
+      {state <= 5 &&
+      <div className="flex flex-col items-start p-2 mb-2 min-h-24">
+        <div className="bg-slate-500 p-4 flex flex-row space-x-2">
+        
+          <MainDropDown setStatus={setStatus} status={status}/>
           <input value={query} placeholder='Manga/Manhwa Name...' 
             className="min-w-64 min-h-8 text-white bg-gray-400 
-              rounded-lg p-2 border-none placeholder:text-white focus:outline-none focus:shadow-md focus:shadow-stone-300"
+            rounded-lg p-2 border-none placeholder:text-white focus:outline-none focus:shadow-md focus:shadow-stone-300"
             onChange={(e) => setQuery(e.target.value)}
-          />
+            />
           <button
             className="rounded-md min-w-8 min-h-4 font-bold
-             bg-cyan-900 text-white p-2 active:scale-90 hover:bg-cyan-950 ease-out duration-200
-             transform translate-x-1/2"
-             onClick={() => {setSelect(!select); setButton(false)}}
-          >
+            bg-cyan-900 text-white p-2 active:scale-90 hover:bg-cyan-950 ease-out duration-200
+            transform translate-x-1/4"
+            onClick={() => {setSelect(!select); setButton(false)}}
+            >
             Edit
           </button>
           {select && <button
             className="rounded-md min-w-8 min-h-4 font-bold
              bg-red-900 text-white p-2 active:scale-90 hover:bg-red-950 ease-out duration-200
-              transform translate-x-1/2"
+              transform translate-x-1/4"
               onClick={() => {if (deleteList.length !== 0) setConfirm(true)}}
           >
             Delete
@@ -260,13 +289,40 @@ function App() {
 
       </div>
         <div className="flex-grow overflow-y-scroll no-scrollbar">
-            {state === 0 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} />}
 
-            {state === 1 && !ifDelete && title !== "" && <Manhwa Title={title} 
+            {/* Main Page */}
+            {state === 0 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} status={status} />}
+
+            {/* Favorites Pgae */}
+            {state === 1 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} status={status} />}
+
+            {/* Plan to Read Manhwas */}
+            {/* {state === 2 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} state={state} />} */}
+
+            {/* Reading Manhwas */}
+            {/* {state === 3 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} state={state}/>} */}
+
+            {/* Completed Manhwas */}
+            {/* {state === 4 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} state={state}/>} */}
+
+            {/* Dropped Manhwas */}
+            {/* {state === 5 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} state={state}/>} */}
+
+            {/* Current Manhwa if Reading */}
+            {state === 6 && !ifDelete && title !== "" && <Manhwa Title={title} 
               onDelete={setDelete} chgState={setState}/>}
 
-            {state === 2 && <Manhwa Title={title2} onDelete={setDelete} chgState={setState}/>}
+            {/* Manhwa clicked on from mainpage */}
+            {state === 7 && <Manhwa Title={title2} onDelete={setDelete} chgState={setState}/>}
+            
+
+
         </div>
     </div>
   );

@@ -3,6 +3,21 @@
 var manhwaList = [];
 var exist = false;
 
+// const supportedSites = [
+//    "https://asuracomic.net/*",
+//    "https://flamecomics.xyz/*",
+//    "https://reaperscans.com/*",
+//    "https://manganato.com/*",
+//    "https://www.mangago.me/*",
+//    "https://mangakakalot.com/*",
+//    "https://drakecomic.org/*",
+//    "https://hivetoon.com/*",
+//    "https://astrascans.org/*",
+//    "https://nightsup.net/*",
+//    "https://rizzfables.com/*",
+//    "https://bato.to/*"
+// ].sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
 const getDomain = () => {
     const hostname = window.location.href;
     console.log("hostname: ", hostname);
@@ -191,6 +206,8 @@ const getDomain = () => {
         }
     }
 
+
+
     
     window.addEventListener('load', () => updateSite(domainPrime, hostnamePrime));
     // updateSite(domainPrime, hostnamePrime);
@@ -210,24 +227,6 @@ const getDomain = () => {
     
     // Start observing changes in the DOM
     observer.observe(document.body, { childList: true, subtree: true });
-
-
-
-    // const observer2 = new MutationObserver((mutationsList) => {
-    //     for (const mutation of mutationsList) {
-    //         if (mutation.type === 'childList') {
-    //             const chapters = document.querySelectorAll('li.wp-manga-chapter a');
-    //             if (chapters.length > 0) {
-    //                 updateSite(domainPrime, hostnamePrime);
-    //                 manhwaList = [];
-    //                 observer.disconnect(); // Stop observing once found
-    //             }
-    //         }
-    //     }
-    // });
-    
-    // observer2.observe(document.body, { childList: true, subtree: true });
-    
 
 
     

@@ -1,14 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
 import { useEffect, useState } from "react";
 import Card from "./Components/Card";
 import clsx from "clsx";
 
 
-function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, selectAll, favList }) {
+function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, selectAll, status }) {
     const [list, setList] = useState([]);
     const [filterOpts, setFilterOpts] = useState([]);
     const [selectBoxes, setBoxes] = useState([]);
     const [chgFav, setChgFav] = useState(false);
+    const [doneFetch, setFetch] = useState(false);
 
 
     useEffect(() => {
@@ -22,15 +24,20 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
     }, [query, chgFav])
 
     useEffect(() => {
-        console.log("Value of Favs in Mainpage:", Favs);
-        if (Favs) {
-            console.log("Enters Here");
-            setFilterOpts(list.filter((manhwa) => manhwa.fav));
-        }
-        else {
-            setFilterOpts(list);
-        }
-    }, [Favs])
+        setFilterOpts(
+            list.filter(manhwa => {
+                //status goes from 0 to 4, 0 - Plan To Read, 1-Reading
+                //2-Completed, 3-Dropped, 4-Goes back to original manhwa page w/no filter
+                const matchesStatus = status === 4 || manhwa.status === status;
+                const matchesFav = !Favs || manhwa.fav; // Only filter by fav if Favs is true
+                const matchesQuery = manhwa.title.toLowerCase().includes(query.toLowerCase());
+                return matchesStatus && matchesFav && matchesQuery;
+            })
+        );
+    }, [status, query, Favs, list, doneFetch]);
+    
+
+
 
     useEffect(() => {
         const fetchManhwas = async () => {
@@ -43,12 +50,7 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, Favs, se
             if (result) {
                 setList(result);
                 setBoxes([]);
-                if (!Favs) {
-                    setFilterOpts(result);
-                }
-                else {
-                    setFilterOpts(result.filter(manhwas => manhwas.fav))
-                }
+                setFetch(true);
             }
         };
         fetchManhwas();

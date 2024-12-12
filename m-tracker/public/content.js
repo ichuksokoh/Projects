@@ -20,7 +20,6 @@ var exist = false;
 
 const getDomain = () => {
     const hostname = window.location.href;
-    console.log("hostname: ", hostname);
     let domain = "";
     if (hostname.includes('asura')) {
         domain += "asura";
@@ -140,7 +139,6 @@ const getDomain = () => {
 };
 
   const update =  (manhwaTitle, newChapters, Manhwa) => {
-        console.log("manhwaTitle: ", manhwaTitle);
         chrome.storage.local.get([manhwaTitle], (result) => {
             if (result[manhwaTitle]) {
                 const existingManhwa = result[manhwaTitle];
@@ -160,7 +158,6 @@ const getDomain = () => {
             else if (newChapters.length !== 0) {
                 exist = true; //it will exist
                 Manhwa.chapters = newChapters;
-                console.log("Psibl New Manhwa: ", Manhwa);
                 chrome.storage.local.set({ [manhwaTitle] : Manhwa });
             }
         });
@@ -172,7 +169,6 @@ const getDomain = () => {
     const domainPrime = getDomain();
     const hostnamePrime = window.location.href;
 
-    console.log("hostnamePrime: ", hostnamePrime);
 
 
     const updateSite = (domain, hostname) => {
@@ -234,8 +230,6 @@ const getDomain = () => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'getTitle') {
-        // console.log("Value of title in content.js: ", title);
-        // console.log("Value of exist in content.js: ", exist);
         sendResponse({ title : exist ?  title : "" });
     }
     return true; // Allows the async response

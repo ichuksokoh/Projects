@@ -1,7 +1,5 @@
 
 
-
-
 function Dropdown ({ selectedOption, handleChange, manhwa }) {
 
 

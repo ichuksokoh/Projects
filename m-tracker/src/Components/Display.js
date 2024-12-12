@@ -28,9 +28,6 @@ function Display ({ manhwa, chpsRead, lastChp, Title, handleF}) {
 
     const [rating, setRating] = useState("");
     const [stateStatus, setStatus] = useState(-1);
-    console.log("value of stateStatus for manhwa: ", stateStatus);
-    console.log("value of status for manhwa: ", manhwa.status);
-    console.log("value of manhwa.status !== undefined for manhwa: ", manhwa.status !== undefined);
     const handleClick = (status) => {
         manhwa.status = status;
         chrome.storage.local.set({ [manhwa.title]: manhwa });

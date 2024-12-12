@@ -4,6 +4,7 @@ import Popup from './Components/Popup';
 import Dropdown from './Components/Dropdown';
 import Display from './Components/Display';
 import DeleteInfo from './Components/DeleteInfo';
+import MainDropDown from './Components/Dropdown2';
 
 function Manhwa({ Title, onDelete, chgState }) {
     const [selectedOption, setSelectedOption] = useState(''); // State to hold the selected option
@@ -15,7 +16,7 @@ function Manhwa({ Title, onDelete, chgState }) {
     const [addfav, setFav] = useState(false);
 
     const handleChange = (event) => {
-        setSelectedOption(event.target.value); // Update state with the selected value
+        setSelectedOption(event.currentTarget.value); // Update state with the selected value
     };
     
     
@@ -125,22 +126,16 @@ function Manhwa({ Title, onDelete, chgState }) {
 
             <div className="flex flex-col items-start p-2 space-y-5">
                 <div className="flex flex-row w-full items-center">
-                    <Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>
+                    {/* <Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/> */}
+                    <MainDropDown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>
                     <button
                         type="button"
                         className="rounded-md min-w-16 mt-5 duration-200 ease-out min-h-9
                             active:scale-90 ml-auto hover:bg-stone-700 bg-stone-500"
                         onClick={upload}
-                    >
+                    >   
                         {selectedOption !== '' && manhwa.chapters[selectedOption].read ? "Unread" : "Read"}
                     </button>
-                    {/* <button
-                        type="button"
-                        className="rounded-md min-w-16 min-h-8 ml-auto mt-2 p-2 duration-200 ease-out active:scale-90 hover:bg-stone-700 bg-stone-500"
-                        onClick={handleFav}
-                    >
-                        {!manhwa.fav ? "Add to Favorites" : "Remove from Favorites"}
-                    </button> */}
                 </div>
                 <div className="flex flex-row justify-center min-w-[475px] space-x-60">
                     <button

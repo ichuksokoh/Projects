@@ -59,7 +59,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
                     }
                     else {
                         goTo(title);
-                        setTimeout(() => {chgState(7)}, 100);
+                        setTimeout(() => {chgState(3)}, 100);
                     }
                 }}
             >   

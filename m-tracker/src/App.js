@@ -62,11 +62,11 @@ const MainSlider = ({ setStatus, status }) => {
            font-bold bg-gray-400 min-w-28 text-white rounded-lg'
       >
         <span className='px-2 text-center ml-auto'>{ options[status] }</span>
-        <img alt='<' 
+        <img alt='>' 
           className={clsx(
             'transform transition-all max-h-4 ml-auto',
             {
-              'rotate-180' : show,
+              'rotate-180' : !show,
 
             }
           )}

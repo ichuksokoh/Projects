@@ -1,7 +1,7 @@
 
 
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { FixedSizeList as List } from 'react-window';
 
@@ -12,6 +12,8 @@ export default function MainDropDown({ selectedOption, handleChange, manhwa }) {
   
     const [open, setOpen] = useState(false)
     const [show, setShow] = useState(false);
+
+    const listRef = useRef(null);
 
     const ChapterRow = ({ index, style }) => {
         if (index === 0) {
@@ -42,10 +44,10 @@ export default function MainDropDown({ selectedOption, handleChange, manhwa }) {
                     value={index-1}
                     className={clsx(
                         "text-black text-center text-xxs font-bold ease-out duration-150 hover:bg-gray-500",
-                        "ml-auto",
+                        "ml-auto group",
                         {
-                            "hover:text-black": Number(selectedOption) === index-1 && selectedOption !== "",
-                            "hover:text-white": Number(selectedOption) !== index-1,
+                            "bg-gray-500" : Number(selectedOption) === index-1 && selectedOption !== "",
+                            "hover:text-white": Number(selectedOption) !== index-1 || selectedOption === "",
                             "text-white": Number(selectedOption) === index-1 && selectedOption !== "",
                         }
                     )}
@@ -59,11 +61,36 @@ export default function MainDropDown({ selectedOption, handleChange, manhwa }) {
                         <div>
                             {chp.chapter}
                         </div>
-                        {chp?.read && <img className="max-h-8 max-w-4" alt="check?" src={process.env.PUBLIC_URL + '/images/check.png'}></img>}    
+                        {chp?.read && (
+                            <>
+                            {console.log("value of selectedOption: ", selectedOption)}
+                                <img className={clsx(
+                                    "max-h-8 max-w-4 group-hover:hidden",
+                                    {
+                                        "hidden" : Number(selectedOption) === index-1 && selectedOption !== "",
+                                    }
+                                )} alt="check?" src={process.env.PUBLIC_URL + '/images/check.png'}></img>
+                                <img className={clsx(
+                                    "max-h-8 max-w-4 group-hover:block",
+                                    {
+                                        "block" : Number(selectedOption) === index-1 && selectedOption !== "",
+                                        "hidden" : Number(selectedOption) !== index-1 || selectedOption === "",
+                                    }
+                                )} alt="check?" src={process.env.PUBLIC_URL + '/images/white-check.png'}></img>
+                            </>
+                        )}    
                     </div>
                 </button>
         );
     };
+
+
+    useEffect(() => {
+        if (open && selectedOption !== "") {
+            listRef.current.scrollToItem(Number(selectedOption), "start");
+        }
+
+    }, [open,selectedOption])
 
     
   
@@ -88,7 +115,7 @@ export default function MainDropDown({ selectedOption, handleChange, manhwa }) {
       <div className='flex flex-col relative w-3/4'>
         {open && <div
           className={clsx(
-            'absolute min-w-20 w-full rounded-lg overflow-auto no-scrollbar bg-gray-400',
+            'absolute min-w-20 w-full rounded-lg overflow-auto bg-gray-400',
             'ease-in-out duration-300 z-10',
             'transform transition-all origin-bottom flex flex-col',
             {
@@ -98,11 +125,12 @@ export default function MainDropDown({ selectedOption, handleChange, manhwa }) {
           )}
         >
           <List
-            height={1000} // Height of the dropdown
+            ref={listRef}
+            height={240} // Height of the dropdown
             itemCount={manhwa.chapters.length+1} // Total number of items
             itemSize={32} // Height of each item
             width="100%" // Width of the dropdown
-            className="no-scrollbar"
+            className="scrollbar"
             >
                 {ChapterRow}
             </List>
@@ -121,7 +149,7 @@ export default function MainDropDown({ selectedOption, handleChange, manhwa }) {
           selectedOption === "" ? "--Choose a Chapter--" : manhwa.chapters[Number(selectedOption)].chapter }</span>
           <img alt='<' 
             className={clsx(
-              'transform transition-all max-h-4 ml-auto my-auto ',
+              'transform transition-all max-h-4 ml-auto my-auto',
               {
                 'rotate-90' : show,
   

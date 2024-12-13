@@ -15,5 +15,27 @@ module.exports = {
         },
       });
     },
+    function ({ addUtilities, theme }) {
+      addUtilities({
+        ".scrollbar": {
+          "overflow": "auto",
+        },
+        ".scrollbar::-webkit-scrollbar": {
+          "width": "8px",
+          "height": "8px",
+        },
+        ".scrollbar::-webkit-scrollbar-track": {
+          "background": theme("colors.gray.500"),
+          "border-radius": "10px",
+        },
+        ".scrollbar::-webkit-scrollbar-thumb": {
+          "background": theme("colors.gray.700"),
+          "border-radius": theme("borderRadius.xl"),
+        },
+        ".scrollbar::-webkit-scrollbar-thumb:hover": {
+          "background": theme("colors.gray.800"),
+        },
+      });
+    },
   ],
 }

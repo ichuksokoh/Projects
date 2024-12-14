@@ -138,7 +138,7 @@ const getDomain = () => {
     return title;
 };
 
-  const update =  (manhwaTitle, newChapters, Manhwa) => {
+const update =  (manhwaTitle, newChapters, Manhwa) => {
         chrome.storage.local.get([manhwaTitle], (result) => {
             if (result[manhwaTitle]) {
                 const existingManhwa = result[manhwaTitle];
@@ -226,8 +226,7 @@ const getDomain = () => {
 
 
     
-
-
+    
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'getTitle') {
         sendResponse({ title : exist ?  title : "" });

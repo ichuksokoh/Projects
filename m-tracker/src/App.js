@@ -174,7 +174,7 @@ function App() {
     handleTitle();
   }, []);
   
-  
+  console.log("value of Title in App.js: ", title);
   useEffect(() => {
     const deleteTitle = async () => {
       const result = await new Promise((resolve) => {

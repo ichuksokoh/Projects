@@ -19,19 +19,9 @@ const scrapeAsuraScans = (update, getTitle, manhwaList) => {
         //Get chapters for manipulation
         const elems = tempDiv.querySelectorAll('h3.text-sm.text-white.font-medium');
         elems.forEach((header) => {
-            const href = header.querySelector('a.flex.flex-row');
-            if (href) {
-                let chpname = href.textContent;
-                let children = href.childNodes
-                let chp = null;
-                if (children && children[0] != null && (children[0].textContent.trim() !== "Chapter" && children[0].textContent !== undefined)) {
-                    chp = children[0].textContent.replace("Chapter", "").trim();
-                }
-                else {
-                    let splitChp = chpname.split(" ");
-                    chp = splitChp[1];
-                }
-                manhwaList.push({chapter : chp, read : false});
+            const chpContent = header.textContent.trim();
+            if (chpContent !== "" && chpContent !== null) {
+                manhwaList.push({chapter: chpContent, read: false});
             }
         });
 

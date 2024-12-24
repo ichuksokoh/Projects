@@ -37,11 +37,12 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
 
     useEffect(() => {
 
-    }, [faved])
+    }, [faved]);
+
 
 
     return (
-        <div>
+        <div className="flex-grow">
             <div className="flex flex-col justify-start items-start
             hover:bg-slate-700 ease-out duration-150 p-2 rounded-md active:scale-95"
                 onClick={() => {
@@ -65,7 +66,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
             >   
                 <div className="flex flex-row w-full">
                     <div className="flex flex-col items-start justify-start pb-2 space-y-1">
-                        <span className="font-bold text-xl">{title}</span>
+                        <span className="font-bold text-lg">{title.length > 75 ? title.slice(0,75) + "..." : title}</span>
                         <span className="text-xs text-white">Chps read: {readChps()}/{lastChp()}</span>
                         <span className="text-xs text-white">Rating: {manhwa.rating !== undefined ? manhwa.rating : 0}/10 </span>
                         {/* <span className="text-xs text-white">Status: {statuses[status]}</span> */}

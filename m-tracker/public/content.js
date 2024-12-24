@@ -152,6 +152,9 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
                     }
                 });
                 existingManhwa.chapters = updatedChapters;
+                if (existingManhwa.hidden === undefined) {
+                    existingManhwa.hidden = false;
+                }
                 chrome.storage.local.set({ [manhwaTitle]: existingManhwa });
                 exist = true;
             }

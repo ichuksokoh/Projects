@@ -24,7 +24,7 @@ const ButtonCard = ({text, handleClick, status, state}) => {
 }
 
 
-function Display ({ manhwa, chpsRead, lastChp, Title, handleF}) {
+function Display ({ manhwa, chpsRead, lastChp, Title, handleF, handleH}) {
 
     const [rating, setRating] = useState("");
     const [stateStatus, setStatus] = useState(-1);
@@ -60,13 +60,22 @@ function Display ({ manhwa, chpsRead, lastChp, Title, handleF}) {
     return (
         <div className="flex flex-col justify-start items-start">
             <div className="flex flex-row items-start justify-start w-full">
-                <span className="text-xl font-bold">{Title}</span>
-               {manhwa.fav && <img alt="favstar" src={process.env.PUBLIC_URL + '/images/darkfullstar.png'} 
-                className="ml-auto max-h-8 max-w-8 z-20"
-                onClick={handleF}></img>}
-               {!manhwa.fav && <img alt="favstar" src={process.env.PUBLIC_URL + '/images/star.png'} 
-                className="ml-auto max-h-8 max-w-8 z-20"
-                onClick={handleF}></img>}
+                <span className="text-lg font-bold">{Title}</span>
+                <div className="flex flex-row gap-x-1 ml-auto">
+                    {manhwa.hidden && <img alt="hide" src={process.env.PUBLIC_URL + '/images/hide.png'}
+                        className="max-h-8 max-w-8 z-20"
+                        onClick={handleH}/>}
+                    {!manhwa.hidden && <img alt="unhide" src={process.env.PUBLIC_URL + '/images/unhide.png'}
+                        className="max-h-8 max-w-8 z-20"
+                        onClick={handleH}/>}
+                {manhwa.fav && <img alt="favstar" src={process.env.PUBLIC_URL + '/images/darkfullstar.png'} 
+                    className="max-h-8 max-w-8 z-20"
+                    onClick={handleF}></img>}
+                {!manhwa.fav && <img alt="favstar" src={process.env.PUBLIC_URL + '/images/star.png'} 
+                    className="max-h-8 max-w-8 z-20"
+                    onClick={handleF}></img>}
+                </div>
+                
             </div>
             <div className="flex flex-row items-start justify-center">
                 <img alt="Title for manhwa here..." className="max-w-48 max-h-96 rounded-md" src={manhwa.img}/>
@@ -74,7 +83,6 @@ function Display ({ manhwa, chpsRead, lastChp, Title, handleF}) {
                     <div className="overflow-y-scroll no-scrollbar max-h-36 bg-gray-600 text-white rounded-lg">
                         <p className="text-xs text-left p-2">{manhwa.description}</p>
                     </div>
-                    {/* <div className="grid grid-cols-3 gap-1 p-1"> */}
                     <div className="flex flex-wrap space-x-0.5 p-2 max-w-64 gap-1">
                         <ButtonCard text={"Plan To Read"} handleClick={handleClick} status={0} state={stateStatus}/>
                         <ButtonCard text={"Reading"} handleClick={handleClick} status={1} state={stateStatus}/>

@@ -14,6 +14,7 @@ function Manhwa({ Title, onDelete, chgState }) {
     const [lastChp, setLastChp] = useState(0);
     const [confirm, setConfirm] = useState(false);
     const [addfav, setFav] = useState(false);
+    const [hidden, setHidden] = useState(false);
 
     const handleChange = (event) => {
         setSelectedOption(event.currentTarget.value); // Update state with the selected value
@@ -112,17 +113,24 @@ function Manhwa({ Title, onDelete, chgState }) {
         setFav(!addfav);
     }
 
+    const handleHidden = () => {
+        manhwa.hidden = !manhwa.hidden;
+        chrome.storage.local.set({ [manhwa.title]: manhwa});
+        setHidden(!hidden);
+    }
+
 
     useEffect(() => {
 
-    },[addfav])
+    },[addfav, hidden])
 
     return (
         <div className="bg-slate-500 min-w-[95vh] min-h-[95vh] text-white p-2">
 
             {confirm && <Popup setConfirm={setConfirm}
                 popupInfo={<DeleteInfo deleteList={null} toDelete={toDelete} setConfirm={setConfirm}/>}/>}
-            {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead} lastChp={lastChp} handleF={handleFav}/>}
+            {<Display Title={Title} manhwa={manhwa} chpsRead={chpsRead} lastChp={lastChp}
+             handleF={handleFav} handleH={handleHidden}/>}
 
             <div className="flex flex-col items-start p-2 space-y-5">
                 <div className="flex flex-row w-full items-center">

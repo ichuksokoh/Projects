@@ -20,7 +20,7 @@ const Button = ({ text, control, state, value }) => {
         'text-white': state === value,
       },
     )}
-    onClick={() => value === 1 ? control(value,true) : control(value)}
+    onClick={(event) => event.shiftKey && value === 1 ? control(4) : control(value)}
     >
       {text}
   </button>
@@ -59,7 +59,7 @@ const MainSlider = ({ setStatus, status }) => {
           onClick={() => toggle()}
           // onBlur={() => setTimeout(() => toggle(true), 100)}
           className='flex flex-row justify-center text-xs
-           font-bold bg-gray-400 min-w-28 text-white rounded-lg'
+           font-bold bg-gray-400 min-w-28 text-white rounded-lg cursor-pointer'
       >
         <span className='px-2 text-center ml-auto'>{ options[status] }</span>
         <img alt='>' 
@@ -115,15 +115,14 @@ function App() {
   const [trigDel, setTrig] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [confirm2, setConfirm2] = useState(false);
-  const [showFav, setFav] = useState(false);
+
   const [selectAllBut, setButton] = useState(false);  
   const [status, setStatus] = useState(4);
 
   const infoButtonRef = useRef(null);
 
-  const control = (n, fav = false) => {
+  const control = (n) => {
     setState(n);
-    setFav(fav);
   };  
 
 
@@ -245,9 +244,7 @@ function App() {
     }
   }, [title])
 
-  useEffect(() => {
 
-  }, [state, showFav]);
 
   return (
     <div className="max-w-[500px] min-w-[500px] min-h-[500px] max-h-[500px] flex flex-col">
@@ -265,15 +262,15 @@ function App() {
           {title !== "" && !ifDelete &&
             <Button text={"Current"} control={control} state={state} value={2}/>
           }
-           <img 
-              ref={infoButtonRef}
-              onClick={() => setConfirm2(true)}
-              src={process.env.PUBLIC_URL + '/images/Info-icon.png'} alt='Info' 
-              className='max-h-5 max-w-5 ml-auto ease-out duration-200 active:scale-90 cursor-pointer'
-              />
+          <img 
+            ref={infoButtonRef}
+            onClick={() => setConfirm2(true)}
+            src={process.env.PUBLIC_URL + '/images/Info-icon.png'} alt='Info' 
+            className='max-h-5 max-w-5 ml-auto ease-out duration-200 active:scale-90 cursor-pointer select-none'
+            />
         </div>
-      {state <= 1 &&
-      <div className="flex flex-col items-start p-2 min-h-24">
+      {(state <= 1 || state === 4) &&
+      <div className="flex flex-col items-start p-2 min-h-20">
         <div className="bg-slate-500 p-2 flex flex-row space-x-2">
           <input value={query} placeholder='Manga/Manhwa Name...' 
             className="min-w-64 min-h-8 text-white bg-gray-400 
@@ -322,13 +319,11 @@ function App() {
 
         <div className="flex-grow overflow-y-scroll no-scrollbar">
 
-            {/* Main Page */}
-            {state === 0 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} status={status} />}
-
-            {/* Favorites Pgae */}
-            {state === 1 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-            selected={select} setDList={setDList} trigDel={trigDel} Favs={showFav} selectAll={selectAllBut} status={status} />}
+            {/* Main Page when state === 0*/}
+            {/* Favorites Pgae when state === 1 */}  
+           {state <= 1 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+            selected={select} setDList={setDList} trigDel={trigDel}
+              selectAll={selectAllBut} status={status} state={state} />}
 
             {/* Current Manhwa if Reading */}
             {state === 2 && !ifDelete && title !== "" && <Manhwa Title={title} 
@@ -337,6 +332,10 @@ function App() {
             {/* Manhwa clicked on from mainpage */}
             {state === 3 && <Manhwa Title={title2} onDelete={setDelete} chgState={setState}/>}
             
+            {/* Hiidden Manhwas triggered by shift-clicking Favorites button */}
+            {state === 4 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+            selected={select} setDList={setDList} trigDel={trigDel}
+              selectAll={selectAllBut} status={status} state={state} />}
 
 
         </div>

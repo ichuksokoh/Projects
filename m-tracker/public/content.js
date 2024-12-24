@@ -72,8 +72,8 @@ const getDomain = () => {
     if (hostname.includes("rizz")) {
         domain += "rizz";
     }
-    if (hostname.includes("bato")) {
-        domain += "bato";
+    if (hostname.includes("readtoto")) {
+        domain += "readtoto";
         if (hostname.includes("series")) {
             domain += "series";
         }
@@ -199,7 +199,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
             || domain.includes('nights') || domain.includes('rizz')) {
             title = scrapeAstraDrakeAndMoreScans(update, getTitle, manhwaList);
         }
-        else if(domain.includes("bato") &&
+        else if(domain.includes("readtoto") &&
              (domain.includes("series") || domain.includes("chapter"))) {
             title = scrapeBatoScans(update, getTitle, manhwaList);
         }

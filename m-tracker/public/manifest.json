@@ -29,7 +29,7 @@
          "https://mangakakalot.com/chapter/*", "https://mangakakalot.com/read-*",
           "https://drakecomic.org/*", "https://hivetoon.com/*", "https://astrascans.org/*"
           ,"https://nightsup.net/*", "https://rizzfables.com/*", 
-          "https://bato.to/series/*", "https://bato.to/chapter/*"],
+          "https://readtoto.net/series/*", "https://readtoto.net/chapter/*"],
       "js": [
               "scrapers/scrapeAsuraScans.js",
               "scrapers/scrapeFlameScans.js",

@@ -12,7 +12,7 @@ export default function SupportInfo ({ setConfirm }) {
        { name: "Manganato", link:  "https://manganato.com/"},
        { name: "Mangago", link: "https://www.mangago.me/"},
         { name: "Mangakakalot", link: "https://mangakakalot.com/"},
-        {name : "DrakeScnas", link: "https://drakecomic.org"},
+        {name : "DrakeScans", link: "https://drakecomic.org"},
         {name : "VoidScans", link: "https://hivetoon.com"},
         {name : "AstraScans", link: "https://astrascans.org/"},
         {name: "NightScans", link: "https://nightsup.net/"},

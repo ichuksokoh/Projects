@@ -3,20 +3,6 @@
 var manhwaList = [];
 var exist = false;
 
-// const supportedSites = [
-//    "https://asuracomic.net/*",
-//    "https://flamecomics.xyz/*",
-//    "https://reaperscans.com/*",
-//    "https://manganato.com/*",
-//    "https://www.mangago.me/*",
-//    "https://mangakakalot.com/*",
-//    "https://drakecomic.org/*",
-//    "https://hivetoon.com/*",
-//    "https://astrascans.org/*",
-//    "https://nightsup.net/*",
-//    "https://rizzfables.com/*",
-//    "https://bato.to/*"
-// ].sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 
 const getDomain = () => {
     const hostname = window.location.href;
@@ -116,15 +102,20 @@ const getDomain = () => {
         title = titleElem ? titleElem.textContent.trim() : "";
     }
     else if (domain.includes('mangakakalot')) {
-        const titleElement = document.querySelector('span[itemprop="itemListElement"] a[itemprop="item"]');
-        title = titleElement ? titleElement.getAttribute('title') : "";
+        const titleElement = document.querySelectorAll('span[itemprop="itemListElement"] a[itemprop="item"]');
+        title = titleElement[1] ? titleElement[1].getAttribute('title') : "";
 
     }
     else if (domain.includes("astra") || 
-        domain.includes("drake") || domain.includes("void")
+        domain.includes("drake")
         || domain.includes("nights") || domain.includes("rizz")) {
         const titleElement = document.querySelector("div.allc a");
         title = titleElement ? titleElement.textContent.trim() : "";
+    }
+
+    else if (domain.includes("void")) {
+        const titleElement = document.querySelector("div.font-semibold.text-gray-50.text-sm.flex.items-center.content-center");
+        title = titleElement ? titleElement.textContent.split("Chapter")[0].trim() : "";
     }
 
    else if (domain.includes("bato")) {
@@ -195,7 +186,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
         else if (domain.includes('mangakakalot') && (domain.includes("/manga") || domain.includes("read-"))) {
             title = scrapeMangakakalot(update, getTitle, manhwaList);
         }
-        else if (domain.includes('astra') || domain.includes('drake') || domain.includes('void')
+        else if (domain.includes('astra') || domain.includes('drake')
             || domain.includes('nights') || domain.includes('rizz')) {
             title = scrapeAstraDrakeAndMoreScans(update, getTitle, manhwaList);
         }
@@ -203,9 +194,10 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
              (domain.includes("series") || domain.includes("chapter"))) {
             title = scrapeBatoScans(update, getTitle, manhwaList);
         }
+        else if (domain.includes("void")) {
+            title = scrapeVoidScans(update, getTitle, manhwaList);
+        }
     }
-
-
 
     
     window.addEventListener('load', () => updateSite(domainPrime, hostnamePrime));
@@ -216,7 +208,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
     
         // Check if the URL matches a series page pattern
 
-        if (currentURL.includes("series") && (currentURL.includes("reaper") || currentURL.includes("flame"))) {
+        if (currentURL.includes("series") && (currentURL.includes("hive") || currentURL.includes("reaper") || currentURL.includes("flame"))) {
             let domain = getDomain();
             updateSite(domain, currentURL);
             manhwaList = [];

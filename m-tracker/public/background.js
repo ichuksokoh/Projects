@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'getTitle') {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -14,5 +15,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.local.set({ isFirstOpen: true });
   });
-    
   

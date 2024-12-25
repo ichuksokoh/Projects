@@ -18,7 +18,7 @@ const scrapeMangakakalot = (update, getTitle, manhwaList) => {
     const chapterList = tempDiv.querySelector('.chapter-list');
 
     // Get all rows within the chapter list
-    const rows = chapterList.querySelectorAll('.row');
+    const rows = chapterList !== null ? chapterList.querySelectorAll('.row') : [];
 
     rows.forEach(row => {
         const chapterLink = row.querySelector('a');
@@ -41,6 +41,6 @@ const scrapeMangakakalot = (update, getTitle, manhwaList) => {
     const Manhwa = {title: manhwaTitle, description: description, chapters: [], 
         img: imgUrl, fav: false, rating: 0.0, status: 0, hidden: false};
     update(manhwaTitle, manhwaList.reverse(), Manhwa);
-
+        console.log("value of manhwaTitle: ", manhwaTitle);
     return manhwaTitle;
 }

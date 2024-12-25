@@ -150,7 +150,7 @@ function Manhwa({ Title, onDelete, chgState }) {
                          type="button"
                          className="rounded-md bg-stone-500 hover:bg-stone-700 active:scale-90 ease-out duration-200
                              min-w-16 min-h-8 font-bold"
-                        onClick={() => chgState(0)}
+                        onClick={() => manhwa.hidden ? chgState(4) : (manhwa.fav ? chgState(1) : chgState(0))}
                     >
                         Back
                     </button>

@@ -115,15 +115,42 @@ function App() {
   const [trigDel, setTrig] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [confirm2, setConfirm2] = useState(false);
-
+  
   const [selectAllBut, setButton] = useState(false);  
   const [status, setStatus] = useState(4);
+  const [url, setUrl] = useState("");
 
   const infoButtonRef = useRef(null);
 
   const control = (n) => {
     setState(n);
   };  
+
+  const matches = ["https://asuracomic.net/*", 
+    "http://asuracomic.net/", "https://flamecomics.xyz/*", "http://flamecomics.xyz/*",
+    "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
+      "https://chapmanganato.to/*", "https://mangakakalot.com/manga/*",
+       "https://mangakakalot.com/chapter/*", "https://mangakakalot.com/read-*",
+        "https://drakecomic.org/*", "https://hivetoon.com/series/*", "https://astrascans.org/*"
+        ,"https://nightsup.net/*", "https://rizzfables.com/*", 
+        "https://readtoto.net/series/*", "https://readtoto.net/chapter/*"];
+  const normalizePattern = (pattern) => {
+    if (pattern.endsWith("*")) {
+      return pattern.slice(0, -1); // Remove the '*' at the end
+    }
+    return pattern;
+  };
+
+  const isMatchingUrl = (url) => {
+    return matches.some((pattern) => url.startsWith(normalizePattern(pattern)));
+  };
+
+  useEffect(() => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        setUrl(tabs[0].url);
+    });
+
+  },[])
 
 
   useEffect(() => {
@@ -140,40 +167,41 @@ function App() {
   
   
   useEffect(() => {
-    const fetchTitle = async () => {
-      return new Promise((resolve) => {
-        chrome.runtime.sendMessage({ type: 'getTitle' }, (response) => {
-          if (response && response.title) {
-            resolve(response.title);
-          } else {
-            resolve(""); // Resolve with empty string if no title is found
-          }
+    if (isMatchingUrl(url)) {
+      const fetchTitle = async () => {
+        return new Promise((resolve) => {
+          chrome.runtime.sendMessage({ type: 'getTitle' }, (response) => {
+            if (response && response.title) {
+              resolve(response.title);
+            } else {
+              resolve(""); // Resolve with empty string if no title is found
+            }
+          });
         });
-      });
-    };
-  
-    const checkTitle = async (val) => {
-      return new Promise((resolve) => {
-        chrome.storage.local.get([val], (response) => {
-          if (Object.keys(response).length === 0) {
-            resolve(""); // Resolve with empty string if not found
-          } else {
-            resolve(val); // Resolve with the title if found
-          }
+      };
+    
+      const checkTitle = async (val) => {
+        return new Promise((resolve) => {
+          chrome.storage.local.get([val], (response) => {
+            if (Object.keys(response).length === 0) {
+              resolve(""); // Resolve with empty string if not found
+            } else {
+              resolve(val); // Resolve with the title if found
+            }
+          });
         });
-      });
-    };
+      };
+    
+      const handleTitle = async () => {
+        const titleFromFetch = await fetchTitle();
+        const titleToCheck = titleFromFetch ? await checkTitle(titleFromFetch) : ""; // Check the title if it exists
+        setTitle(titleToCheck); // Set the title based on the check
+      };
+    
+      handleTitle();
+    }
+  }, [url]);
   
-    const handleTitle = async () => {
-      const titleFromFetch = await fetchTitle();
-      const titleToCheck = titleFromFetch ? await checkTitle(titleFromFetch) : ""; // Check the title if it exists
-      setTitle(titleToCheck); // Set the title based on the check
-    };
-  
-    handleTitle();
-  }, []);
-  
-  console.log("value of Title in App.js: ", title);
   useEffect(() => {
     const deleteTitle = async () => {
       const result = await new Promise((resolve) => {
@@ -321,9 +349,10 @@ function App() {
 
             {/* Main Page when state === 0*/}
             {/* Favorites Pgae when state === 1 */}  
-           {state <= 1 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-            selected={select} setDList={setDList} trigDel={trigDel}
-              selectAll={selectAllBut} status={status} state={state} />}
+            {/* Hiidden Manhwas triggered by shift-clicking Favorites button for state === 4 */}
+            {(state <= 1 || state === 4 )&& <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
+             selected={select} setDList={setDList} trigDel={trigDel}
+               selectAll={selectAllBut} status={status} state={state} />}
 
             {/* Current Manhwa if Reading */}
             {state === 2 && !ifDelete && title !== "" && <Manhwa Title={title} 
@@ -331,12 +360,6 @@ function App() {
 
             {/* Manhwa clicked on from mainpage */}
             {state === 3 && <Manhwa Title={title2} onDelete={setDelete} chgState={setState}/>}
-            
-            {/* Hiidden Manhwas triggered by shift-clicking Favorites button */}
-            {state === 4 && <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-            selected={select} setDList={setDList} trigDel={trigDel}
-              selectAll={selectAllBut} status={status} state={state} />}
-
 
         </div>
     </div>

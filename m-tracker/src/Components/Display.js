@@ -80,7 +80,7 @@ function Display ({ manhwa, chpsRead, lastChp, Title, handleF, handleH}) {
             <div className="flex flex-row items-start justify-center">
                 <img alt="Title for manhwa here..." className="max-w-48 max-h-96 rounded-md" src={manhwa.img}/>
                 <div className='flex flex-col items-start p-2'>
-                    <div className="overflow-y-scroll no-scrollbar max-h-36 bg-gray-600 text-white rounded-lg">
+                    <div className="overflow-y-scroll no-scrollbar max-h-36 max-w-72 bg-gray-600 text-white rounded-lg">
                         <p className="text-xs text-left p-2">{manhwa.description}</p>
                     </div>
                     <div className="flex flex-wrap space-x-0.5 p-2 max-w-64 gap-1">

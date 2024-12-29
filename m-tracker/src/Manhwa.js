@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import React, { useEffect, useState } from 'react';
 import Popup from './Components/Popup';
-import Dropdown from './Components/Dropdown';
 import Display from './Components/Display';
 import DeleteInfo from './Components/DeleteInfo';
 import MainDropDown from './Components/Dropdown2';

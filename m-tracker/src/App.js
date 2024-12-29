@@ -136,7 +136,7 @@ function App() {
         "https://readtoto.net/series/*", "https://readtoto.net/chapter/*"];
   const normalizePattern = (pattern) => {
     if (pattern.endsWith("*")) {
-      return pattern.slice(0, -1); // Remove the '*' at the end
+      return pattern.slice(0, -1);
     }
     return pattern;
   };

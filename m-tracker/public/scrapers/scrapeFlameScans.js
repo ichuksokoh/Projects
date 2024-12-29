@@ -16,7 +16,6 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
     const titleElem = tempDiv.querySelector("h1.m_8a5d1357.mantine-Title-root");
     // const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
-    console.log("Title Element: ", titleElem);
     const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
     //get chapters

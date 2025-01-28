@@ -13,7 +13,7 @@ const scrapeAsuraScans = (update, getTitle, manhwaList) => {
 
 
         // Adjust selectors to target the right elements in the DOM
-        const titleElem = tempDiv.querySelector('span.text-xl.font-bold'); 
+        const titleElem = tempDiv.querySelector('div.text-center.sm\\:text-left > span.text-xl.font-bold'); 
         const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
         //Get chapters for manipulation

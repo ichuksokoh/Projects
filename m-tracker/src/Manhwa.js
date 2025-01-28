@@ -5,7 +5,7 @@ import Display from './Components/Display';
 import DeleteInfo from './Components/DeleteInfo';
 import MainDropDown from './Components/Dropdown2';
 
-function Manhwa({ Title, onDelete, chgState }) {
+function Manhwa({ Title, onDelete, chgState, pState }) {
     const [selectedOption, setSelectedOption] = useState(''); // State to hold the selected option
     const [marked, setMarked] = useState(false);
     const [manhwa, setManhwa] = useState({});
@@ -104,24 +104,28 @@ function Manhwa({ Title, onDelete, chgState }) {
             setLastChp(finalChp());
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [manhwa.chapters, marked])
+    }, [manhwa.chapters, marked]);
     
     const handleFav = () => {
         manhwa.fav = !manhwa.fav;
         chrome.storage.local.set({ [manhwa.title]: manhwa });
         setFav(!addfav);
-    }
+    };
 
     const handleHidden = () => {
         manhwa.hidden = !manhwa.hidden;
         chrome.storage.local.set({ [manhwa.title]: manhwa});
         setHidden(!hidden);
-    }
+    };
 
 
     useEffect(() => {
 
-    },[addfav, hidden])
+    },[addfav, hidden]);
+
+    useEffect(() => {
+        console.log(pState);
+    }, [pState]);
 
     return (
         <div className="bg-slate-500 min-w-[95vh] min-h-[95vh] text-white p-2">
@@ -133,7 +137,6 @@ function Manhwa({ Title, onDelete, chgState }) {
 
             <div className="flex flex-col items-start p-2 space-y-5">
                 <div className="flex flex-row w-full items-center">
-                    {/* <Dropdown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/> */}
                     <MainDropDown selectedOption={selectedOption} handleChange={handleChange} manhwa={manhwa}/>
                     <button
                         type="button"
@@ -149,7 +152,7 @@ function Manhwa({ Title, onDelete, chgState }) {
                          type="button"
                          className="rounded-md bg-stone-500 hover:bg-stone-700 active:scale-90 ease-out duration-200
                              min-w-16 min-h-8 font-bold"
-                        onClick={() => manhwa.hidden ? chgState(4) : (manhwa.fav ? chgState(1) : chgState(0))}
+                        onClick={() => manhwa.hidden ? chgState(4) : (manhwa.fav && pState === 1 ? chgState(1) : chgState(0))}
                     >
                         Back
                     </button>

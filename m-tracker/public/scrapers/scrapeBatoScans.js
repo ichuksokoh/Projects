@@ -30,5 +30,6 @@ const scrapeBatoScans = (update, getTitle, manhwaList) => {
 
     update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
+
     return manhwaTitle;
 }

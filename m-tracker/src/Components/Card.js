@@ -3,14 +3,13 @@
 import { useEffect, useState } from "react";
 
 
-function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
+function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav, setPstate }) {
     const title = manhwa.title;
     const img = manhwa.img;
     const len = manhwa.description.length
     const description = manhwa.description.substring(0,Math.min(len,200));
     const [faved, setFaved] = useState(false)
-    // const statuses = ["Plan To Read", "Reading", "Completed", "Dropped"];
-    // const status = manhwa.status !== undefined ? manhwa.status : 0;
+
 
     const readChps = () =>  {
         let lastRead = 0;
@@ -60,7 +59,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav }) {
                     }
                     else {
                         goTo(title);
-                        setTimeout(() => {chgState(3)}, 100);
+                        setTimeout(() => {chgState(prev => {setPstate(prev); return 3;})}, 100);
                     }
                 }}
             >   

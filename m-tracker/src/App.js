@@ -105,6 +105,7 @@ const MainSlider = ({ setStatus, status }) => {
 function App() {
   
   const [state, setState] = useState(0);
+  const [prevState, setPstate] = useState(0);
   const [title, setTitle] = useState("");
   const [title2, setTitle2] = useState("");
   const [titleToDelete, setDelete] = useState("");
@@ -121,6 +122,7 @@ function App() {
   const [url, setUrl] = useState("");
 
   const infoButtonRef = useRef(null);
+  const pageRef = useRef(null);
 
   const control = (n) => {
     setState(n);
@@ -133,7 +135,8 @@ function App() {
        "https://mangakakalot.com/chapter/*", "https://mangakakalot.com/read-*",
         "https://drakecomic.org/*", "https://hivetoon.com/series/*", "https://astrascans.org/*"
         ,"https://nightsup.net/*", "https://rizzfables.com/*", 
-        "https://readtoto.net/series/*", "https://readtoto.net/chapter/*"];
+        "https://readtoto.net/series/*", "https://readtoto.net/chapter/*", "https://bato.to/series/*"
+        , "https://bato.to/chapter/*"];
   const normalizePattern = (pattern) => {
     if (pattern.endsWith("*")) {
       return pattern.slice(0, -1);
@@ -350,16 +353,16 @@ function App() {
             {/* Main Page when state === 0*/}
             {/* Favorites Pgae when state === 1 */}  
             {/* Hiidden Manhwas triggered by shift-clicking Favorites button for state === 4 */}
-            {(state <= 1 || state === 4 )&& <MainPage Title={title} goTo={setTitle2} chgState={setState} query={query} 
-             selected={select} setDList={setDList} trigDel={trigDel}
-               selectAll={selectAllBut} status={status} state={state} />}
+            {(state <= 1 || state === 4 )&& <MainPage Title={title2} goTo={setTitle2} chgState={setState} query={query} 
+             selected={select} setDList={setDList} trigDel={trigDel} pageRef={pageRef}
+               selectAll={selectAllBut} status={status} state={state} chgPstate={setPstate} />}
 
             {/* Current Manhwa if Reading */}
             {state === 2 && !ifDelete && title !== "" && <Manhwa Title={title} 
-              onDelete={setDelete} chgState={setState}/>}
+              onDelete={setDelete} chgState={setState} pState={prevState}/>}
 
             {/* Manhwa clicked on from mainpage */}
-            {state === 3 && <Manhwa Title={title2} onDelete={setDelete} chgState={setState}/>}
+            {state === 3 && <Manhwa Title={title2} onDelete={setDelete} chgState={setState} pState={prevState}/>}
 
         </div>
     </div>

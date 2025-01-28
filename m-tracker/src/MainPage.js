@@ -1,17 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Card from "./Components/Card";
 import clsx from "clsx";
 import { FixedSizeList as List } from "react-window";
 
 
-function MainPage({ goTo, chgState, query, selected, setDList, trigDel, selectAll, status, state }) {
+function MainPage({ goTo, chgState, query, selected, setDList, trigDel, selectAll, status, state, chgPstate, pageRef, Title }) {
     const [list, setList] = useState([]);
     const [filterOpts, setFilterOpts] = useState([]);
     const [selectBoxes, setBoxes] = useState([]);
     const [chgFav, setChgFav] = useState(false);
     const [doneFetch, setFetch] = useState(false);
+    
+    
+
+    // listRef.current.scrollToItem(Number(selectedOption), "start");
+
 
     const ManhwaItem = ({ index, style }) => {
         var man = filterOpts[index];
@@ -57,6 +62,7 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, selectAl
                     <Card manhwa={man} selected={selected} setBoxes={setBoxes} 
                             goTo={(arg) => !selected ? goTo(arg) : null } 
                             chgState={(arg) => !selected ? chgState(arg) : null}
+                            setPstate={chgPstate}
                             setChgFav={setChgFav}/>    
                 </div>
             </div>
@@ -141,7 +147,15 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, selectAl
             setBoxes([]);
         }
 
-    }, [selectAll])
+    }, [selectAll]);
+
+    useEffect(() => {
+        if (Title !== "") {
+            // let items = document.querySelectorAll("span");
+            // let item = items.filter(elem => elem.textContent === Title);
+            // pageRef.current.scrollToItem(item, "center");
+        }
+    }, [Title]);
 
 
 
@@ -154,6 +168,7 @@ function MainPage({ goTo, chgState, query, selected, setDList, trigDel, selectAl
                 {state === 1 && filterOpts.length === 0 && "You don't like anything smh"}
                 {state === 4 && filterOpts.length === 0 && "None Hidden! You're not naughty good job!"}
                 <List
+                     ref={pageRef}
                      height={295} // Height of the dropdown
                      itemCount={filterOpts.length} // Total number of items
                      itemSize={200} // Height of each item

@@ -58,8 +58,8 @@ const getDomain = () => {
     if (hostname.includes("rizz")) {
         domain += "rizz";
     }
-    if (hostname.includes("readtoto")) {
-        domain += "readtoto";
+    if (hostname.includes("readtoto") || hostname.includes("bato")) {
+        domain += "bato";
         if (hostname.includes("series")) {
             domain += "series";
         }
@@ -118,7 +118,7 @@ const getDomain = () => {
         title = titleElement ? titleElement.textContent.split("Chapter")[0].trim() : "";
     }
 
-   else if (domain.includes("bato")) {
+   else if (domain.includes("bato") || domain.includes("readtoto")) {
         const titleElement = document.querySelector('h3.nav-title a');
         title = titleElement ? titleElement.textContent.trim() : "";
    }
@@ -190,7 +190,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
             || domain.includes('nights') || domain.includes('rizz')) {
             title = scrapeAstraDrakeAndMoreScans(update, getTitle, manhwaList);
         }
-        else if(domain.includes("readtoto") &&
+        else if((domain.includes("readtoto") || domain.includes("bato")) &&
              (domain.includes("series") || domain.includes("chapter"))) {
             title = scrapeBatoScans(update, getTitle, manhwaList);
         }
@@ -201,7 +201,6 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
 
     
     window.addEventListener('load', () => updateSite(domainPrime, hostnamePrime));
-    // updateSite(domainPrime, hostnamePrime);
 
     const observer = new MutationObserver(() => {
         const currentURL = window.location.href;

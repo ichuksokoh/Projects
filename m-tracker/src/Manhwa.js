@@ -124,7 +124,6 @@ function Manhwa({ Title, onDelete, chgState, pState }) {
     },[addfav, hidden]);
 
     useEffect(() => {
-        console.log(pState);
     }, [pState]);
 
     return (

@@ -55,8 +55,8 @@ const getDomain = () => {
     if (hostname.includes("nights")) {
         domain += "nights";
     }
-    if (hostname.includes("rizz")) {
-        domain += "rizz";
+    if (hostname.includes("realmoasis")) {
+        domain += "realmoasis";
     }
     if (hostname.includes("readtoto") || hostname.includes("bato")) {
         domain += "bato";
@@ -108,9 +108,13 @@ const getDomain = () => {
     }
     else if (domain.includes("astra") || 
         domain.includes("drake")
-        || domain.includes("nights") || domain.includes("rizz")) {
-        const titleElement = document.querySelector("div.allc a");
+        || domain.includes("nights") || domain.includes("realmoasis")) {
+        let titleElement = document.querySelector("div.allc a");
         title = titleElement ? titleElement.textContent.trim() : "";
+        if (domain.includes("realmoasis")) {
+            titleElement = document.querySelector("h1.entry-title");
+            title = titleElement ? titleElement.textContent.split("Chapter")[0].trim() : "";
+        }
     }
 
     else if (domain.includes("void")) {
@@ -187,7 +191,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
             title = scrapeMangakakalot(update, getTitle, manhwaList);
         }
         else if (domain.includes('astra') || domain.includes('drake')
-            || domain.includes('nights') || domain.includes('rizz')) {
+            || domain.includes('nights') || domain.includes('realmoasis')) {
             title = scrapeAstraDrakeAndMoreScans(update, getTitle, manhwaList);
         }
         else if((domain.includes("readtoto") || domain.includes("bato")) &&
@@ -207,7 +211,8 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
     
         // Check if the URL matches a series page pattern
 
-        if (currentURL.includes("series") && (currentURL.includes("hive") || currentURL.includes("reaper") || currentURL.includes("flame"))) {
+        if (currentURL.includes("series") && (currentURL.includes("hive") || currentURL.includes("reaper") 
+            || currentURL.includes("flame"))) {
             let domain = getDomain();
             updateSite(domain, currentURL);
             manhwaList = [];

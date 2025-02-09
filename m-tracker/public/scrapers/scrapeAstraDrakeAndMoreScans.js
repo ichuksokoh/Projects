@@ -40,8 +40,5 @@ const scrapeAstraDrakeAndMoreScans = (update, getTitle, manhwaList) => {
         img: imgUrl, fav: false, rating: 0.0, status: 0, hidden: false};
     update(manhwaTitle, manhwaList.reverse(), Manhwa);
 
-
-
-
     return manhwaTitle;
 }

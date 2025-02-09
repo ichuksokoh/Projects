@@ -173,6 +173,7 @@ function App() {
     if (isMatchingUrl(url)) {
       const fetchTitle = async () => {
         return new Promise((resolve) => {
+          console.log("Message sent");
           chrome.runtime.sendMessage({ type: 'getTitle' }, (response) => {
             if (response && response.title) {
               resolve(response.title);
@@ -286,7 +287,7 @@ function App() {
         {confirm2 && <Popup setConfirm={setConfirm2} popupInfo={<SupportInfo setConfirm={setConfirm2}/>}/>}
       <div className="flex flex-col bg-slate-500">
         <div
-          className="flex flex-row p-2 sticky top-0 z-10 mb-1  rounded-lg"
+          className="flex flex-row p-2 sticky top-0 z-10 mb-1 rounded-lg"
           >
           <Button text={"Manhwas"} control={control} state={state} value={0}/>
           <Button text={"Favorites"} control={control} state={state} value={1}/>

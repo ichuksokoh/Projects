@@ -39,6 +39,11 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
         let tmp = combinedDescription.split("&nbsp");
         combinedDescription = tmp[0];
     }
+    else {
+        const descriptElem2 = tempDiv.querySelector('p.m_b6d8b162[data-line-clamp="true"] + p');
+        let tmp2 = descriptElem2 ? descriptElem2.textContent.trim(): "";
+        combinedDescription = tmp2;
+    }
     
     
     //Entire manhwa stored as one object

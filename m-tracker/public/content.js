@@ -223,8 +223,6 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
     // Start observing changes in the DOM
     observer.observe(document.body, { childList: true, subtree: true });
 
-
-    
     
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'getTitle') {

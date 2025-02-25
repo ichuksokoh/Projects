@@ -173,7 +173,6 @@ function App() {
     if (isMatchingUrl(url)) {
       const fetchTitle = async () => {
         return new Promise((resolve) => {
-          console.log("Message sent");
           chrome.runtime.sendMessage({ type: 'getTitle' }, (response) => {
             if (response && response.title) {
               resolve(response.title);

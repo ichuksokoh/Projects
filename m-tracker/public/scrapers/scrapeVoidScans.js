@@ -22,7 +22,7 @@ const scrapeVoidScans = (update, getTitle, manhwaList) => {
 
     //get manhwa cover art
     const imgElem = tempDiv.querySelector('img.w-full.rounded-lg.object-cover.object-bottom.sm\\:max-h-\\[400px\\].h-auto')
-    const imgUrl = imgElem ?"https://hivetoon.com/" +  imgElem.getAttribute('src') : "";
+    const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
 
     //get manhwa description
     const descriptElem  = tempDiv.querySelector('div[itemprop="description"].p-4.bg-white\\/10.rounded-lg');

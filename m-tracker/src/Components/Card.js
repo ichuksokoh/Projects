@@ -76,7 +76,7 @@ function Card ({ goTo, chgState, manhwa, setBoxes, selected, setChgFav, setPstat
                             onClick={(e) => handleFav(e,manhwa)}></img>}
                 </div>
                 <div className="flex flex-row justify-start items-start">
-                    <img alt="Title for manhwa is..." src={img} className="rounded-md max-w-16 max-h-32" />
+                    <img alt="Title for manhwa is..." src={img} onError={(e) => e.currentTarget.src = process.env.PUBLIC_URL + 'images/LazyTrackerSym.png'} className="rounded-md max-w-16 max-h-32" />
                     <p className="text-xs text-left p-2">{description}{len <= 200 ? "": "..."}</p>
                 </div>
             </div>

@@ -136,7 +136,7 @@ function App() {
         "https://drakecomic.org/*", "https://hivetoon.com/series/*", "https://astrascans.org/*"
         ,"https://nightsup.net/*", "https://rizzfables.com/*", 
         "https://readtoto.net/series/*", "https://readtoto.net/chapter/*", "https://bato.to/series/*"
-        , "https://bato.to/chapter/*"];
+        , "https://bato.to/chapter/*", "https://www.natomanga.com/manga/*"];
   const normalizePattern = (pattern) => {
     if (pattern.endsWith("*")) {
       return pattern.slice(0, -1);

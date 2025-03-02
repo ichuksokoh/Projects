@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "2.4.5",
+  "version": "2.4.6",
   "short_name": "Lzyt",
   "name": "Lazy Tracker",
   "description": "Manga/Manhwa Tracker for all your lazy needs! Please stay on series page initally so Tracker can Store manhwa",
@@ -18,7 +18,6 @@
       "128": "images/LazyTrackerSym.png"
     }
   },
-  "host_permissions": ["https://realmoasis.com/*"],
   "permissions": [
     "storage",
     "activeTab" 
@@ -34,8 +33,8 @@
         "https://chapmanganato.to/*", "https://mangakakalot.com/manga/*",
          "https://mangakakalot.com/chapter/*", "https://mangakakalot.com/read-*",
           "https://drakecomic.org/*", "https://hivetoon.com/series/*", "https://astrascans.org/*"
-          ,"https://nightsup.net/*", "https://realmoasis.com/*", 
-          "https://bato.to/series/*", "https://bato.to/chapter/*"],
+          ,"https://nightsup.net/*", "https://rizzfables.com/series/*", 
+          "https://bato.to/series/*", "https://bato.to/chapter/*", "https://www.natomanga.com/manga/*"],
       "js": [
               "scrapers/scrapeAsuraScans.js",
               "scrapers/scrapeFlameScans.js",

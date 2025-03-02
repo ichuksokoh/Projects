@@ -78,7 +78,7 @@ function Display ({ manhwa, chpsRead, lastChp, Title, handleF, handleH}) {
                 
             </div>
             <div className="flex flex-row items-start justify-center">
-                <img alt="Title for manhwa here..." className="max-w-48 max-h-96 rounded-md" src={manhwa.img}/>
+                <img alt="Title for manhwa here..." className="max-w-48 max-h-96 rounded-md" onError={(e) => e.currentTarget.src = process.env.PUBLIC_URL + 'images/LazyTrackerSym.png'} src={manhwa.img}/>
                 <div className='flex flex-col items-start p-2'>
                     <div className="overflow-y-scroll no-scrollbar max-h-36 max-w-72 bg-gray-600 text-white rounded-lg">
                         <p className="text-xs text-left p-2">{manhwa.description}</p>

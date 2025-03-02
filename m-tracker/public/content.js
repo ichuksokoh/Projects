@@ -25,11 +25,11 @@ const getDomain = () => {
     if (hostname.includes('read-manga')) {
         domain += " read-manga";
     }
-    if (hostname.includes('manganato')) {
-        domain += " manganato"
+    if (hostname.includes('natomanga')) {
+        domain += " natomanga"
     }
-    if (hostname.includes('manga-')) {
-        domain += " manga-"
+    if (hostname.includes('manga')) {
+        domain += " manga"
     }
     if (hostname.includes("mangakakalot")) {
         domain += "mangakakalot"
@@ -55,8 +55,8 @@ const getDomain = () => {
     if (hostname.includes("nights")) {
         domain += "nights";
     }
-    if (hostname.includes("realmoasis")) {
-        domain += "realmoasis";
+    if (hostname.includes("rizz")) {
+        domain += "rizz";
     }
     if (hostname.includes("readtoto") || hostname.includes("bato")) {
         domain += "bato";
@@ -93,9 +93,9 @@ const getDomain = () => {
         const titleElem = tempDiv.querySelector('h2.font-semibold.font-sans.text-muted-foreground.text-xxs')
         title = titleElem ? titleElem.textContent.trim() : "";
     }
-    else if (domain.includes('manganato')) {
-        const titleElem = tempDiv.querySelectorAll('a.a-h')
-        title = titleElem[1] ? titleElem[1].textContent.trim() : "";
+    else if (domain.includes('natomanga')) {
+        const titleElem = tempDiv.querySelector('div.info-top-chapter > h2');
+        title = titleElem ? titleElem.textContent.trim() : "";
     }
     else if (domain.includes('mangago')) {
         const titleElem = tempDiv.querySelector('#series')
@@ -108,10 +108,10 @@ const getDomain = () => {
     }
     else if (domain.includes("astra") || 
         domain.includes("drake")
-        || domain.includes("nights") || domain.includes("realmoasis")) {
+        || domain.includes("nights") || domain.includes("rizz")) {
         let titleElement = document.querySelector("div.allc a");
         title = titleElement ? titleElement.textContent.trim() : "";
-        if (domain.includes("realmoasis")) {
+        if (domain.includes("rizz")) {
             titleElement = document.querySelector("h1.entry-title");
             title = titleElement ? titleElement.textContent.split("Chapter")[0].trim() : "";
         }
@@ -180,7 +180,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
         else if (domain.includes('mangago') && domain.includes('read-manga')) {
            title = scrapeMangago(update, getTitle, manhwaList);
         }
-        else if ((domain.includes('manganato') && domain.includes('manga-'))
+        else if ((domain.includes('natomanga') && domain.includes('manga'))
             || domain.includes("chapmanganato")) {
                 title = scrapeManganato(update, getTitle, manhwaList);
         }
@@ -191,7 +191,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
             title = scrapeMangakakalot(update, getTitle, manhwaList);
         }
         else if (domain.includes('astra') || domain.includes('drake')
-            || domain.includes('nights') || domain.includes('realmoasis')) {
+            || domain.includes('nights') || domain.includes('rizz')) {
             title = scrapeAstraDrakeAndMoreScans(update, getTitle, manhwaList);
         }
         else if((domain.includes("readtoto") || domain.includes("bato")) &&

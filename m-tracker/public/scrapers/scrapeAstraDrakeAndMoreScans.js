@@ -19,6 +19,7 @@ const scrapeAstraDrakeAndMoreScans = (update, getTitle, manhwaList) => {
     //getting manhwa Cover art
     const imgElem = tempDiv.querySelector('img.attachment-.size-.wp-post-image')
     const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
+    console.log("imgUrl:", imgUrl);
 
     //getting description
     const descriptElem = tempDiv.querySelector('div.entry-content.entry-content-single');

@@ -10,32 +10,33 @@ const scrapeManganato = (update, getTitle, manhwaList) => {
     tempDiv.innerHTML = html;
 
     //get title
-    const containerTitle = tempDiv.querySelector('div.story-info-right');
-    const titleElem = containerTitle ? containerTitle.querySelector('h1') : null;
+    // const containerTitle =
+    const titleElem =  tempDiv.querySelector('ul.manga-info-text > li > h1');
     const manhwaTitle = titleElem ? titleElem.textContent.trim() : getTitle();
 
     //get num of chpaters
-    const ChpElems = tempDiv.querySelectorAll('a.chapter-name');
+    const ChpElems = tempDiv.querySelectorAll('div.chapter-list > div.row');
     ChpElems.forEach((elem) => {
-         const chpNumElem = elem ? elem.textContent.trim() : null;
+        chp = elem.querySelectorAll("span > a");
+         const chpNumElem = chp[0] ? chp[0].textContent.trim() : null;
          if (chpNumElem) {
              manhwaList.push({ chapter: chpNumElem, read: false });
          }
     })
 
     //get cover art
-    const imgContainer = tempDiv.querySelector('span.info-image')
-    const imgElem = imgContainer ? imgContainer.querySelector("img.img-loading") : null ;
+    const imgContainer = tempDiv.querySelector('div.manga-info-pic');
+    const imgElem = imgContainer ? imgContainer.querySelector("img.lz-loading") : null ;
     const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
     
     //get manhwa description
-    const descriptElem = tempDiv.querySelector('div.panel-story-info-description')
+    const descriptElem = tempDiv.querySelector('#contentBox');
     const description = descriptElem ? descriptElem.textContent.trim() : "";
 
     const Manhwa = {title: manhwaTitle, description: description, chapters: [], 
         img: imgUrl, fav: false, rating: 0.0, status: 0, hidden: false};    
     update(manhwaTitle, manhwaList.reverse(), Manhwa);
- 
+    
 
  return manhwaTitle;
 }

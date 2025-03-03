@@ -94,15 +94,17 @@ const getDomain = () => {
         title = titleElem ? titleElem.textContent.trim() : "";
     }
     else if (domain.includes('natomanga')) {
-        const titleElem = tempDiv.querySelector('div.info-top-chapter > h2');
-        title = titleElem ? titleElem.textContent.trim() : "";
+        // const titleElem = tempDiv.querySelector('div.info-top-chapter > h2');
+        const titleElem = tempDiv.querySelectorAll("div.breadcrumb.breadcrumbs.bred_doc > p > span");
+        console.log("TitleElement: ", titleElem);
+        title = titleElem[2] ? titleElem[2].textContent.trim() : "";
     }
     else if (domain.includes('mangago')) {
         const titleElem = tempDiv.querySelector('#series')
         title = titleElem ? titleElem.textContent.trim() : "";
     }
     else if (domain.includes('mangakakalot')) {
-        const titleElement = document.querySelectorAll('span[itemprop="itemListElement"] a[itemprop="item"]');
+        const titleElement = tempDiv.querySelectorAll('span[itemprop="itemListElement"] a[itemprop="item"]');
         title = titleElement[1] ? titleElement[1].getAttribute('title') : "";
 
     }

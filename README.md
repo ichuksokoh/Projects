@@ -11,4 +11,4 @@ Projects completed so far
 [def]: https://github.com/ichuksokoh/Projects/tree/main/tm_c%2B%2B
 [def2]: https://github.com/ichuksokoh/Projects/tree/main/TM_in_C
 [def3]: https://github.com/ichuksokoh/Projects/tree/main/m-tracker
-[def4]: hetps://github.com/ichuksokoh/Projects/tree/main/minimtype
+[def4]: https://github.com/ichuksokoh/Projects/tree/main/minimtype

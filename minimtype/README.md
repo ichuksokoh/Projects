@@ -1,4 +1,4 @@
-#Project 3 (Minimal Typing Test Website)
+# Project 3 (Minimal Typing Test Website)
 
 Goal currently is too making a website somewhat similar to MonkeyType.com
 * Working on Test creation, mistake handling, WPM and Accurcacy calculation

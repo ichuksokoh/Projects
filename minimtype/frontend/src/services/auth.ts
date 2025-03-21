@@ -5,6 +5,11 @@ export const registerUser = async (user_email: string, password: string) => {
     return response.data;
 };
 
+export const logoutUser = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
+}
 export const loginUser = async (user_email: string, password: string) => {
     const response = await API.post('/auth/login', {user_email, password});
     if (response.data.token) { 
@@ -13,10 +18,8 @@ export const loginUser = async (user_email: string, password: string) => {
     if (response.data.userId) {
         localStorage.setItem('userId', response.data.userId);
     }
-    return response.data
-}
-
-export const logoutUser = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
+    if (response.data.userEmail) {
+        localStorage.setItem('userEmail',response.data.userEmail);
+    }
+    return response.data;
 }

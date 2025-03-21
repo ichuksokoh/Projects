@@ -13,9 +13,9 @@ export default function Home() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen text-xl text-white">
+    <div className="flex flex-col items-center justify-center h-screen w-screen text-xl text-white bg-gray-500">
       <h1>🏠 Home Page</h1>
-      <Link to="/practice" className="mt-4 p-2 bg-white rounded">
+      <Link to="/practice" className="mt-4 p-2 bg-white text-black rounded">
         Go to Practice
       </Link>
       <button onClick={handleLogout} className="rounded-md w-32 h-12">Logout</button>

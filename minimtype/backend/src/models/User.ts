@@ -9,7 +9,6 @@ interface IUser extends Document {
     _id: string;
     user_email: string;
     password: string;
-    user_id: number;
     user_since: Date;
     verifyPw(password: string): Promise<boolean>;
   }
@@ -27,9 +26,6 @@ const UserSchema = new Schema<IUser>({
         trim: true,
         unique: true,
     },
-    user_id: {
-        type: Number,
-    },
     user_since: {
         type: Date,
         required: true,
@@ -41,7 +37,7 @@ const UserSchema = new Schema<IUser>({
     }
 })
 
-UserSchema.plugin(AutoIncrement, { inc_field: "user_id" });
+// UserSchema.plugin(AutoIncrement, { inc_field: "user_id" });
 
 UserSchema.methods.verifyPw = async function (password: string) {
     const user = this;

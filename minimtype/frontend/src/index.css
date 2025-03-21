@@ -23,17 +23,20 @@
     }
   }
 
- 
+ :root {
+  --enable-animation: none;
+ }
 
-  
-
+  ::-webkit-scrollbar {
+    display: none;
+  }
   
   .cursorLeft {
-    animation: blinking1 2s infinite;
+    animation: var(--enable-animation), blinking1 2s infinite;
     border-left: solid 2px white;
   } 
   .cursorRight {
-    animation: blinking2 2s infinite;
+    animation: var(--enable-animation), blinking2 2s infinite;
     border-right: 2px solid white;
   } 
 }

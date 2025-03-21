@@ -33,7 +33,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 
         const user = await User.findById(userId);
         if (user) {
-            const deletedTests = await Test.deleteMany({user_id: user.user_id });
+            const deletedTests = await Test.deleteMany({user_id: user.id });
             const deletedUser = await User.deleteOne({ _id: user?.id });
             if (deletedTests && deletedUser) {
                 res.status(200).send('User deleted Successfully');

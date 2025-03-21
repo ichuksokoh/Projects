@@ -1,7 +1,7 @@
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import { useState, useEffect} from 'react'
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, useFetcher, useNavigate } from "react-router-dom"
 import Practice from './pages/Practice';
 import Home from './pages/Home';
 import { AuthProvider } from './context/AuthProvider';
@@ -32,6 +32,8 @@ function App() {
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
+
+ 
 
   return (
     <AuthProvider>

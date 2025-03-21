@@ -9,16 +9,12 @@ export default function ProtectedRoute({ children } : { children: ReactNode }) {
 
    useEffect(() => {
     if (!userId || !token) {
-        navigate('/register');
-    }
-    else {
-        console.log("userId: ", userId);
-        console.log("token: ", token);
+        navigate('/practice2');
     }
 
    }, [userId, token, navigate])
 
-   if (!userId || !token) return null;
+//    if (!userId || !token) return null;
 
    return (
     <>

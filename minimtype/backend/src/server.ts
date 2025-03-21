@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import { Test } from "./models/Test";
+import { ITest, Test } from "./models/Test";
 import { User } from "./models/User";
 import { loginUser } from "./auth/login";
 import { registerUser } from "./auth/register";
@@ -56,12 +56,13 @@ app.delete("/tests/:id", deleteTest);
 
 
 const seedDatabase = async () => {
-    await User.create([
-      { user_email: "Alice@gmail.com", password: "pw123"},
-      { user_email: "Bob@gmail.com", password: "pw1234"},
-      { user_email: "Charlie@gmail.com", password: "pw12345"},
-    ]);
-    console.log("Sample data inserted");
+    const query = {user_id: "FJbSoG9zw3ThLEIg8Kqb9"}
+    const tests = await Test.find(query);
+    console.log(tests);
+    // await Test.create([
+    //   { user_email: "Alice@gmail.com", wpm: 30, raw_wpm: 40, graph_data: [[9]], accuracy: 90, user_id: "FJbSoG9zw3ThLEIg8Kqb9"},
+    // ]);
+    // console.log("Sample data inserted");
   };
   // seedDatabase();
 

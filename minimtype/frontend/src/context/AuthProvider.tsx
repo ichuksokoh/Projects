@@ -4,7 +4,8 @@ import { AuthContext } from "./AuthContext";
 
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+    const [userId, setUserId] = useState<string>(localStorage.getItem('userId') || "");
+    const [userEmail, setUserEmail] = useState<string>(localStorage.getItem('userEmail') || "");
 
     const register = (user_email: string, password: string) => {
         return registerUser(user_email, password);
@@ -16,11 +17,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const logout = () => {
         logoutUser();
-        setUserId(null);
+        setUserId("");
+        setUserEmail("");
     };
 
     return (
-        <AuthContext.Provider value={{ userId, register, login, logout }}>
+        <AuthContext.Provider value={{ userId, register, login, logout, userEmail }}>
             {children}
         </AuthContext.Provider>
     )

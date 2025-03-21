@@ -37,7 +37,7 @@ export const Options =() => {
       };
 
     return (
-        <div className="flex max-w-full min-w-[70vw] justify-between mx-auto">
+        <div className="flex max-w-full min-w-[70vw] justify-between mx-auto ">
             <div>
                 Links
             </div>

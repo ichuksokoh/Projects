@@ -48,7 +48,7 @@ export default function Register() {
 
     return (
         <>
-        <div className="flex flex-col items-center justify-center h-screen w-screen">
+        <div className="flex flex-col items-center justify-center h-screen w-screen bg-gray-500 text-white">
             <form title="Register" onSubmit={handleRegister} className="bg-gray-600 rounded-md p-2">
                 <h1>Register</h1>
                 <div className="flex flex-col items-start justify-center gap-y-1">
@@ -79,7 +79,6 @@ export default function Register() {
                         type={visible[1] ? "text" : "password"}
                         value={confirmPw}
                         onChange={e => setConfirm(e.target.value)}
-                        id="Pw2"
                     />
                     <div className="flex flex-row gap-x-2 mb-2">
                         <input type="checkbox" checked={visible[1]} id="Pw2" onChange={(e) => handleSeePw(e)}/>

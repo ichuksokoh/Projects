@@ -2,11 +2,13 @@ import { TestContext } from "./TestContext";
 import { useState, ReactNode } from "react";
 
 export const TestProvider = ({ children } : { children: ReactNode}) => {
-    const [testTime, setTime] = useState(30);
+    const defaultTime = localStorage.getItem('defaulttime');
+    const [testTime, setTime] = useState(Number(defaultTime) || 30);
 
     const values = {
         testTime,
-        setTime
+        setTime: (newTime: number) => 
+            {localStorage.setItem('defaulttime', String(newTime)); setTime(_ => newTime);}
     }
 
     return (

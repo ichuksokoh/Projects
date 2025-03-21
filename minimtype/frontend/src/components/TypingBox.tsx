@@ -3,9 +3,15 @@ import React, { createRef, useContext, useEffect, useMemo, useRef, useState } fr
 import { Menu } from './Menu'
 import { TestContext } from '../context/TestContext'
 import { ThemeContext } from '../context/ThemeContext'
+import { themeOptions } from '../utils/themeOptions'
+import { Stats } from './Stats'
+import { AuthContext } from '../context/AuthContext'
+import useAPI from '../hooks/useAPI'
+import { createTest } from '../services/tests'
 
 export const TypingBox = () => {
-    const [words, setWords] = useState<string[]>(generate({exactly: 44, minLength: 2}) as string[])
+    const typingWordsLen = 300;
+    const [words, setWords] = useState<string[]>(generate({exactly: typingWordsLen, minLength: 2}) as string[])
     const { testTime } = useContext(TestContext)!;
     const [countDown, setCD] = useState(testTime);
     const [testStart, setStart] = useState(false);
@@ -16,44 +22,186 @@ export const TypingBox = () => {
     const [incorrectChars, setIncorrectChars] = useState(0);
     const [missedChars, setMissedChars] = useState(0);
     const [extraChars, setExtraChars] = useState(0);
-    const [correctWords, setCorrectWords] = useState(0);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const wordsSpanRef = useMemo(() => {
-        return Array(words.length).fill(0).map(_ => createRef<HTMLSpanElement>());
-    }, [words]);
-
+    const [totalChars, setTotalChars] = useState(0);
+    const [correctCharsInWords, setCIW] = useState(0);
+    const [allTypedWords, setTypedWords] = useState(0);
     const { theme } = useContext(ThemeContext)!
+    const [oldTheme, setOldTheme] = useState(Object.values(theme.value));
+    const [newTheme, setNewTheme] = useState(Object.values(theme.value));
+    const [graphData, setGraphData] = useState<number[][]>([]);
+    const [intervalID, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const maxWordLen = 32;
+    const wordsSpanRef = useMemo(() => {
+            return words.map(_ => createRef<HTMLSpanElement>());
+        }, [words]);
 
-    const cursorLeft = 'animate-blinking1 border-l-2 border-white';
-    const cursorRight = 'animate-blinking2 border-r-2 border-white';
+    
+    const {userId, userEmail } = useContext(AuthContext)!;
 
     const focusInput = () => {
         if (inputRef.current) inputRef.current.focus();
     };
 
     const calcWPM = () => {
-        return Math.round((correctChars / 5) / (testTime / 60));
-    }
+        return Math.round((correctCharsInWords / 5) / (testTime / 60));
+    };
+    
+    const calcRaw = () => {
+        return Math.round((allTypedWords / 5) / (testTime / 60));
+    };
 
     const calcAcc = () => {
-        return Math.round((correctWords/(currWordIndex+1)) * 100)
-    }
-    
-    const startTimer = () => {
-        const intervalID = setInterval(timer, 1000);
-
-        function timer() {
-            setCD(prev => {if (prev === 1) {setEnd(true); clearInterval(intervalID);}; return prev - 1;});
-
-        }
+        return Math.round(((correctChars)/(Math.max(totalChars, 1))) * 100)
     };
+    
+
+    const handleTestEnd = () => {
+        const testInfo = { 
+            user_email: userEmail ,
+            wpm:  calcWPM(), 
+            raw_wpm: calcRaw(), 
+            characters: {
+                correct_chars: correctChars,
+                incorrect_chars: incorrectChars,
+                missed_chars: missedChars,
+                extra_chars: extraChars,
+            },
+            graph_data: graphData, 
+            accuracy: calcAcc(), 
+            user_id: userId! };
+        const validTest = () => {
+            return testInfo.wpm >= 10 && testEnd;
+        };
+        if (validTest()) {
+            createTest(testInfo).then(res => console.log(res) )
+        }
+        else {
+            console.log("Test Invalid");
+        }
+    }
+
+    const startTimer = () => {
+        const intervalId = setInterval(timer, 1000);
+        setIntervalId(intervalId);
+        function timer() {
+            setCD(cd => 
+                {
+                    setCIW(prev => {
+                        setTypedWords(prev2 => {
+                            setGraphData(gd => {
+                                return [...gd, [
+                                    testTime - cd + 1,
+                                    (prev/5)/((testTime-cd + 1)/60),
+                                    (prev2/5)/((testTime-cd + 1)/60),
+                                ]];
+                            });
+                            return prev2;
+                        })
+                        return prev;
+                    });
+                    if (cd === 1) {
+                        setEnd(true); 
+                        clearInterval(intervalId);
+                        }; 
+                    return cd - 1;
+                });
+        };
+    };
+
+
+    const resetTest = () => {
+        clearInterval(intervalID!);
+        wordsSpanRef.forEach(ref => {
+            const children = Array.from(ref.current?.childNodes || []);
+            children.forEach(node => {
+                if ((node as HTMLSpanElement).classList.contains("extra")) {
+                    ref.current?.removeChild(node);
+                }
+                (node as HTMLSpanElement).className = "";
+            });
+        });
+        
+        setWords(generate({exactly: typingWordsLen, minLength: 2}) as string[]);
+        setStart(false);
+        setEnd(false);
+        setCD(testTime);
+        setCurrWordIndex(0);
+        setCurrCharIndex(0);
+        setCorrectChars(0);
+        setIncorrectChars(0);
+        setMissedChars(0);
+        setExtraChars(0);
+        setTotalChars(0);
+        setCIW(0);
+        setTypedWords(0);
+        setGraphData([]);
+    };
+
+    const handleRestart = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            resetTest();
+        }
+    }
+
 
     useEffect(() => {
         focusInput();
         if(wordsSpanRef[0].current) {
            ( wordsSpanRef[0].current.childNodes[0] as HTMLElement).className = 'cursorLeft';
         }
-    },[])
+    },[words])
+
+    useEffect(() => {
+        if (testEnd) {
+            handleTestEnd();
+        }
+    }, [testEnd])
+
+
+
+    useEffect(() => {
+        if (testStart) {
+            document.documentElement.style.setProperty(
+                "--enable-animation",
+                testStart ? 'unset' : 'none'
+            );
+        }
+        if (testEnd) {
+            document.documentElement.style.setProperty(
+                "--enable-animation",
+                testEnd ? 'none' : 'unset'
+            );
+        }
+    }, [testStart, testEnd])
+
+    useEffect(() => {
+        setOldTheme(newTheme);
+        setNewTheme(Object.values(theme.value));
+        focusInput();
+    }, [theme]);
+
+    useEffect(() => {
+        focusInput();
+    }, [testTime])
+    
+    useEffect(() => {
+        wordsSpanRef.forEach(elem => {
+            if (!elem.current) return;
+
+            elem.current.childNodes.forEach(node => {
+                if (node instanceof HTMLElement) {
+                    const classes = node.classList;
+                    oldTheme.forEach((oldClass, i) => {
+                        if (classes.contains(oldClass)) {
+                            classes.remove(oldClass);
+                            classes.add(newTheme[i]);
+                        }
+                    });
+                }
+            });
+        });
+    }, [newTheme]);
 
     
  
@@ -61,26 +209,37 @@ export const TypingBox = () => {
         setCD(testTime);
     }, [testTime]);
 
-
+  
 
 
     const handleUserInput = (e: React.KeyboardEvent) => {
+        if ((e.altKey || e.ctrlKey) && e.key !== "") return;
+        if (!/^[a-zA-Z0-9]$/.test(e.key) && !(e.key === 'Backspace' || e.key === ' ')) {
+            return;
+          }
 
         if (!testStart) {
             startTimer();
             setStart(true);
         }
 
+
         const wordElement = wordsSpanRef[currWordIndex].current;
         if (wordElement) {
             const allCurrChars = wordElement.getElementsByTagName('span');
+            if (allCurrChars.length === maxWordLen) return;
             if (e.key === ' ') {
                 if (currCharIndex === 0) return;
-                let correctCharsInWord = wordsSpanRef[currWordIndex].current!.querySelectorAll(`.${theme.value.correct}`);
+                let correctLettersInWord = wordsSpanRef[currWordIndex].current!.querySelectorAll(`.${theme.value.correct}`);
 
-                if (correctCharsInWord.length === allCurrChars.length) {
-                    setCorrectWords(prev => prev + 1);
+                if (correctLettersInWord.length === allCurrChars.length) {
+                    setCIW(prev => prev + 1 + allCurrChars.length);
+                    setTypedWords(prev => prev + 1 + correctLettersInWord.length);
                 }
+                else {
+                    setTypedWords(prev => prev + 1 + correctLettersInWord.length);
+                }
+
                 if (allCurrChars.length <= currCharIndex) {
                     allCurrChars[currCharIndex-1].classList.remove('cursorRight')
                 }
@@ -92,10 +251,16 @@ export const TypingBox = () => {
                 if (currWordIndex < wordsSpanRef.length ) {
                         (wordsSpanRef[currWordIndex + 1].current!.childNodes[0] as HTMLElement).className = "cursorLeft";
                 }
+
+
+
                 setCurrWordIndex(prev => prev + 1);
                 setCurrCharIndex(0);
+
                 return;
             }
+
+
 
             if (e.key === 'Backspace') {
                 if (currCharIndex !== 0) {
@@ -136,10 +301,7 @@ export const TypingBox = () => {
                     const prevChars = wordsSpanRef[currWordIndex -1].current?.querySelectorAll('span');
                     const wrong = wordsSpanRef[currWordIndex - 1].current?.querySelectorAll(`.${theme.value.wrong}`).length;
                     const right = wordsSpanRef[currWordIndex - 1].current?.querySelectorAll(`.${theme.value.correct}`).length;
-                    console.log(right);
-                    console.log(wrong);
-                    console.log(currCharIndex);
-                    console.log(prevChars?.length);
+                   
                     if (wrong! + right! !== prevChars?.length ) {
                         allCurrChars[currCharIndex].className = '';
                         prevChars![wrong! + right!].className += " cursorLeft";
@@ -151,21 +313,6 @@ export const TypingBox = () => {
 
                 return;
 
-                // if(currCharIndex !== 0) {
-                //     //in this case we know that currCharIndex === allCurrChars.length
-                //     //in addition only works if word is an extra word
-                //     console.log("first: ", allCurrChars.length);
-                //     if (allCurrChars[currCharIndex - 1].className.includes('extra')) {
-                //         allCurrChars[currCharIndex - 1].remove();
-                //         allCurrChars[currCharIndex - 2].className += ' ' + cursorRight
-                //     }
-                //     console.log("currCharIndex: ", currCharIndex);
-                //     // console.log("second: ", allCurrChars.length);
-                //     allCurrChars[currCharIndex === allCurrChars.length ? currCharIndex - 1 : currCharIndex ].className = '';
-                //     allCurrChars[currCharIndex - 1].className = cursorLeft;
-                //     setCurrCharIndex(prev => prev - 1);
-                // }
-                // return;
             }
 
             if (currCharIndex === allCurrChars.length) {
@@ -197,6 +344,7 @@ export const TypingBox = () => {
                 allCurrChars[currCharIndex + 1].className = "cursorLeft";
             }
             
+            setTotalChars(prev => prev + 1);
             setCurrCharIndex(prev => prev + 1);
 
         }
@@ -205,9 +353,10 @@ export const TypingBox = () => {
     
 
     return (
-        <div>
-            <Menu countDown={countDown}></Menu>
-            {testEnd ? <h1>Test Over</h1>  : <div className='block max-w-[1000px] h-[140px] mx-auto overflow-hidden' onClick={focusInput}>
+        <div className='' onKeyDown={handleRestart}>
+            <Menu countDown={countDown} restart={resetTest}></Menu>
+            {testEnd ? <Stats stats={{raw: calcRaw(), wpm: calcWPM(), accuracy: calcAcc(), correctChars, incorrectChars, missedChars, extraChars, graphData}}/> 
+            : <div className='block max-w-[1000px] h-[140px] mx-auto overflow-hidden' onClick={focusInput}>
                 <div className='font-mono flex text-lg flex-wrap cursor-text select-none'>
                     {
                         words.map((word, i) => (
@@ -227,12 +376,7 @@ export const TypingBox = () => {
                 className='opacity-0'
                 onKeyDown={handleUserInput}
             />
-        <div>
-            WPM: {calcWPM()}
-        </div>
-        <div>
-            Accurcacy: {calcAcc()}
-        </div>
+      
         </div>
     )
 }

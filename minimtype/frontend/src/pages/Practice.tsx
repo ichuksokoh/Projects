@@ -30,7 +30,7 @@ export default function Practice() {
     }, [])
 
     useEffect(() => {
-        let interval: number = -1;
+        let interval: NodeJS.Timeout;
         if (isTyping && timeLeft > 0) {
             interval = setInterval(() => {
                 setTime(prev => prev - 1);
@@ -49,7 +49,7 @@ export default function Practice() {
 
         }
         else if (timeLeft === 0) {
-            clearInterval(interval);
+            clearInterval(interval!);
             setIsTyping(false);
         }
 

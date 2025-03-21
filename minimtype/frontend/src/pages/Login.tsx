@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
@@ -8,10 +8,15 @@ export default function Login() {
     const [password, setPw] = useState("");
     const [error, setError] = useState("")
     const [visible, setVis] = useState(false)
+    const [timer, setTimer] = useState(3600);
     const navigate = useNavigate();
-    const { login } = useContext(AuthContext)!;
+    const { login, logout } = useContext(AuthContext)!;
 
     
+  
+
+
+
 
     const handleLogin = async (e : React.FormEvent) => {
         e.preventDefault();
@@ -19,7 +24,12 @@ export default function Login() {
         if (loggedIn !== null && localStorage.getItem('userId')) {
             setError("");
             console.log("Success");
-            navigate('/home')
+            navigate('/practice2')
+            setTimeout(() => { 
+                logout();
+                navigate('/login')
+                console.log("logged out");
+            }, (timer * 1000));
         }
         else {
             console.log("Failure");
@@ -39,7 +49,7 @@ export default function Login() {
 
     return (
         <>
-            <div className="flex flex-col h-screen w-screen justify-center items-center">
+            <div className="flex flex-col h-screen w-screen justify-center items-center bg-gray-500 text-white">
             <form title="Login" onSubmit={(e) => handleLogin(e)} className="gap-y-1 bg-gray-600 rounded-md p-2">
                 <h1>Login</h1>
                 <div className="flex flex-col items-start justify-center">

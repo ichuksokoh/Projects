@@ -6,14 +6,7 @@ export const getTests = async (req: Request, res: Response) => {
     const userId = req?.params?.id;
     try {
         const query = { user_id: userId };
-        const tests = await Test.find(query, (err: Error, tests: ITest[]) => {
-            if (err) {
-                console.error('Error finding tests:', err);
-            }
-            else {
-                console.log('Found tests', tests);
-            }
-        }).sort({date: 1}).limit(50);
+        const tests = await Test.find(query).sort({date: 1}).limit(50);
 
         if (tests) {
             res.status(200).send(tests);
@@ -26,9 +19,10 @@ export const getTests = async (req: Request, res: Response) => {
 };
 
 export const createTests = async (req: Request, res: Response) => {
-    const { username, wpm, accuracy, user_id } = req?.body;
+    const { user_email, wpm, raw_wpm, characters, graph_data, accuracy, user_id } = req?.body;
     try {
-        const result = await Test.create({ user_email: username, wpm: wpm, accuracy: accuracy, user_id: user_id });
+        const result = await Test.create({ user_email: user_email, wpm: wpm, raw_wpm: raw_wpm,
+            characters: characters, graph_data: graph_data, accuracy: accuracy, user_id: user_id });
         if (result) {
             res.status(200).send(`Test saved: ${result}`);
         }
@@ -36,7 +30,7 @@ export const createTests = async (req: Request, res: Response) => {
     catch (error) {
         res.status(500).send(`Test save failure: ${error}`);
     }
-}
+};
 
 export const updateTest = async (req: Request, res: Response) => {
     const testId = req?.params?.id; 
@@ -58,7 +52,7 @@ export const updateTest = async (req: Request, res: Response) => {
     catch (error) {
         res.status(500).send(`Updated Test failed: ${error}`);
     }
-}
+};
 
 export const deleteTest = async (req: Request, res: Response) => {
     const testId = req?.params?.id;
@@ -74,4 +68,4 @@ export const deleteTest = async (req: Request, res: Response) => {
     catch (error) {
         res.status(500).send('internal server error');
     }
-}
+};

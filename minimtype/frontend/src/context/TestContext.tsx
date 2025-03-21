@@ -1,11 +1,8 @@
 import { createContext } from "react";
+import { TestTimer } from "../Interfaces";
 
 
-interface TestType {
-    testTime: number;
-    setTime: (newtime: number) => void;
-};
 
-export const TestContext = createContext<TestType | null>(null);
+export const TestContext = createContext<TestTimer | null>(null);
 
 

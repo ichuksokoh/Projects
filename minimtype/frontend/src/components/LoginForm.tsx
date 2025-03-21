@@ -28,7 +28,7 @@ export const LoginForm = ({ openClose } : {openClose : (open: boolean) => void})
             return;
         }
         const loggedIn = await login(email, password);
-        if (loggedIn !== null && localStorage.getItem('userId')) {
+        if (loggedIn !== null && localStorage.getItem('user')) {
             setError("");
             console.log("Success");
             

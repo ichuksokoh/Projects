@@ -1,7 +1,8 @@
 import Select, { DropdownIndicatorProps, GroupBase, SingleValue, StylesConfig } from "react-select";
-import { themeOptions, ThemeValues } from "../utils/themeOptions";
+import { themeOptions } from "../utils/themeOptions";
 import { useContext, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
+import { ThemeValues } from "../Interfaces";
 
 
 export const Options =() => {

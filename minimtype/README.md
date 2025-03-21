@@ -9,8 +9,10 @@ Goal currently is too making a website somewhat similar to [MonkeyType][def1]
 2. Developed mongoDB database for users will element Google login later as well
     - User login available with email and password, password is hashed and jwt token required
         for user verification
+    - User page created to see WPM and raw WPM over time
 
 3. May implement test tracking for users who do not save an account
+
 
 
 [def1]: https://monkeytype.com

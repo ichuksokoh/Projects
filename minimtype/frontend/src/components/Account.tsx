@@ -5,12 +5,13 @@ import { LoginForm } from './LoginForm';
 import { SignupForm } from './Signup';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 
 export const Account = () => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(0);
-
+    const navigate = useNavigate();
 
     const handleModalOpen = () => {
         setOpen(true);
@@ -21,21 +22,23 @@ export const Account = () => {
         setValue(v);
     }
 
-    const { logout} = useContext(AuthContext)!;
+    const { user, logout} = useContext(AuthContext)!;
     const [loggedIn, setLoggedIn] = useState(false);
     useEffect(() => {
-        if (localStorage.getItem('userId')) {
+        if (JSON.stringify(user) !== "{}") {
             setLoggedIn(true);
         }
         else {
             setLoggedIn(false);
         }
-    }, [localStorage.getItem('userId')])
+    }, [user])
 
     return (
         <div>
-            {loggedIn ? <></> : <AccountCircleIcon onClick={handleModalOpen}/>}
-            {loggedIn ? <LogoutIcon className='hover:cursor-pointer' onClick={() => {logout(); setLoggedIn(false)}}/> : <></>}
+            <div className="flex flex-row gap-x-2">
+                {loggedIn ? <AccountCircleIcon onClick={() => navigate('/user')}/> : <AccountCircleIcon onClick={handleModalOpen}/>}
+                {loggedIn ? <LogoutIcon className='hover:cursor-pointer' onClick={() => {logout(); setLoggedIn(false)}}/> : <></>}
+            </div>
             <Modal
                 open={open}
                 onClose={handleClose}

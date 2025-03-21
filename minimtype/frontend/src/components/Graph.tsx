@@ -9,7 +9,7 @@
         Legend
     } from 'chart.js';
 import { useContext } from 'react';
-    import { Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { ThemeContext } from '../context/ThemeContext';
 
     ChartJS.register(

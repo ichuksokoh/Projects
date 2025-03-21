@@ -3,14 +3,12 @@ import React, { createRef, useContext, useEffect, useMemo, useRef, useState } fr
 import { Menu } from './Menu'
 import { TestContext } from '../context/TestContext'
 import { ThemeContext } from '../context/ThemeContext'
-import { themeOptions } from '../utils/themeOptions'
 import { Stats } from './Stats'
 import { AuthContext } from '../context/AuthContext'
-import useAPI from '../hooks/useAPI'
 import { createTest } from '../services/tests'
 
 export const TypingBox = () => {
-    const typingWordsLen = 300;
+    const typingWordsLen = 400;
     const [words, setWords] = useState<string[]>(generate({exactly: typingWordsLen, minLength: 2}) as string[])
     const { testTime } = useContext(TestContext)!;
     const [countDown, setCD] = useState(testTime);
@@ -37,7 +35,7 @@ export const TypingBox = () => {
         }, [words]);
 
     
-    const {userId, userEmail } = useContext(AuthContext)!;
+    const { user } = useContext(AuthContext)!;
 
     const focusInput = () => {
         if (inputRef.current) inputRef.current.focus();
@@ -58,7 +56,7 @@ export const TypingBox = () => {
 
     const handleTestEnd = () => {
         const testInfo = { 
-            user_email: userEmail ,
+            user_email: user.userEmail ,
             wpm:  calcWPM(), 
             raw_wpm: calcRaw(), 
             characters: {
@@ -69,7 +67,7 @@ export const TypingBox = () => {
             },
             graph_data: graphData, 
             accuracy: calcAcc(), 
-            user_id: userId! };
+            user_id: user.userId! };
         const validTest = () => {
             return testInfo.wpm >= 10 && testEnd;
         };
@@ -210,6 +208,12 @@ export const TypingBox = () => {
     }, [testTime]);
 
   
+    useEffect(() => {
+        const wordRef = wordsSpanRef[currWordIndex];
+        if (wordRef.current) {
+            wordRef.current.scrollIntoView({ behavior: "smooth", block:"center"});
+        }
+    },[currWordIndex])
 
 
     const handleUserInput = (e: React.KeyboardEvent) => {

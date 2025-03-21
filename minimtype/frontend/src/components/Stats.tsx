@@ -1,17 +1,8 @@
-import { ReactNode, useContext } from "react";
+import {  useContext } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { Graph } from "./Graph";
+import { statsistics } from "../Interfaces";
 
-interface statsistics {
-    wpm: number;
-    raw: number,
-    accuracy: number;
-    correctChars: number;
-    incorrectChars: number;
-    missedChars: number;
-    extraChars: number;
-    graphData: Number[][];
-};
 
 export const Stats = ({ stats } : { stats : statsistics}) => {
 
@@ -29,7 +20,7 @@ export const Stats = ({ stats } : { stats : statsistics}) => {
             <div className={`stats-box flex max-w-[1000px] max-h-[350px] mx-auto ${theme.value.textColor}`}>
                 <div className="left-stats w-[30%] p-7 flex flex-col justify-center text-xl">
                     <div>Raw:</div>
-                    <div>{stats.raw}</div>
+                      <div>{stats.raw}</div>
                    <div>WPM:</div>
                    <div>{stats.wpm}</div>
                    <div>Accuracy:</div>

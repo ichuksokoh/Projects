@@ -1,7 +1,7 @@
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import { useState, useEffect} from 'react'
-import { Route, Routes, useFetcher, useNavigate } from "react-router-dom"
+import { Route, Routes } from "react-router-dom"
 import Practice from './pages/Practice';
 import Home from './pages/Home';
 import { AuthProvider } from './context/AuthProvider';
@@ -11,6 +11,7 @@ import ProtectedRoute from './services/ProtectedRoute';
 import Practice2 from './pages/Practice2';
 import { TestProvider } from './context/TestProvider';
 import { ThemeProvider } from './context/ThemeProvider';
+import { UserPage } from './pages/User';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -21,7 +22,8 @@ function App() {
     {path: '/', element: <Home/>},
     {path: '/practice', element: <Practice/>},
     {path: '/practice2', element: <Practice2/>},
-  ]
+    {path: '/user', element: <UserPage/>},
+  ];
 
   useEffect(() => {
     // Fetch data from the backend API

@@ -50,23 +50,7 @@ const defaultTheme = {
     graphbg: "rgb(156,163,175)"
 };
 
-export interface value {
-    label: string;
-    background: string;
-    textColor: string;
-    correct: string;
-    wrong: string;
-    lineColor: string;
-    lineColor2: string;
-    typeBoxText: string;
-    graphbg: string;
-};
 
-
-export interface ThemeValues {
-    label: string;
-    value: value;
-};
 
 export const themeOptions = [
     {label: 'Default', value: defaultTheme},

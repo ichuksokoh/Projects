@@ -1,12 +1,16 @@
 import { createContext } from "react";
+import { AuthContextType } from "../Interfaces";
 
-interface AuthContextType {
-    userId: string;
-    userEmail: string;
-    register: (user_email: string, password: string) => Promise<boolean>;
-    login: (user_email: string, password: string) => Promise<void>;
-    logout: () => void;
-}
+// interface AuthContextType {
+//     user: {
+//         userId: string;
+//         userEmail: string;
+//         userSince: Date;
+//     };
+//     register: (user_email: string, password: string) => Promise<boolean>;
+//     login: (user_email: string, password: string) => Promise<void>;
+//     logout: () => void;
+// }
 
 
 

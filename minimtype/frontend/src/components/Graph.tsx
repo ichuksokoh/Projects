@@ -97,7 +97,7 @@ import { ThemeContext } from '../context/ThemeContext';
         }
 
         return (
-            <div className=''>
+            <div className='w-full h-full'>
                 <Line options={options} data={data}/>
             </div>
         );

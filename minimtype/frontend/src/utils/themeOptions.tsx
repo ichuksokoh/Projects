@@ -8,7 +8,7 @@ const darkTheme = {
     textColor: 'text-white',
     lineColor: 'rgb(255,255,255)',
     lineColor2: 'rgb(162,167,155)',
-    typeBoxText: 'grey',
+    typeBoxText: 'gray',
     graphbg: "rgb(166,166,166)"
 };
 
@@ -20,7 +20,7 @@ const magicTheme = {
     textColor: 'text-indigo-500',
     lineColor: 'rgb(99,102,241)',
     lineColor2: 'rgb(193,141,211)',
-    typeBoxText: 'grey',
+    typeBoxText: 'gray',
     graphbg: "rgb(156,113,255)"
 };
 

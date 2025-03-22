@@ -8,11 +8,15 @@ export const Stats = ({ stats } : { stats : statsistics}) => {
 
     const { theme } = useContext(ThemeContext);
     let timeSet = new Set();
-    const newGraphDaata = stats.graphData.filter(i => {
-        if (!timeSet.has(i[0])) {
-            timeSet.add(i[0]);
-            return i;
+    const newGraphDaata = stats.graphData.filter((e,i) => {
+        if (!timeSet.has(e[0])) {
+            timeSet.add(e[0]);
+            return true;
+            if (stats.graphData.length <= 30 || (i % 3 === 1 && stats.graphData.length >= 60) ) {
+                return true;
+            }
         }
+        return false;
     });
 
     return (

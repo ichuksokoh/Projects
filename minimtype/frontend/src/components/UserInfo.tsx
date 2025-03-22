@@ -1,11 +1,13 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { ThemeContext } from '../context/ThemeContext';
 
 
 export const UserInfo  = ({ tests } : { tests: number }) => {
     
     const { user } = useContext(AuthContext)!;
+    const { theme } = useContext(ThemeContext)!;
 
 
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
@@ -18,13 +20,13 @@ export const UserInfo  = ({ tests } : { tests: number }) => {
     const dayOfWeek = date.getDay();
 
     return (
-        <div className='bg-gray-600 h-full rounded-2xl py-4 px-2 flex flex-row items-center gap-x-2 min-w-3/5 min-h-1/3'>
+        <div className={`bg-gray-500 h-[175px] w-[850px] rounded-2xl py-4 px-2 flex flex-row items-center gap-x-2`}>
                     <div className='w-[20%] flex flex-row justify-center'>
                         <AccountCircleIcon sx={{ transform: "scale(6)" }}/>
                     </div>
-                    <div className='w-[35%]'>
+                    <div className='w-[40%] font-bold text-lg'>
                         <div>Email: {user.userEmail}</div>
-                        <div>Memeber Since: {days[dayOfWeek]} {day}, {months[month]} {year}</div>
+                        <div>User Since: {days[dayOfWeek]} {day}, {months[month]} {year}</div>
                     </div>
                     <div className='h-full w-[1px] self-stretch bg-white'></div>
                     <div className='w-[40%] text-center text-2xl'>

@@ -31,7 +31,9 @@ export const TypingBox = () => {
     const [graphData, setGraphData] = useState<number[][]>([]);
     const [intervalID, setIntervalId] = useState<NodeJS.Timeout | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const soundRef = useRef(new Audio(keyClickSound));
+    const soundRight = useRef(new Audio(keyClickSound));
+    const soundWrong = useRef(new Audio(keyClickSound2));
+    const [volume, setVolume] = useState(0.1);
     const maxWordLen = 32;
     const wordsSpanRef = useMemo(() => {
             return words.map(_ => createRef<HTMLSpanElement>());
@@ -153,6 +155,14 @@ export const TypingBox = () => {
         }
     }
 
+    useEffect(() => {
+
+        soundRight.current.volume = volume;
+        soundWrong.current.volume = volume
+       
+
+    },[volume]);
+
 
     useEffect(() => {
         focusInput();
@@ -241,18 +251,8 @@ export const TypingBox = () => {
 
         const wordElement = wordsSpanRef[currWordIndex].current;
         if (wordElement) {
-            // if (soundRef.current) {
-            //     soundRef.current.currentTime = 0;
-            //     soundRef.current.play().catch(error => console.error("Audio play error: ", error));
-            // }
-            const soundRight = new Audio(keyClickSound);
-            const soundWrong = new Audio(keyClickSound2);
-            soundRight.volume = 0.1;
-            soundRight.currentTime = 0;
-            soundRight.currentTime = 0;
-            soundWrong.volume = 0.1;
-            soundWrong.currentTime = 0;
-            soundWrong.currentTime = 0;
+            soundRight.current.currentTime = 0;
+            soundWrong.current.currentTime = 0;
             const allCurrChars = wordElement.getElementsByTagName('span');
             if (allCurrChars.length === maxWordLen) return;
             if (e.key === ' ') {
@@ -273,7 +273,7 @@ export const TypingBox = () => {
                 else {
                     allCurrChars[currCharIndex].classList.remove('cursorLeft')
                     setMissedChars(missedChars + (allCurrChars.length - currCharIndex));
-                    soundWrong.play().catch(error => console.error("Audio error: ", error));
+                    soundWrong.current.play().catch(error => console.error("Audio error: ", error));
                 }
 
                 if (currWordIndex < wordsSpanRef.length ) {
@@ -291,7 +291,7 @@ export const TypingBox = () => {
 
 
             if (e.key === 'Backspace') {
-                soundRight.play().catch(error => console.error("Audio error: ", error));
+                soundRight.current.play().catch(error => console.error("Audio error: ", error));
                 if (currCharIndex !== 0) {
                     if (currCharIndex === allCurrChars.length) {
                         if (allCurrChars[currCharIndex - 1].className.includes('extra')) {
@@ -361,12 +361,12 @@ export const TypingBox = () => {
             if (e.key == allCurrChars[currCharIndex].innerText) {
                 allCurrChars[currCharIndex].className = `${theme.value.correct}`
                 setCorrectChars(prev => prev + 1);
-                soundRight.play().catch(error => console.error("Audio error: ", error));
+                soundRight.current.play().catch(error => console.error("Audio error: ", error));
             }
             else {
                 allCurrChars[currCharIndex].className = `${theme.value.wrong}`
                 setIncorrectChars(prev => prev + 1);
-                soundWrong.play().catch(error => console.error("Audio error: ", error));
+                soundWrong.current.play().catch(error => console.error("Audio error: ", error));
             }
             if (currCharIndex + 1 === allCurrChars.length) {
                 allCurrChars[currCharIndex].className += ' ' + "cursorRight";
@@ -385,7 +385,7 @@ export const TypingBox = () => {
 
     return (
         <div className='' onKeyDown={handleRestart}>
-            <Menu countDown={countDown} restart={resetTest}></Menu>
+            <Menu countDown={countDown} volControl={setVolume} restart={resetTest} vol={volume}></Menu>
             {testEnd ? <Stats stats={{raw: calcRaw(), wpm: calcWPM(), accuracy: calcAcc(), correctChars, incorrectChars, missedChars, extraChars, graphData}}/> 
             : <div className='block max-w-[1000px] h-[140px] mx-auto overflow-hidden' onClick={focusInput}>
                 <div className='font-mono flex text-lg flex-wrap cursor-text select-none'>

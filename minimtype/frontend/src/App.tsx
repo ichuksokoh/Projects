@@ -17,6 +17,7 @@ function App() {
   const [count, setCount] = useState(0)
   const [message, setMessage] = useState<string>('');
 
+
   const protectedRoutes = [
     {path: '/home', element: <Home/>},
     {path: '/', element: <Home/>},

@@ -34,7 +34,7 @@ export const Stats = ({ stats } : { stats : statsistics}) => {
 
                 </div>
                 <div className="right-stats w-[70%]">
-                    <Graph graphData={newGraphDaata}/>
+                    <Graph graphData={stats.graphData}/>
                 </div>
 
             </div>

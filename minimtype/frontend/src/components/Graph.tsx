@@ -79,19 +79,21 @@ import { ThemeContext } from '../context/ThemeContext';
                 x: {
                     ticks: {
                         color: theme.value.lineColor,
+                        maxRotation: typeof graphData[0][0] === 'string' ? 40 : 0,
+                        minRotation: typeof graphData[0][0] === 'string' ? 40 : 0,
                     },
-                    grid: {
-                        color: theme.value.lineColor
-                    }
+                    // grid: {
+                    //     color: theme.value.lineColor
+                    // }
                 },
                 y: {
                    ticks: {
                     color: theme.value.lineColor,
                     // stepsize: 40,
                    },
-                   grid: {
-                    color: theme.value.lineColor
-                   }
+                //    grid: {
+                //     color: theme.value.lineColor
+                //    }
                 }
             }
         }

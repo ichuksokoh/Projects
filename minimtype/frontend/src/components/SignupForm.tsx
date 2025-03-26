@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 
-export const SignupForm = () => {
+export const SignupForm = ({ openClose } : {openClose : (open: boolean) => void}) => {
 
     const [email, setEmail] = useState("");
     const [password, setPw] = useState("");
@@ -18,7 +18,7 @@ export const SignupForm = () => {
     const [showPassword2, setShowPassword2] = useState(false);
     const navigate = useNavigate();
 
-    const { register } = useContext(AuthContext)!;
+    const {login, register, user } = useContext(AuthContext)!;
     
 
 
@@ -40,7 +40,16 @@ export const SignupForm = () => {
             const success = await register(email, password);
             if (success) {
                 setError("");
-                navigate('/practice2');
+                console.log("Success signing up");
+                const loggedin = await login(email, password);
+                console.log(user);
+                console.log(loggedin);
+                if (loggedin !== null) {
+                    console.log("rerouting");
+                    openClose(false);
+                    navigate('/practice2');
+                }
+                
             }
         } 
         catch (error) {
@@ -79,7 +88,7 @@ export const SignupForm = () => {
                 error={error !== ""}
                 helperText={error}
                 variant="outlined"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 label="Enter Password"
                 sx={{ "& .MuiInputBase-input": { color: "white" },
                       "& label": {color: "white"},
@@ -106,7 +115,7 @@ export const SignupForm = () => {
                 error={error2 !== ""}
                 helperText={error2}
                 variant="outlined"
-                type="password"
+                type={showPassword2 ? "text" : "password"}
                 label="Confirm Password"
                 sx={{ "& .MuiInputBase-input": { color: "white" },
                       "& label": {color: "white"},

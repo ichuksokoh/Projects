@@ -2,7 +2,7 @@ import { AppBar, Modal, Tabs, Tab } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import React, { useContext, useEffect, useState } from 'react';
 import { LoginForm } from './LoginForm';
-import { SignupForm } from './Signup';
+import { SignupForm } from './SignupForm';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -55,7 +55,7 @@ export const Account = () => {
                             <Tab className='!text-white' label='signup'></Tab>
                         </Tabs>
                     </AppBar>
-                    {value === 0 ? <LoginForm openClose={setOpen} /> : <SignupForm/>}
+                    {value === 0 ? <LoginForm openClose={setOpen} /> : <SignupForm openClose={setOpen}/>}
                 </div>
             </Modal>
         </div>

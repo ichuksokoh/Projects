@@ -20,7 +20,7 @@ export const UserInfo  = ({ tests } : { tests: number }) => {
     const dayOfWeek = date.getDay();
 
     return (
-        <div className={`bg-gray-500 h-[175px] w-[850px] rounded-2xl py-4 px-2 flex flex-row items-center gap-x-2`}>
+        <div className={`bg-gray-500/40 h-[175px] w-[850px] rounded-2xl py-4 px-2 flex flex-row items-center gap-x-2`}>
                     <div className='w-[20%] flex flex-row justify-center'>
                         <AccountCircleIcon sx={{ transform: "scale(6)" }}/>
                     </div>

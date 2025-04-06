@@ -12,6 +12,7 @@ import ArrowForward from '@mui/icons-material/ArrowForward';
 import { Popup } from '../components/Popup';
 import { deleteUser } from '../services/users';
 import { useNavigate } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 
 
@@ -22,6 +23,7 @@ export const UserPage = () => {
     const { user, logout } = useContext(AuthContext)!;
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
+    const [open3, setOpen3] = useState(false);
     const [currTest, setTest] = useState<statsistics | null>(null);
     const [testIndex, setIndex] = useState(0);
     const [arrColFor, setArrColFor] = useState(theme.value.textColor);
@@ -40,11 +42,11 @@ export const UserPage = () => {
         return data ? [...data].slice(page*rowsPerPage, page * rowsPerPage + rowsPerPage) : [];
     }, [rowsPerPage, page, data]);
 
-    // useEffect(() => {
-    //     if (!loading) {
-            
-    //     }
-    // }, [loading, data])
+    useEffect(() => {
+        if (!loading) {
+            mutate();
+        }
+    }, [loading, data])
 
     useEffect(() => {
         if (data && data.length !== 0) {
@@ -68,7 +70,7 @@ export const UserPage = () => {
     
     const tests = data && !loading ? data.length : 0;
 
-    const WPM_graph_data = loading ? [[]] :
+    const WPM_graph_data = !data && loading ? [[]] :
         data.map((e : TestSaved )=> {
             const date = new Date(e.date);
             const month = date.getMonth() + 1;
@@ -90,13 +92,18 @@ export const UserPage = () => {
         if (deletion === 'Confirm') {
             const response = deleteUser(user.userId);
             if (response !== null) {
-                logout();
+                if (localStorage.getItem('token')) {
+                    localStorage.removeItem('token');
+                }
+                if (localStorage.getItem('user')) {
+                    localStorage.removeItem('user');
+                }
                 navigate('/practice2');
             }
         }
     }
 
-    const handlePageChange = (_ : React.MouseEvent<HTMLButtonElement, MouseEvent> | null , newPage: number | number[]) => {
+    const handlePageChange = ( _ : React.MouseEvent<HTMLButtonElement, MouseEvent> | null , newPage: number | number[]) => {
         setPage(newPage as number);
     }
 
@@ -118,6 +125,7 @@ export const UserPage = () => {
 
     const handleModalClose = () => setOpen(false);
     const handleModalClose2 = () => setOpen2(false);
+    const handleModalClose3 = () => setOpen3(false);
 
     const handleModalOpen = (e: React.MouseEvent<HTMLTableRowElement>) => {
         const index : number = Number(e.currentTarget.dataset.key) + page*rowsPerPage;
@@ -131,16 +139,15 @@ export const UserPage = () => {
     const nextTest = () => setIndex(prev => Math.min(prev + 1, data.length - 1))
     const prevTest = () => setIndex(prev => Math.max(prev - 1, 0));
 
-
     return (
-        <div className={`${theme.value.background} ${theme.value.textColor} flex flex-col h-screen w-screen justify-center items-center overflow-scroll`}>
+        <div className={`${theme.value.background} ${theme.value.textColor} flex flex-col h-screen w-screen justify-center items-center overflow-y-scroll`}>
          
             {open && <Popup onClose={handleModalClose}>
                 <div className='flex flex-row justify-between items-center'>
                     <div>
                         <Arrowback className={`${arrColBac}`} onClick={prevTest}/>
                     </div>
-                    <div className="border-2 border-white/50 rounded-lg w-5/7 p-4">
+                    <div className="border-2 border-white/50 rounded-lg w-7/7 sm:w-5/7 p-4">
                         <Stats stats={currTest!}/>
                     </div>
                     <div>
@@ -149,12 +156,12 @@ export const UserPage = () => {
                 </div>
             </Popup>}
             {open2 && <Popup onClose={handleModalClose2} classname='flex justify-center items-center'>
-                <div className='bg-gray-700/40 flex flex-col justify-center items-center gap-y-4 w-2/5 p-2 rounded-lg'>
+                <div className='bg-gray-700/40 flex flex-col justify-center w-1/2 sm:w-1/2 items-center gap-y-4 lg:w-2/5 p-2 rounded-lg'>
                            <span>Are You sure?</span> 
                         <div className='flex flex-row gap-x-3 justify-center'>
-                            <span>Type 'Confirm'</span>
+                            <span className='text-xs lg:text-sm'>Type 'Confirm'</span>
                             <input 
-                                className='bg-white/30 rounded-md h-6 w-32 p-1'
+                                className='bg-white/30 rounded-md h-6 w-full lg:w-32 p-1'
                                 value={deletion}
                                 onChange={(e) => setDelete(e.target.value)}
                             ></input>
@@ -167,14 +174,35 @@ export const UserPage = () => {
                         </button>
                     </div>
                 </Popup>}
-            <div className='w-[100vh] h-[600px] flex flex-col items-center'>
-                <div className='w-[120vh] h-[1000px]'>
+                {open3 && <Popup onClose={handleModalClose3} classname='flex justify-center items-center'>
+                    <div className='flex flex-col items-center gap-y-4 w-3/4 sm:w-1/2   lg:w-2/5 h-full bg-gray-700/40 p-4 rounded-lg'>
+                        <div className='flex flex-row gap-x-3'>
+                            <span className='lg:text-sm text-xs'>Old Password:</span>
+                            <input type='password' className='lg:w-40 w-full min-h-8 rounded-md px-2 bg-white/30'/>
+                        </div>
+                        <div className='flex flex-row gap-x-2'>
+                            <span className='lg:text-sm text-xs'>New Password:</span>
+                            <input type='password' className='lg:w-40 w-full min-h-8 rounded-md px-2 bg-white/30'/>
+                        </div>
+                        <button
+                            className='bg-blue-600/30 p-2 font-bold rounded-lg active:scale-95 transition-all'
+                        >
+                            Confirm
+                        </button>
+                    </div>
+                    </Popup>}
+            <div className='w-full h-full flex flex-col items-center py-12'>
+                <div className='w-3/4 flex justify-between mb-8'>
+                    <Arrowback className='transition-all active:scale-90'  onClick={() => navigate('/practice2')}/>
+                    <LogoutIcon className='transition-all active:scale-90' onClick={() => {navigate('/practice2'); logout();}}/>
+                </div>
+                <div className='w-3/4 mb-10 md:w-1/2'>
                     <UserInfo tests ={tests}/>
                 </div>
-                <div className='w-[130vh] h-[130vh]'>
+                <div className='w-10/12 lg:w-2/3 h-full min-h-[200px] flex items-center'>
                     <Graph graphData={ WPM_graph_data}/>
                 </div>
-                <TableContainer style={{minHeight: '90vh', minWidth: '900px'}}>
+                <TableContainer style={{minHeight: '75vh', width: '60%'}}>
                     <Table>
                         <TableHead>
                             <TableRow>
@@ -232,9 +260,14 @@ export const UserPage = () => {
                         sx={{color: 'white'}}
                     />
                 </TableContainer>
-                <div className='min-h-24'>
+                <div className='min-h-24 flex flex-col gap-y-4'>
+                    <button className='rounded-md p-2 bg-sky-600/50 min-w-32 min-h-8 font-bold hover:bg-sky-700/50
+                        ease-in-out duration-200 active:scale-95 '
+                        onClick={() => setOpen3(true)}>
+                        Reset Password
+                    </button>
                     <button className='rounded-md bg-gray-500/50 p-2 min-w-32 min-h-10 font-bold
-                     hover:bg-gray-700/50 ease-in-ou duration-200 active:scale-95'
+                     hover:bg-gray-700/50 ease-in-out duration-200 active:scale-95'
                      onClick={() => setOpen2(true)}
                      >
                         Delete Account

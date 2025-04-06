@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+
 
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -10,9 +11,9 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
 
-        if (!decoded) {
+        if (!decoded || !decoded.userId) {
             console.log(token);
             res.status(404).json({ error: "User not found" });
         }

@@ -4,6 +4,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import PasswordValidator from 'password-validator';
 
 export const LoginForm = ({ openClose } : {openClose : (open: boolean) => void}) => {
 
@@ -14,6 +15,16 @@ export const LoginForm = ({ openClose } : {openClose : (open: boolean) => void})
     const { login, logout } = useContext(AuthContext)!;
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+
+    const pwSchema = new PasswordValidator();
+    pwSchema
+        .is().min(8)
+        .is().max(100)
+        .has().uppercase(1)
+        .has().lowercase(1)
+        .has().digits(1)
+        .has().not().spaces()
+        .has().symbols(1);
 
 
 

@@ -5,10 +5,17 @@ export const registerUser = async (user_email: string, password: string) => {
     return response.data;
 };
 
-export const logoutUser = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-}
+export const logoutUser = async () => {
+    const response = await API.delete('/auth/refresh_token');
+    if (response?.data.logged_out) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+    }
+    else {
+        throw new Error("Logout failed");
+    }
+
+};
 export const loginUser = async (user_email: string, password: string) => {
     const response = await API.post('/auth/login', {user_email, password});
     if (response.data.token) { 
@@ -18,4 +25,4 @@ export const loginUser = async (user_email: string, password: string) => {
         localStorage.setItem('user', JSON.stringify(response.data.user));
     }
     return response.data;
-}
+};

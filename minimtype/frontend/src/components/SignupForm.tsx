@@ -4,6 +4,7 @@ import VisibilityOff  from "@mui/icons-material/VisibilityOff";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import PasswordValidator from "password-validator";
 
 
 export const SignupForm = ({ openClose } : {openClose : (open: boolean) => void}) => {
@@ -19,21 +20,54 @@ export const SignupForm = ({ openClose } : {openClose : (open: boolean) => void}
     const navigate = useNavigate();
 
     const {login, register, user } = useContext(AuthContext)!;
+    const pwSchema = new PasswordValidator();
+        pwSchema
+            .is().min(6, 'At least 6 characters please')
+            .is().max(100, 'Only 100 characters allowed')
+            .has().uppercase(1, 'At least 1 Capital letter')
+            .has().lowercase(1, 'At least 1 Lower Case letter')
+            .has().digits(1, 'At least 1 number')
+            .has().not().spaces(0, 'No spaces allowed')
+            .has().symbols(1, 'At least 1 symbol');
+    
     
 
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (email === "") {
+            setError("Email Required*");
+        }
+        else {
+            setError("");
+        }
         if (!isValidEmail(email)) {
-            setError3("Invalid Email Address*");
+            setError("Invalid Email Address*");
             return;
         }
-        if (password === "" || email === "") {
-            setError("Email/Password Required*");
+        else {
+            setError("");
+        }
+        if (password === "") {
+            setError2("Password Required*");
             return;
+        }
+        else {
+            setError2("");
         }
         if (password !== confirmPw) {
             setError2("Passwords do not match*");
+            setError3("Passwords do not match*");
+            return;
+        }
+        else {
+            setError2("");
+            setError3("");
+        }
+        if (!pwSchema.validate(password)) {
+            const msgs = pwSchema.validate(password, {details: true});
+            console.log(msgs);
+            setError2('Password must contain at least 8 characters and at least 1 symbol, number, uppercase and lowercase letter');
             return;
         }
         try {
@@ -74,8 +108,8 @@ export const SignupForm = ({ openClose } : {openClose : (open: boolean) => void}
             p={3}
         >
             <TextField
-                error={error !== "" || error3 !== ""}
-                helperText={error || error3}
+                error={error !== ""}
+                helperText={error}
                 variant="outlined"
                 type="email"
                 label="Enter Email"
@@ -85,8 +119,8 @@ export const SignupForm = ({ openClose } : {openClose : (open: boolean) => void}
                 onChange={(e) => setEmail(e.target.value)}
             />
             <TextField
-                error={error !== ""}
-                helperText={error}
+                error={error2 !== ""}
+                helperText={error2}
                 variant="outlined"
                 type={showPassword ? "text" : "password"}
                 label="Enter Password"
@@ -112,8 +146,8 @@ export const SignupForm = ({ openClose } : {openClose : (open: boolean) => void}
                 }}
             />
             <TextField
-                error={error2 !== ""}
-                helperText={error2}
+                error={error3 !== ""}
+                helperText={error3}
                 variant="outlined"
                 type={showPassword2 ? "text" : "password"}
                 label="Confirm Password"

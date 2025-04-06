@@ -22,18 +22,18 @@ function App() {
     {path: '/home', element: <Home/>},
     {path: '/', element: <Home/>},
     {path: '/practice', element: <Practice/>},
-    {path: '/practice2', element: <Practice2/>},
+    // {path: '/practice2', element: <Practice2/>},
     {path: '/user', element: <UserPage/>},
   ];
 
   useEffect(() => {
     // Fetch data from the backend API
-    fetch('http://localhost:5000/api/message')
-      .then((response) => response.json())
-      .then((data) => {
-        setMessage(data.message); // Set the message from backend
-      })
-      .catch((error) => console.error('Error fetching data:', error));
+    // fetch('http://localhost:5000/api/message')
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     setMessage(data.message); // Set the message from backend
+    //   })
+    //   .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
  
@@ -50,6 +50,7 @@ function App() {
             ))}
               {/* <Route path='/home' element={<Home/>} />
               <Route path='/practice' element={<Practice/>} /> */}
+            <Route path='/practice2' element={<Practice2/>}/>
           </Routes>
         </ThemeProvider>
       </TestProvider>

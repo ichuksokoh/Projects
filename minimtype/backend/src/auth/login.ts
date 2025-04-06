@@ -19,10 +19,23 @@ export const loginUser = async (req: Request, res: Response) => {
             return;
         }
 
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "30m" });
+        const refresh_token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: '1w'});
+        const now = new Date();
+        const expiresIn = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        user.refresh_tokens.push({token: refresh_token, expiryDate: expiresIn});
 
+        await user.save();
 
-        res.send({ token: token, user: {userId: user._id, userEmail: user.user_email, userSince: user.user_since}});
+        res.cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            path: '/auth/refresh_token'
+        })
+        res.send({ token: token, 
+            user: {userId: user._id, userEmail: user.user_email, userSince: user.user_since}});
 
 
     } 

@@ -3,6 +3,7 @@ import { themeOptions } from "../utils/themeOptions";
 import { useContext, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { ThemeValues } from "../Interfaces";
+import Github from '@mui/icons-material/GitHub'
 
 
 export const Options =() => {
@@ -40,7 +41,9 @@ export const Options =() => {
     return (
         <div className="flex max-w-full min-w-[70vw] justify-between mx-auto ">
             <div>
-                Links
+                <a href={"https://github.com/ichuksokoh/Projects/tree/main/minimtype"}>
+                    <Github/>
+                </a>
             </div>
             <div className="text-black">
                 <Select isSearchable={false} styles={customStyles} className="min-h-32 min-w-40" value={value} options={themeOptions} onChange={handleChange} menuPlacement="top"/>

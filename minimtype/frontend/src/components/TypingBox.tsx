@@ -1,5 +1,5 @@
 import { generate } from 'random-words'
-import React, { createRef, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { createRef, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Menu } from './Menu'
 import { TestContext } from '../context/TestContext'
 import { ThemeContext } from '../context/ThemeContext'
@@ -8,6 +8,8 @@ import { AuthContext } from '../context/AuthContext'
 import { createTest } from '../services/tests'
 import keyClickSound from '../assets/keyClickSound5.mp3';
 import keyClickSound2 from '../assets/keyClickSound2.wav';
+import Replay from '@mui/icons-material/Replay';
+// import AdsClick from '@mui/icons-material/AdsClick';
 
 export const TypingBox = () => {
     const typingWordsLen = 400;
@@ -31,6 +33,7 @@ export const TypingBox = () => {
     const [graphData, setGraphData] = useState<number[][]>([]);
     const [intervalID, setIntervalId] = useState<NodeJS.Timeout | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [focus, setFocus] = useState(true);
     const soundRight = useRef(new Audio(keyClickSound));
     const soundWrong = useRef(new Audio(keyClickSound2));
     const [volume, setVolume] = useState(0.1);
@@ -41,6 +44,8 @@ export const TypingBox = () => {
 
     
     const { user } = useContext(AuthContext)!;
+    const isMobile = /Android|iPhone|iPad|Mobi/i.test(navigator.userAgent);
+
 
     const focusInput = () => {
         if (inputRef.current) inputRef.current.focus();
@@ -147,6 +152,11 @@ export const TypingBox = () => {
         setCIW(0);
         setTypedWords(0);
         setGraphData([]);
+        inputRef.current!.value = "";
+        soundRight.current.pause();
+        soundRight.current.currentTime = 0;
+        soundWrong.current.pause();
+        soundWrong.current.currentTime = 0;
     };
 
     const handleRestart = (e: React.KeyboardEvent) => {
@@ -154,6 +164,10 @@ export const TypingBox = () => {
             resetTest();
         }
     }
+
+    useEffect(() => {
+        // if(inputRef.current === document.blu)
+    }, [focus])
 
     useEffect(() => {
 
@@ -237,7 +251,10 @@ export const TypingBox = () => {
     },[currWordIndex])
 
 
-    const handleUserInput = (e: React.KeyboardEvent) => {
+    const handleUserInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (isMobile) {
+            return;
+        }
         if ((e.altKey || e.ctrlKey) && e.key !== "") return;
         if (!/^[a-zA-Z0-9]$/.test(e.key) && !(e.key === 'Backspace' || e.key === ' ')) {
             return;
@@ -254,7 +271,7 @@ export const TypingBox = () => {
             soundRight.current.currentTime = 0;
             soundWrong.current.currentTime = 0;
             const allCurrChars = wordElement.getElementsByTagName('span');
-            if (allCurrChars.length === maxWordLen) return;
+            if (allCurrChars.length === maxWordLen && (e.key !== 'Backspace' && e.key !== ' ')) return;
             if (e.key === ' ') {
                 if (currCharIndex === 0) return;
                 let correctLettersInWord = wordsSpanRef[currWordIndex].current!.querySelectorAll(`.${theme.value.correct}`);
@@ -381,14 +398,62 @@ export const TypingBox = () => {
         }
         
     }
+
+
+    const [chk, setChk] = useState('');
+    const [chk2, setChk2] = useState('');
+    const [mobileValue, setMV] = useState('^^');
+
+    const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
+        if (!isMobile) {
+            return;
+        }
+        if (currCharIndex + 1 > maxWordLen) return;
+        const currword = wordsSpanRef[currWordIndex].current?.getElementsByTagName('span');
+        const key = e.currentTarget.value;
+        const char = key.slice(-1);
+        setChk(char);
+        if (currword) {
+            if (mobileValue === key && mobileValue != '^^') {
+                currword[currCharIndex].className = '';
+                setCurrCharIndex(prev => prev - 1);
+                setMV(key.slice(0, key.length - 2));
+                return;
+            }
+
+            if (currCharIndex === currword.length) {
+                const newChar = document.createElement('span');
+                newChar.innerText = char;
+                newChar.className = `${theme.value.wrong} extra`
+                wordsSpanRef[currWordIndex].current?.append(newChar);
+                setCurrCharIndex(prev => prev + 1);
+                setExtraChars(prev => prev + 1);
+                setMV(key);
+                return;
+            }
+            const curChar = currword[currCharIndex].innerText;
+            setChk2(curChar);
+            if (curChar === char) {
+                currword[currCharIndex].classList.add(theme.value.correct);
+            }
+            else {
+                currword[currCharIndex].classList.add(theme.value.wrong);
+            }
+
+        }
+        setMV(key);
+       setCurrCharIndex(prev => prev + 1);
+
+    }
     
 
     return (
-        <div className='' onKeyDown={handleRestart}>
+        <div className='flex flex-col gap-y-2 w-full' onKeyDown={handleRestart}>
             <Menu countDown={countDown} volControl={setVolume} restart={resetTest} vol={volume}></Menu>
-            {testEnd ? <Stats stats={{raw: calcRaw(), wpm: calcWPM(), accuracy: calcAcc(), correctChars, incorrectChars, missedChars, extraChars, graphData}}/> 
-            : <div className='block max-w-[1000px] h-[140px] mx-auto overflow-hidden' onClick={focusInput}>
-                <div className='font-mono flex text-lg flex-wrap cursor-text select-none'>
+            {testEnd ? <Stats stats={{raw: calcRaw(), wpm: calcWPM(), accuracy: calcAcc(), correctChars, incorrectChars, missedChars, extraChars, graphData}} handleRestart={handleRestart}/> 
+            : <div className='flex md:max-w-[1000px] h-[140px] mx-auto ' onClick={focusInput}>
+                {/* {!focus && <div><AdsClick/> Click Here or press any key to focus</div>} */}
+                <div className='font-mono max-w-full overflow-hidden h-2/4 md:h-3/5 flex sm:text-lg flex-wrap items-start cursor-text select-none'>
                     {
                         words.map((word, i) => (
                             <span className='mx-2' key={i} ref={wordsSpanRef[i]}>
@@ -401,11 +466,24 @@ export const TypingBox = () => {
                 </div>
 
             </div>}
+            {/* {chk} */}
+            {/* {chk2} */}
+            {mobileValue}
+            <div>
+                {isMobile ? <Replay onClick={resetTest} className='active:-rotate-90 duration-500 ease-in'/> : <></>}
+            </div>
             <input
+                id='testArea'
+                autoCapitalize='off'
+                autoComplete='off'
+                autoCorrect='off'
                 ref={inputRef}
                 type='text'
-                className='opacity-0'
+                className='opacity-0 w-0 h-0'
                 onKeyDown={handleUserInput}
+                onInput={handleMobileInput}
+                onBlur={() => setFocus(false)}
+                onFocus={() => setFocus(true)}
             />
       
         </div>

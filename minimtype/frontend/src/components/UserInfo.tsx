@@ -20,16 +20,16 @@ export const UserInfo  = ({ tests } : { tests: number }) => {
     const dayOfWeek = date.getDay();
 
     return (
-        <div className={`bg-gray-500/40 h-[175px] w-[850px] rounded-2xl py-4 px-2 flex flex-row items-center gap-x-2`}>
+        <div className={`bg-gray-500/40 h-[130%] w-full rounded-2xl py-4 px-2 flex flex-row items-center gap-x-2`}>
                     <div className='w-[20%] flex flex-row justify-center'>
-                        <AccountCircleIcon sx={{ transform: "scale(6)" }}/>
+                        <AccountCircleIcon sx={{wdith: '50%', transform: {lg: 'scale(5)', sm: 'scale(3)', xs: 'scale(2)'}}}/>
                     </div>
-                    <div className='w-[40%] font-bold text-lg'>
+                    <div className='w-[40%] text-[7px] font-bold lg:text-lg'>
                         <div>Email: {user.userEmail}</div>
                         <div>User Since: {days[dayOfWeek]} {day}, {months[month]} {year}</div>
                     </div>
                     <div className='h-full w-[1px] self-stretch bg-white'></div>
-                    <div className='w-[40%] text-center text-2xl'>
+                    <div className='w-[40%] text-center text-[10px] lg:text-2xl'>
                         All Time Tests - { tests }
                     </div>
                 </div>

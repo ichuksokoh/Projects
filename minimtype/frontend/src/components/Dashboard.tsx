@@ -6,9 +6,9 @@ export const Dashboard = () => {
 
 
     return (
-        <div className="flex pt-4 mx-auto max-h-[80px] min-w-[1000px] justify-between items-center self-stretch ">
+        <div className="flex pt-4 mx-auto max-h-[80px] lg:min-w-[1000px] w-full justify-between items-center self-stretch ">
             <div className="w-full h-full flex-col justify-start">
-                <img src={Logo}  className=" h-full w-1/10"/>
+                <img src={Logo}  className="h-full @min-xs:w-1/10"/>
             </div>
             <div>
                 <Account/>

@@ -50,19 +50,12 @@ import { ThemeContext } from '../context/ThemeContext';
 
         const options = {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                title: {
-                    display: true,
-                    text: "",
-                    color: theme.value.lineColor, 
-                    font: {
-                        size: 16,
-                    }
-                },
                 tooltip: {
                     enabled: true, 
                     mode: 'nearest' as const,
-                    intersect: false, // Shows the tooltip even if not directly over a point
+                    intersect: false, 
                     callbacks: {
                         label: function(tooltipItem: any) {
                             return `${toolTipLabels[tooltipItem.datasetIndex]}: ${Math.round(tooltipItem.raw)}`; // Customize the tooltip label
@@ -79,8 +72,8 @@ import { ThemeContext } from '../context/ThemeContext';
                 x: {
                     ticks: {
                         color: theme.value.lineColor,
-                        maxRotation: typeof graphData[0][0] === 'string' ? 40 : 0,
-                        minRotation: typeof graphData[0][0] === 'string' ? 40 : 0,
+                        maxRotation: graphData.length !== 0 && typeof graphData[0][0] === 'string' ? 40 : 0,
+                        minRotation: graphData.length !== 0 && typeof graphData[0][0] === 'string' ? 40 : 0,
                     },
                     // grid: {
                     //     color: theme.value.lineColor
@@ -89,7 +82,7 @@ import { ThemeContext } from '../context/ThemeContext';
                 y: {
                    ticks: {
                     color: theme.value.lineColor,
-                    // stepsize: 40,
+                    // stepSize: 50,
                    },
                 //    grid: {
                 //     color: theme.value.lineColor
@@ -99,8 +92,13 @@ import { ThemeContext } from '../context/ThemeContext';
         }
 
         return (
-            <div className='w-full h-full'>
-                <Line options={options} data={data}/>
-            </div>
+            // <div className='w-full h-[200vh]'>
+                <Line 
+                    options={options} 
+                    data={data}
+                    height={'100%'}
+                    width={'100%'}
+                />
+            //  </div>
         );
     };

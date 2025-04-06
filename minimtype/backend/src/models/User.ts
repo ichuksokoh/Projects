@@ -11,6 +11,7 @@ interface IUser extends Document {
     password: string;
     user_since: Date;
     verifyPw(password: string): Promise<boolean>;
+    refresh_tokens: {token: string, expiryDate: Date}[],
   }
   
 
@@ -34,10 +35,18 @@ const UserSchema = new Schema<IUser>({
     password: {
         type: String,
         required: true,
+    },
+    refresh_tokens: {
+        type: [{
+            expiryDate: Date,
+            token: String,
+            _id: false, 
+        }],
+        required: true,
+        default: []
     }
 })
 
-// UserSchema.plugin(AutoIncrement, { inc_field: "user_id" });
 
 UserSchema.methods.verifyPw = async function (password: string) {
     const user = this;

@@ -1,5 +1,6 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { ThemeContext } from "../context/ThemeContext";
 
 
 export default function ProtectedRoute({ children } : { children: ReactNode }) {
@@ -7,14 +8,23 @@ export default function ProtectedRoute({ children } : { children: ReactNode }) {
    const token = localStorage.getItem('token');
    const navigate = useNavigate();
 
-   useEffect(() => {
-    if (!user || !token) {
-        navigate('/practice2');
-    }
+   const { theme } = useContext(ThemeContext);
 
-   }, [user, token, navigate])
 
-//    if (!userId || !token) return null;
+   if (!user || !token) {
+        return (
+            <div className={`${theme.value.background} ${theme.value.textColor} text-2xl  font-bold w-screen h-screen flex flex-col items-center justify-center gap-y-2`}>
+                <span>
+                    Please Login to view this page
+                </span>
+                <button
+                    onClick={() => navigate('/practice2')}
+                    className={`${theme.value.textColor} rounded-lg bg-gray-300/20 p-2 active:scale-90 duration-300 ease-out`}>
+                    Go to Practice!
+                </button>
+            </div>  
+        )
+   }
 
    return (
     <>

@@ -6,7 +6,7 @@ export const getTests = async (req: Request, res: Response) => {
     const userId = req?.params?.id;
     try {
         const query = { user_id: userId };
-        const tests = await Test.find(query).sort({date: 1}).limit(50);
+        const tests = await Test.find(query).sort({date: -1}).limit(50);
 
         if (tests) {
             res.status(200).send(tests);

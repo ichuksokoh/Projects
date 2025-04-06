@@ -8,7 +8,7 @@ const darkTheme = {
     textColor: 'text-white',
     lineColor: 'rgb(255,255,255)',
     lineColor2: 'rgb(162,167,155)',
-    typeBoxText: 'gray',
+    typeBoxText: 'white',
     graphbg: "rgb(166,166,166)"
 };
 

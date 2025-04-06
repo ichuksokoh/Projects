@@ -8,14 +8,21 @@ import { loginUser } from "./auth/login";
 import { registerUser } from "./auth/register";
 import { createTests, deleteTest, getTests, updateTest } from "./utils/tests";
 import { authenticateToken } from "./auth/authMiddleware";
-import { deleteUser, updateUser } from "./utils/users";
+import { deleteUser, getUser, updateUser } from "./utils/users";
+import { refreshToken } from "./auth/refreshToken";
+import cookieParser from 'cookie-parser';
+import { logout_refreshToken } from "./auth/logout";
 
 dotenv.config({path: "../.env"});
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
-app.use(cors({origin: "http://localhost:5173"}));
+app.use(cors({origin: ["http://172.26.63.1:5173", "http://localhost:5173"],
+              credentials: true,
+}));
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
+const HOST = process.env.HOST || '127.0.0.1';
 const MONGO_URI = process.env.MONGO_URI as string;
 
 mongoose.connect(MONGO_URI)
@@ -32,7 +39,7 @@ app.get('/api/message', (req, res) => {
     res.json({ message: 'Hello from the backend!' });
   });
 
-app.listen(PORT, () => {
+app.listen(PORT, HOST as string, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
@@ -40,12 +47,16 @@ app.listen(PORT, () => {
 // Auth routes
 app.post("/auth/register", registerUser);
 app.post("/auth/login", loginUser);
+app.post("/auth/refresh_token", refreshToken);
+app.delete("/auth/refresh_token", logout_refreshToken);
 
 
 
 //Protected user routes
+app.use('/user', authenticateToken);
 app.put('/user/:id', updateUser);
 app.delete('/user/:id', deleteUser);
+app.get('/user/:id', getUser);
 
 // Protected test routes
 app.use("/tests", authenticateToken);

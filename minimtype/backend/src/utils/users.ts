@@ -4,6 +4,19 @@ import { Request, Response } from "express";
 import bycrypt from 'bcryptjs';
 
 
+export const getUser = async (req: Request, res: Response) => {
+    const userId = req.params.id;
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            res.status(404).json({error: "No such user found"});
+        }
+        res.send({pw: user?.password});
+    } 
+    catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+}
 
 export const updateUser = async (req: Request, res: Response) => {
     const userId = req?.params?.id;

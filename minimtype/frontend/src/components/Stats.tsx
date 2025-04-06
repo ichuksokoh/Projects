@@ -1,10 +1,10 @@
-import {  useContext } from "react";
+import React, {  useContext } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { Graph } from "./Graph";
 import { statsistics } from "../Interfaces";
 
 
-export const Stats = ({ stats } : { stats : statsistics}) => {
+export const Stats = ({ stats, handleRestart=()=>{return;} } : { stats : statsistics, handleRestart?: (e: React.KeyboardEvent) => void}) => {
 
     const { theme } = useContext(ThemeContext);
     let timeSet = new Set();
@@ -12,17 +12,14 @@ export const Stats = ({ stats } : { stats : statsistics}) => {
         if (!timeSet.has(e[0])) {
             timeSet.add(e[0]);
             return true;
-            if (stats.graphData.length <= 30 || (i % 3 === 1 && stats.graphData.length >= 60) ) {
-                return true;
-            }
         }
         return false;
     });
 
     return (
-        <div>
+        <div onKeyDown={handleRestart}>
             <div className={`stats-box flex max-w-[1000px] max-h-[350px] mx-auto ${theme.value.textColor}`}>
-                <div className="left-stats w-[30%] p-7 flex flex-col justify-center text-xl">
+                <div className="left-stats w-[30%] text-xs sm:text-lg sm:w-[30%] p-7 flex flex-col justify-center">
                     <div>Raw:</div>
                       <div>{stats.raw}</div>
                    <div>WPM:</div>
@@ -30,11 +27,17 @@ export const Stats = ({ stats } : { stats : statsistics}) => {
                    <div>Accuracy:</div>
                    <div>{stats.accuracy}%</div>
                    <div>Characters:</div>
-                   <div>{stats.correctChars} / {stats.incorrectChars} / {stats.missedChars} / {stats.extraChars} </div>
+                   <div className="">
+
+                    {stats.correctChars}/
+                     {stats.incorrectChars}/ 
+                     {stats.missedChars}/ 
+                     {stats.extraChars} 
+                    </div>
 
                 </div>
-                <div className="right-stats w-[70%]">
-                    <Graph graphData={stats.graphData}/>
+                <div className="right-stats w-[60%] sm:w-[70%]">
+                    <Graph graphData={newGraphDaata}/>
                 </div>
 
             </div>

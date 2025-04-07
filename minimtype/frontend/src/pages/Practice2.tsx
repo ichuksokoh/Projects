@@ -17,7 +17,7 @@ export default function Practice2() {
 
     return (
         <>
-            <div className={` ${theme.value.background} ${theme.value.textColor} p-4 gap-8 w-screen h-screen 
+            <div className={` ${theme.value.background} ${theme.value.textColor} p-4 gap-8 w-screen min-h-screen 
             transition-all duration-[0.25s] ease-linear grid grid-flow-row items-center text-center`}>
                 <Dashboard/>
                 <TypingBox />

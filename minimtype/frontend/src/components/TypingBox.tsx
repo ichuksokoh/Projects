@@ -552,9 +552,9 @@ export const TypingBox = () => {
         <div className='flex flex-col gap-y-2 w-full' onKeyDown={handleRestart}>
             <Menu countDown={countDown} volControl={setVolume} restart={resetTest} vol={volume}></Menu>
             {testEnd ? <Stats stats={{raw: calcRaw(), wpm: calcWPM(), accuracy: calcAcc(), correctChars, incorrectChars, missedChars, extraChars, graphData}} handleRestart={handleRestart}/> 
-            : <div className='flex md:max-w-[1000px] h-[140px] mx-auto ' onClick={focusInput}>
+            : <div className='flex md:max-w-[1000px] h-[75px] md:h-[140px] mx-auto ' onClick={focusInput}>
                 {/* {!focus && <div><AdsClick/> Click Here or press any key to focus</div>} */}
-                <div className='font-mono max-w-full overflow-hidden h-2/4 md:h-3/5 flex sm:text-lg flex-wrap items-start cursor-text select-none'>
+                <div className='font-mono max-w-full overflow-hidden h-2/4 md:h-3/5 flex text-3xl sm:text-lg flex-wrap items-start cursor-text select-none'>
                     {
                         words.map((word, i) => (
                             <span className='mx-2' key={i} ref={wordsSpanRef[i]}>

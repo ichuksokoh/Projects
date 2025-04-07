@@ -18,10 +18,10 @@ export const Stats = ({ stats, handleRestart=()=>{return;} } : { stats : statsis
 
     return (
         <div onKeyDown={handleRestart}>
-            <div className={`stats-box flex max-w-[1000px] max-h-[350px] mx-auto ${theme.value.textColor}`}>
-                <div className="left-stats w-[30%] text-xs sm:text-lg sm:w-[30%] p-7 flex flex-col justify-center">
+            <div className={`stats-box items-center flex-col md:flex-row flex max-w-[1000px] md:max-h-[350px] mx-auto ${theme.value.textColor}`}>
+                <div className="left-stats w-[30%] text-2xl sm:text-lg sm:w-[30%] p-7 flex flex-col items-center justify-center">
                     <div>Raw:</div>
-                      <div>{stats.raw}</div>
+                    <div>{stats.raw}</div>
                    <div>WPM:</div>
                    <div>{stats.wpm}</div>
                    <div>Accuracy:</div>

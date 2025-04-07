@@ -33,6 +33,7 @@ export const TypingBox = () => {
     const [graphData, setGraphData] = useState<number[][]>([]);
     const [intervalID, setIntervalId] = useState<NodeJS.Timeout | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
     const [focus, setFocus] = useState(true);
     const soundRight = useRef(new Audio(keyClickSound));
     const soundWrong = useRef(new Audio(keyClickSound2));
@@ -362,6 +363,7 @@ export const TypingBox = () => {
             }
 
             if (currCharIndex === allCurrChars.length) {
+                soundWrong.current.play().catch(error => console.error("Audio error: ", error));
                 const newChar = document.createElement('span');
                 newChar.innerText = e.key;
                 newChar.className = `${theme.value.wrong} ${"cursorRight"} extra`;
@@ -375,7 +377,7 @@ export const TypingBox = () => {
                 return;
             }
 
-            if (e.key == allCurrChars[currCharIndex].innerText) {
+            if (e.key === allCurrChars[currCharIndex].innerText) {
                 allCurrChars[currCharIndex].className = `${theme.value.correct}`
                 setCorrectChars(prev => prev + 1);
                 soundRight.current.play().catch(error => console.error("Audio error: ", error));
@@ -400,49 +402,148 @@ export const TypingBox = () => {
     }
 
 
-    const [chk, setChk] = useState('');
-    const [chk2, setChk2] = useState('');
-    const [mobileValue, setMV] = useState('^^');
+    const [mobileValue, setMV] = useState('');
 
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
         if (!isMobile) {
             return;
         }
         if (currCharIndex + 1 > maxWordLen) return;
-        const currword = wordsSpanRef[currWordIndex].current?.getElementsByTagName('span');
+
+        if (!testStart) {
+            startTimer();
+            setStart(true);
+        }
+        
+        const allCurrChars = wordsSpanRef[currWordIndex].current?.getElementsByTagName('span');
         const key = e.currentTarget.value;
         const char = key.slice(-1);
-        setChk(char);
-        if (currword) {
-            if (mobileValue === key && mobileValue != '^^') {
-                currword[currCharIndex].className = '';
-                setCurrCharIndex(prev => prev - 1);
-                setMV(key.slice(0, key.length - 2));
+        if (allCurrChars) {
+            if (mobileValue.length > key.length) {
+                soundRight.current.play().catch(error => console.error("Audio error: ", error));
+                if (currCharIndex !== 0) {
+                    if (currCharIndex === allCurrChars.length) {
+                        if (allCurrChars[currCharIndex - 1].className.includes('extra')) {
+                            allCurrChars[currCharIndex - 1].remove();
+                            allCurrChars[currCharIndex - 2].className += ' ' + "cursorRight";
+                        }
+                        else {
+                            allCurrChars[currCharIndex - 1].className = "cursorLeft";
+                        }
+                    }
+                    else {
+                        allCurrChars[currCharIndex].className = '';
+                        allCurrChars[currCharIndex - 1].className =  "cursorLeft";
+                    }
+                    setCurrCharIndex(prev => prev - 1);
+                }
+                if (currCharIndex === 0 &&  (currWordIndex !== 0 && 
+                    wordsSpanRef[currWordIndex - 1].current?.querySelectorAll(`.${theme.value.wrong}`).length !== 0)) {
+                        allCurrChars[currCharIndex].className = '';
+                        const prevWordElem = wordsSpanRef[currWordIndex - 1];
+                        const wrong = wordsSpanRef[currWordIndex - 1].current?.querySelectorAll(`.${theme.value.wrong}`).length;
+                        const right = wordsSpanRef[currWordIndex - 1].current?.querySelectorAll(`.${theme.value.correct}`).length;
+                        if (prevWordElem.current) {
+                            const prevChars = prevWordElem.current.getElementsByTagName('span');
+                            const chk = wrong! + right! === prevChars.length;
+                            prevChars[chk ? wrong! + right! - 1 : wrong! + right!].className += chk ? " cursorRight" : " cursorLeft";
+                            setCurrCharIndex(wrong! + right!);
+                        }
+                        setCurrWordIndex(prev => prev - 1);
+                        setMV(key);
+                        return;
+                }
+
+                if (currCharIndex === 0 && currWordIndex !== 0) {
+                    const prevChars = wordsSpanRef[currWordIndex -1].current?.querySelectorAll('span');
+                    const wrong = wordsSpanRef[currWordIndex - 1].current?.querySelectorAll(`.${theme.value.wrong}`).length;
+                    const right = wordsSpanRef[currWordIndex - 1].current?.querySelectorAll(`.${theme.value.correct}`).length;
+                  
+                    if (wrong! + right! !== prevChars?.length ) {
+                        console.log('entered backspace 2');
+                        allCurrChars[currCharIndex].className = '';
+                        prevChars![wrong! + right!].className += " cursorLeft";
+                        setCurrCharIndex(Math.max(wrong!, right!));
+                        setCurrWordIndex(prev => prev - 1);
+                    }
+
+                }
+
+                setMV(key);
                 return;
             }
 
-            if (currCharIndex === currword.length) {
+            if (char === ' ') {
+                if (currCharIndex === 0) return;
+                let correctLettersInWord = wordsSpanRef[currWordIndex].current!.querySelectorAll(`.${theme.value.correct}`);
+
+                if (correctLettersInWord.length === allCurrChars.length) {
+                    setCIW(prev => prev + 1 + allCurrChars.length);
+                    setTypedWords(prev => prev + 1 + correctLettersInWord.length);
+                }
+                else {
+                    setTypedWords(prev => prev + 1 + correctLettersInWord.length);
+                }
+
+                if (allCurrChars.length <= currCharIndex) {
+                    allCurrChars[currCharIndex-1].classList.remove('cursorRight')
+                }
+                else {
+                    allCurrChars[currCharIndex].classList.remove('cursorLeft')
+                    setMissedChars(missedChars + (allCurrChars.length - currCharIndex));
+                    soundWrong.current.play().catch(error => console.error("Audio error: ", error));
+                }
+
+                if (currWordIndex < wordsSpanRef.length ) {
+                        (wordsSpanRef[currWordIndex + 1].current!.childNodes[0] as HTMLElement).className = "cursorLeft";
+                }
+
+                setCurrWordIndex(prev => prev + 1);
+                setCurrCharIndex(0);
+                setMV(key);
+
+                return;
+            }
+
+            if (currCharIndex === allCurrChars.length) {
+                soundWrong.current.play().catch(error => console.error("Audio error: ", error));
                 const newChar = document.createElement('span');
-                newChar.innerText = char;
-                newChar.className = `${theme.value.wrong} extra`
-                wordsSpanRef[currWordIndex].current?.append(newChar);
+                newChar.innerText = key.slice(-1);
+                newChar.className = `${theme.value.wrong} ${"cursorRight"} extra`;
+                
+                allCurrChars[currCharIndex-1].classList.remove('cursorRight');
+
+
+                wordsSpanRef[currWordIndex].current!.append(newChar);
                 setCurrCharIndex(prev => prev + 1);
                 setExtraChars(prev => prev + 1);
                 setMV(key);
                 return;
             }
-            const curChar = currword[currCharIndex].innerText;
-            setChk2(curChar);
-            if (curChar === char) {
-                currword[currCharIndex].classList.add(theme.value.correct);
+
+           
+            const curChar = allCurrChars[currCharIndex].innerText;
+            if (char === curChar) {
+                allCurrChars[currCharIndex].className = `${theme.value.correct}`
+                setCorrectChars(prev => prev + 1);
+                soundRight.current.play().catch(error => console.error("Audio error: ", error));
             }
             else {
-                currword[currCharIndex].classList.add(theme.value.wrong);
+                allCurrChars[currCharIndex].className = `${theme.value.wrong}`
+                setIncorrectChars(prev => prev + 1);
+                soundWrong.current.play().catch(error => console.error("Audio error: ", error));
+            }
+            if (currCharIndex + 1 === allCurrChars.length) {
+                allCurrChars[currCharIndex].className += ' ' + "cursorRight";
+            } 
+            else {
+                allCurrChars[currCharIndex + 1].className = "cursorLeft";
             }
 
+            setTotalChars(prev => prev + 1);
+            setCurrCharIndex(prev => prev + 1);
+            setMV(_ => key);
         }
-        setMV(key);
-       setCurrCharIndex(prev => prev + 1);
 
     }
     
@@ -466,9 +567,8 @@ export const TypingBox = () => {
                 </div>
 
             </div>}
-            {/* {chk} */}
-            {/* {chk2} */}
-            {mobileValue}
+            {/* <div>{currCharIndex}</div> */}
+            {/* <div>{mobileValue}</div> */}
             <div>
                 {isMobile ? <Replay onClick={resetTest} className='active:-rotate-90 duration-500 ease-in'/> : <></>}
             </div>
@@ -479,12 +579,13 @@ export const TypingBox = () => {
                 autoCorrect='off'
                 ref={inputRef}
                 type='text'
-                className='opacity-0 w-0 h-0'
+                className='opacity-0 w-[1px] h-[1px] absolute'
                 onKeyDown={handleUserInput}
-                onInput={handleMobileInput}
+                onChange={handleMobileInput}
                 onBlur={() => setFocus(false)}
                 onFocus={() => setFocus(true)}
             />
+            
       
         </div>
     )

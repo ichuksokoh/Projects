@@ -131,8 +131,8 @@ function App() {
   const matches = ["https://asuracomic.net/*", 
     "http://asuracomic.net/", "https://flamecomics.xyz/*", "http://flamecomics.xyz/*",
     "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
-      "https://chapmanganato.to/*", "https://mangakakalot.com/manga/*",
-       "https://mangakakalot.com/chapter/*", "https://mangakakalot.com/read-*",
+      "https://chapmanganato.to/*", "https://www.mangakakalot.gg/manga/*",
+       "https://mangakakalot.gg/chapter/*", "https://mangakakalot.gg/read-*",
         "https://drakecomic.org/*", "https://hivetoon.com/series/*", "https://astrascans.org/*"
         ,"https://nightsup.net/*", "https://rizzfables.com/*", 
         "https://readtoto.net/series/*", "https://readtoto.net/chapter/*", "https://bato.to/series/*"
@@ -200,7 +200,6 @@ function App() {
         const titleToCheck = titleFromFetch ? await checkTitle(titleFromFetch) : ""; // Check the title if it exists
         setTitle(titleToCheck); // Set the title based on the check
       };
-    
       handleTitle();
     }
   }, [url]);

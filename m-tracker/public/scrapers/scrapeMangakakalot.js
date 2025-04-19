@@ -1,7 +1,6 @@
 
 
 const scrapeMangakakalot = (update, getTitle, manhwaList) => {
-    
     // Get the entire page's HTML content
     const html = document.documentElement.innerHTML;
 

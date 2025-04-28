@@ -3,6 +3,6 @@
     "create-next-app": "^14.2.13",
     "mongodb": "^6.13.0",
     "mongoose-sequence": "^6.0.1",
-    "react-router-dom": "^7.1.5"
+    "react-router-dom": "^7.5.2"
   }
 }

@@ -17,7 +17,7 @@ dotenv.config({path: "../.env"});
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors({origin: ["http://172.26.63.1:5173", "http://localhost:5173"],
+app.use(cors({origin: ["http://172.26.115.110:5173", "http://localhost:5173"],
               credentials: true,
 }));
 

@@ -24,7 +24,7 @@ import { ThemeContext } from '../context/ThemeContext';
 
     export const Graph = ({ graphData } : {graphData : Number[][]}) => {
         const { theme } = useContext(ThemeContext)
-        const saveOld = 'rgb(75,192,192)';
+        // const saveOld = 'rgb(75,192,192)';
 
         const toolTipLabels = ["WPM", "RAW"];
         const data = {
@@ -82,7 +82,8 @@ import { ThemeContext } from '../context/ThemeContext';
                 y: {
                    ticks: {
                     color: theme.value.lineColor,
-                    // stepSize: 50,
+                    stepSize: 40,
+                    beginAtZero: true,
                    },
                 //    grid: {
                 //     color: theme.value.lineColor
@@ -92,13 +93,11 @@ import { ThemeContext } from '../context/ThemeContext';
         }
 
         return (
-            // <div className='w-full h-[200vh]'>
                 <Line 
                     options={options} 
                     data={data}
                     height={'100%'}
                     width={'100%'}
                 />
-            //  </div>
         );
     };

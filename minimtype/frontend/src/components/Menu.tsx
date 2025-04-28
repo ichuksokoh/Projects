@@ -67,7 +67,7 @@ export const Menu = ({ countDown, restart, volControl, vol } : { countDown: Reac
                     times.map((e, i) => {
                         return (
                             <div 
-                            className={`transition-colors  @max-md:text-xs duration-300 select-none ${e === testTime ? 'text-yellow-500' : ''}`} 
+                            className={`transition-colors cursor-pointer  @max-md:text-xs duration-300 select-none ${e === testTime ? 'text-yellow-500' : ''}`} 
                             onClick={updateTestTime} 
                             key={i} 
                             id={String(e)}

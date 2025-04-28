@@ -3,10 +3,10 @@ import { themeOptions } from "../utils/themeOptions";
 import { useContext, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { ThemeValues } from "../Interfaces";
-import Github from '@mui/icons-material/GitHub'
+import Github from '@mui/icons-material/GitHub';
 
 
-export const Options =() => {
+export const Options = () => {
 
     const { theme, setTheme } = useContext(ThemeContext)!;
     const [value, setValue] = useState<ThemeValues | null>(theme);
@@ -47,7 +47,6 @@ export const Options =() => {
             </div>
             <div className="text-black">
                 <Select isSearchable={false} styles={customStyles} className="min-h-32 min-w-40" value={value} options={themeOptions} onChange={handleChange} menuPlacement="top"/>
-
             </div>
         </div>
     )

@@ -12,11 +12,14 @@ export interface ITest extends Document {
         incorrect_chars: Number;
         missed_chars: Number;
         extra_chars: Number;
+        test_end_correct_chars: Number;
+        test_end_incorrect_chars: Number;
     };
     graph_data: Number[][];
     accuracy: Number;
     date: Date;
     user_id: string;
+    mobile: boolean;
 }
 
 const TestSchema = new mongoose.Schema<ITest>({
@@ -52,6 +55,14 @@ const TestSchema = new mongoose.Schema<ITest>({
         extra_chars:{
             type: Number,
             required: true
+        },
+        test_end_correct_chars: {
+            type: Number,
+            required: true
+        },
+        test_end_incorrect_chars: {
+            type: Number,
+            required: true
         }
     },
     graph_data: {
@@ -68,6 +79,11 @@ const TestSchema = new mongoose.Schema<ITest>({
     },
     user_id: {
         type: String,
+    },
+    mobile: {
+        type: Boolean,
+        required: true,
+        default: false
     }
   });
 

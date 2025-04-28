@@ -44,6 +44,10 @@ export interface TestType {
     setTime: (newtime: number) => void;
 };
 
+export interface DeviceTypeContext {
+    isMobile: boolean;
+};
+
 
 //Interface for Tests prior to DB save
 export interface TestUnsaved {
@@ -55,10 +59,13 @@ export interface TestUnsaved {
         incorrect_chars: Number;
         missed_chars: Number;
         extra_chars: Number;
+        test_end_correct_chars: Number;
+        test_end_incorrect_chars: Number;
     };
     graph_data: number[][];
     accuracy: number;
     user_id: string;
+    mobile: boolean;
 };
 
 //interface for Test after saved to DB
@@ -72,10 +79,13 @@ export interface TestSaved {
         incorrect_chars: Number;
         missed_chars: Number;
         extra_chars: Number;
+        test_end_correct_chars: Number;
+        test_end_incorrect_chars: Number;
     };
     graph_data: number[][];
     accuracy: number;
     user_id: string;
+    mobile: boolean;
     date: Date;
 };
 
@@ -87,6 +97,8 @@ export interface statsistics {
     accuracy: number;
     correctChars: number;
     incorrectChars: number;
+    testEndCorrectChars: number;
+    testEndIncorrectChars: number;
     missedChars: number;
     extraChars: number;
     graphData: Number[][];

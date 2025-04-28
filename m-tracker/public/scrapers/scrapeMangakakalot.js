@@ -33,7 +33,7 @@ const scrapeMangakakalot = (update, getTitle, manhwaList) => {
     const imgUrl =  imgElem ? imgElem.getAttribute('src') : "";
 
     //get description 
-    const getDescription = tempDiv.querySelector('#noidungm');
+    const getDescription = tempDiv.querySelector('#contentBox');
     const description = getDescription ? getDescription.textContent.trim() : "";
 
 

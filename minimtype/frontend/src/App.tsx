@@ -12,6 +12,7 @@ import Practice2 from './pages/Practice2';
 import { TestProvider } from './context/TestProvider';
 import { ThemeProvider } from './context/ThemeProvider';
 import { UserPage } from './pages/User';
+import { DeviceProvider } from './context/DeviceProvider';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -40,20 +41,22 @@ function App() {
 
   return (
     <AuthProvider>
-      <TestProvider>
-        <ThemeProvider>
-          <Routes>
-            <Route path='/register' element={<Register/>} />
-            <Route path='/login' element={<Login/>} />
-            {protectedRoutes.map(({ path, element }, index) => (
-              <Route key={index} path={path} element={<ProtectedRoute>{element}</ProtectedRoute>}/>
-            ))}
-              {/* <Route path='/home' element={<Home/>} />
-              <Route path='/practice' element={<Practice/>} /> */}
-            <Route path='/practice2' element={<Practice2/>}/>
-          </Routes>
-        </ThemeProvider>
-      </TestProvider>
+      <DeviceProvider>
+        <TestProvider>
+          <ThemeProvider>
+            <Routes>
+              <Route path='/register' element={<Register/>} />
+              <Route path='/login' element={<Login/>} />
+              {protectedRoutes.map(({ path, element }, index) => (
+                <Route key={index} path={path} element={<ProtectedRoute>{element}</ProtectedRoute>}/>
+              ))}
+                {/* <Route path='/home' element={<Home/>} />
+                <Route path='/practice' element={<Practice/>} /> */}
+              <Route path='/practice2' element={<Practice2/>}/>
+            </Routes>
+          </ThemeProvider>
+        </TestProvider>
+      </DeviceProvider>
     </AuthProvider>
   )
 }

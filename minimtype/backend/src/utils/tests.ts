@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Test, ITest } from "../models/Test";
+import { Test } from "../models/Test";
 
 
 export const getTests = async (req: Request, res: Response) => {
@@ -19,10 +19,10 @@ export const getTests = async (req: Request, res: Response) => {
 };
 
 export const createTests = async (req: Request, res: Response) => {
-    const { user_email, wpm, raw_wpm, characters, graph_data, accuracy, user_id } = req?.body;
+    const { user_email, wpm, raw_wpm, characters, graph_data, accuracy, user_id, mobile } = req?.body;
     try {
         const result = await Test.create({ user_email: user_email, wpm: wpm, raw_wpm: raw_wpm,
-            characters: characters, graph_data: graph_data, accuracy: accuracy, user_id: user_id });
+            characters: characters, graph_data: graph_data, accuracy: accuracy, user_id: user_id, mobile: mobile});
         if (result) {
             res.status(200).send(`Test saved: ${result}`);
         }

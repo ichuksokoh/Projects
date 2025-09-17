@@ -230,13 +230,13 @@ export const UserPage = () => {
             {open && <Popup onClose={handleModalClose}>
                 <div className='flex flex-row justify-between items-center'>
                     <div>
-                        <Arrowback className={`active:scale-90 duration-300 ease-in ${arrColBac}`} onClick={prevTest}/>
+                        <Arrowback className={`active:scale-90 duration-300 ease-in ${arrColBac} cursor-pointer`} onClick={prevTest}/>
                     </div>
                     <div className="border-2 border-white/50 rounded-lg w-7/7 sm:w-5/7 p-4">
                         <Stats stats={currTest!}/>
                     </div>
                     <div>
-                        <ArrowForward className={`active:scale-90 duration-300 ease-in-out ${arrColFor}`} onClick={nextTest}/>
+                        <ArrowForward className={`active:scale-90 duration-300 ease-in-out ${arrColFor} cursor-pointer`} onClick={nextTest}/>
                     </div>
                 </div>
             </Popup>}

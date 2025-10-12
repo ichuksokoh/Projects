@@ -40,7 +40,6 @@
               "scrapers/scrapeFlameScans.js",
               "scrapers/scrapeMangago.js",
               "scrapers/scrapeManganato.js",
-              "scrapers/scrapeReaperScans.js",
               "scrapers/scrapeMangakakalot.js",
               "scrapers/scrapeAstraDrakeAndMoreScans.js",
               "scrapers/scrapeBatoScans.js",

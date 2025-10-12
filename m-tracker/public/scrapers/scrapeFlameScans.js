@@ -10,7 +10,7 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
     tempDiv.innerHTML = html;
 
     //target correct DOM elements
-    const elems = tempDiv.querySelectorAll(".ChapterCard_chapterWrapper__j8pBx");
+    const elems = tempDiv.querySelectorAll(".ChapterCard_chapterWrapper__YjOzx.mantine-focus-auto");
 
     //get manhwa title
     const titleElem = tempDiv.querySelector("h1.m_8a5d1357.mantine-Title-root");
@@ -33,7 +33,7 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
     const imgUrl = imgElem ? imgElem.getAttribute('src') : "";
 
     //Get manhwa description
-    const descriptElem = tempDiv.querySelector('p.m_b6d8b162[data-line-clamp="true"]');
+    const descriptElem = tempDiv.querySelector('mantine-focus-auto.SeriesPage_descriptionWrapper__UdzLP.m_b6d8b162.mantine-Text-root');
     let combinedDescription = descriptElem ? descriptElem.textContent.trim() : "";
     if (combinedDescription !== "") {
         let tmp = combinedDescription.split("&nbsp");
@@ -44,8 +44,8 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
         let tmp2 = descriptElem2 ? descriptElem2.textContent.trim(): "";
         combinedDescription = tmp2;
     }
-    
-    
+
+
     //Entire manhwa stored as one object
     const Manhwa = {title: manhwaTitle, description: combinedDescription, chapters: [], 
         img: imgUrl, fav: false, rating: 0.0, status: 0, hidden: false};

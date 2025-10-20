@@ -20,7 +20,11 @@
   },
   "permissions": [
     "storage",
-    "activeTab" 
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api.mangadex.org/*",
+    "https://uploads.mangadex.org/*"
   ],
   "background": {
     "service_worker": "background.js"

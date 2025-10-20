@@ -1,6 +1,6 @@
 
 
-const scrapeMangakakalot = (update, getTitle, manhwaList) => {
+const scrapeMangakakalot = async (update, getTitle, manhwaList, getBestImage) => {
     // Get the entire page's HTML content
     const html = document.documentElement.innerHTML;
 
@@ -28,9 +28,12 @@ const scrapeMangakakalot = (update, getTitle, manhwaList) => {
     });
 
 
-    //get cover art
+    //get cover art from page
     const imgElem = tempDiv.querySelector('div.manga-info-pic img');
-    const imgUrl =  imgElem ? imgElem.getAttribute('src') : "";
+    const pageImage =  imgElem ? imgElem.getAttribute('src') : "";
+
+    // Get the best available image (MangaDX match or page image)
+    const imgUrl = await getBestImage(manhwaTitle, pageImage);
 
     //get description 
     const getDescription = tempDiv.querySelector('#contentBox');

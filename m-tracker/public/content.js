@@ -3,6 +3,147 @@
 var manhwaList = [];
 var exist = false;
 
+// MangaDX auxiliary functions for image matching
+// API key will be retrieved securely from background script
+let MANGA_DEX_SECRET = null;
+
+// Function to get API key from background script
+const getMangaDxSecret = async () => {
+    if (MANGA_DEX_SECRET) {
+        return MANGA_DEX_SECRET;
+    }
+    
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage({ type: 'getMangaDxSecret' }, (response) => {
+            if (response && response.apiKey) {
+                MANGA_DEX_SECRET = response.apiKey;
+                resolve(MANGA_DEX_SECRET);
+            } else {
+                console.warn('Failed to get MangaDX API key from background script');
+                resolve(null);
+            }
+        });
+    });
+};
+
+/**
+ * Normalize title for better matching
+ * Removes special characters, extra spaces, and converts to lowercase
+ */
+const normalizeTitle = (title) => {
+    if (!title) return '';
+    
+    return title
+        .toLowerCase()
+        .replace(/[^\w\s]/g, '') // Remove special characters
+        .replace(/\s+/g, ' ')    // Replace multiple spaces with single space
+        .trim();                 // Remove leading/trailing spaces
+};
+
+/**
+ * Calculate similarity between two titles using simple string matching
+ * Returns true if titles are considered similar enough to be the same work
+ */
+const titlesSimilar = (title1, title2, threshold = 0.75) => {
+    const norm1 = normalizeTitle(title1);
+    const norm2 = normalizeTitle(title2);
+    
+    if (norm1 === norm2) return true;
+    if (norm1.length === 0 || norm2.length === 0) return false;
+    
+    // Check if one title is contained in another (for cases like "Title" vs "Title: Subtitle")
+    if (norm1.includes(norm2) || norm2.includes(norm1)) {
+        const longer = norm1.length > norm2.length ? norm1 : norm2;
+        const shorter = norm1.length > norm2.length ? norm2 : norm1;
+        return shorter.length / longer.length >= threshold;
+    }
+    
+    // Count common words
+    const words1 = norm1.split(' ').filter(w => w.length > 2);
+    const words2 = norm2.split(' ').filter(w => w.length > 2);
+    
+    if (words1.length === 0 || words2.length === 0) return false;
+    
+    const commonWords = words1.filter(word => words2.includes(word));
+    const similarity = commonWords.length / Math.max(words1.length, words2.length);
+    
+    return similarity >= threshold;
+};
+
+/**
+ * Search MangaDX for a manga by title and return the best matching cover image
+ */
+const searchMangaDXImage = async (manhwaTitle, fallbackImage = '') => {
+    try {
+        console.log(`Searching MangaDX for: "${manhwaTitle}"`);
+        
+        // Send request to background script to handle MangaDX API call (avoids CORS)
+        return new Promise((resolve) => {
+            chrome.runtime.sendMessage({
+                type: 'searchMangaDXImage',
+                title: manhwaTitle,
+                fallbackImage: fallbackImage
+            }, (response) => {
+                if (response && response.success) {
+                    console.log(`Found matching cover for "${manhwaTitle}": ${response.imageUrl}`);
+                    resolve(response.imageUrl);
+                } else {
+                    console.log(`No good match found for "${manhwaTitle}", using fallback image`);
+                    resolve(fallbackImage);
+                }
+            });
+        });
+        
+    } catch (error) {
+        console.error('Error searching MangaDX:', error);
+        return fallbackImage;
+    }
+};
+
+/**
+ * Calculate precise similarity score between two normalized strings
+ */
+const calculateSimilarity = (str1, str2) => {
+    if (str1 === str2) return 1.0;
+    
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    
+    if (longer.length === 0) return 1.0;
+    
+    // Use simple character-based similarity
+    let matches = 0;
+    const maxLength = Math.max(str1.length, str2.length);
+    
+    for (let i = 0; i < Math.min(str1.length, str2.length); i++) {
+        if (str1[i] === str2[i]) matches++;
+    }
+    
+    // Add bonus for contained strings
+    if (longer.includes(shorter)) {
+        matches += shorter.length * 0.5;
+    }
+    
+    return matches / maxLength;
+};
+
+/**
+ * Get the best available image - either from MangaDX match or fallback to page image
+ */
+const getBestImage = async (manhwaTitle, pageImage) => {
+    if (!manhwaTitle || manhwaTitle.trim() === '') {
+        return pageImage;
+    }
+    
+    try {
+        const mangaDXImage = await searchMangaDXImage(manhwaTitle, pageImage);
+        return mangaDXImage || pageImage;
+    } catch (error) {
+        console.error('Error getting best image:', error);
+        return pageImage;
+    }
+};
+
 
 const getDomain = () => {
     const hostname = window.location.href;
@@ -171,7 +312,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
 
 
 
-    const updateSite = (domain, hostname) => {
+    const updateSite = async (domain, hostname) => {
         if (domain.includes('asura') && domain.includes('series')) {
             title = scrapeAsuraScans(update, getTitle, manhwaList);
         }
@@ -184,13 +325,13 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
         }
         else if ((domain.includes('natomanga') && domain.includes('manga'))
             || domain.includes("chapmanganato")) {
-                title = scrapeManganato(update, getTitle, manhwaList);
+                title = await scrapeManganato(update, getTitle, manhwaList, getBestImage);
         }
         else if (domain.includes('reaperscans') && domain.includes('series')) {
             title = scrapeReaperScans(update, getTitle, manhwaList);
         }
         else if (domain.includes('mangakakalot') && (domain.includes("/manga") || domain.includes("read-"))) {
-            title = scrapeMangakakalot(update, getTitle, manhwaList);
+            title = await scrapeMangakakalot(update, getTitle, manhwaList, getBestImage);
         }
         else if (domain.includes('astra') || domain.includes('drake')
             || domain.includes('nights') || domain.includes('rizz')) {
@@ -206,9 +347,9 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
     }
 
     
-    window.addEventListener('load', () => updateSite(domainPrime, hostnamePrime));
+    window.addEventListener('load', async () => await updateSite(domainPrime, hostnamePrime));
 
-    const observer = new MutationObserver(() => {
+    const observer = new MutationObserver(async () => {
         const currentURL = window.location.href;
     
         // Check if the URL matches a series page pattern
@@ -216,7 +357,7 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
         if (currentURL.includes("series") && (currentURL.includes("hive") || currentURL.includes("reaper") 
             || currentURL.includes("flame"))) {
             let domain = getDomain();
-            updateSite(domain, currentURL);
+            await updateSite(domain, currentURL);
             manhwaList = [];
         }
 

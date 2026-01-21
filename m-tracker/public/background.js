@@ -30,8 +30,8 @@ const titlesSimilar = (title1, title2, threshold = 0.75) => {
         return shorter.length / longer.length >= threshold;
     }
     
-    const words1 = norm1.split(' ').filter(w => w.length > 2);
-    const words2 = norm2.split(' ').filter(w => w.length > 2);
+    const words1 = norm1.split(' ').filter(w => w.length > 1); // Changed from >2 to >1
+    const words2 = norm2.split(' ').filter(w => w.length > 1);
     
     if (words1.length === 0 || words2.length === 0) return false;
     
@@ -107,7 +107,7 @@ const searchMangaDXImage = async (manhwaTitle, fallbackImage) => {
             ].filter(Boolean);
             
             for (const title of titles) {
-                if (titlesSimilar(title, manhwaTitle, 0.7)) {
+                if (titlesSimilar(title, manhwaTitle, 0.6)) { // Lowered from 0.7
                     const similarity = calculateSimilarity(normalizeTitle(title), normalizeTitle(manhwaTitle));
                     if (similarity > bestSimilarity) {
                         bestSimilarity = similarity;
@@ -117,7 +117,7 @@ const searchMangaDXImage = async (manhwaTitle, fallbackImage) => {
             }
         }
         
-        if (bestMatch && bestSimilarity > 0.7) {
+        if (bestMatch && bestSimilarity > 0.5) { // Lowered from 0.7
             const coverArt = bestMatch.relationships?.find(rel => rel.type === 'cover_art');
             if (coverArt?.attributes?.fileName) {
                 const coverUrl = `https://uploads.mangadex.org/covers/${bestMatch.id}/${coverArt.attributes.fileName}`;

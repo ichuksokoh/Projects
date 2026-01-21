@@ -10,7 +10,7 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
     tempDiv.innerHTML = html;
 
     //target correct DOM elements
-    const elems = tempDiv.querySelectorAll(".ChapterCard_chapterWrapper__YjOzx.mantine-focus-auto");
+    const elems = tempDiv.querySelectorAll(".ChapterCard_chapterWrapper__NIPp5.mantine-focus-auto");
 
     //get manhwa title
     const titleElem = tempDiv.querySelector("h1.m_8a5d1357.mantine-Title-root");
@@ -27,6 +27,8 @@ const scrapeFlameScans = (update, getTitle, manhwaList) => {
             manhwaList.push({ chapter: parseInt(chapter, 10), read: false });
         }
     });
+
+   
 
     //get cover art
     const imgElem = tempDiv.querySelector('img[alt="Cover"]');

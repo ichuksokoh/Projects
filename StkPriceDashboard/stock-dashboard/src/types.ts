@@ -8,12 +8,6 @@ export type StockSearchResult = {
   }>;
 };
 
-export type CandleResponse = {
-  c: number[]; // close prices
-  t: number[]; // timestamps (unix seconds)
-  s: string;   // status
-};
-
 export type QuoteResponse = {
   c: number; // current price
   h: number;
@@ -22,3 +16,4 @@ export type QuoteResponse = {
   pc: number; // previous close
   t: number;  // timestamp
 };
+export type AvWeeklyPoint = { t: number; c: number };

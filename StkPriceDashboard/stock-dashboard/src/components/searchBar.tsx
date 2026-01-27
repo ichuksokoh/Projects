@@ -45,7 +45,7 @@ export default function SearchBar({ setResult }: { setResult: (data: StockSearch
         placeholder="Search stocks..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="md:w-125 w-full bg-green-100 p-2 border border-gray-300 rounded outline-none"
+        className="md:w-125 w-full bg-gray-100 p-2 text-black border border-gray-300 rounded outline-none"
       />
     </div>
   );

@@ -56,7 +56,7 @@ export default function Graph({chartSymbol, graphData, graphLoading, graphError,
         height="auto"
         viewBox={`0 0 ${w} ${h}`}
         preserveAspectRatio="xMidYMid meet"
-        className="w-full h-auto max-h-[220px] sm:max-h-[280px] md:max-h-[360px]"
+        className="w-full h-auto max-h-55 sm:max-h-70 md:max-h-90"
       >
         {/* Grid lines */}
         {yTicks.map((y, i) => (

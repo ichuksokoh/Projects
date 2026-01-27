@@ -182,7 +182,6 @@ function App() {
                       key={idx}
                       description={item.description}
                       displaySymbol={item.displaySymbol}
-                      type={item.type}
                       onSelect={() => handleAddSymbol(item.symbol, item.description)}
                       removableComps={CompsInTable}
                       handleRemoveSymbol={handleRemoveSymbol}

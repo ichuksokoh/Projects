@@ -1,7 +1,6 @@
-export default function StockCard({description, displaySymbol, type, onSelect, handleRemoveSymbol, removableComps}: {
+export default function StockCard({description, displaySymbol, onSelect, handleRemoveSymbol, removableComps}: {
   description: string;
   displaySymbol: string;
-  type: string;
   onSelect?: () => void;
   handleRemoveSymbol?: (symbol: string, description: string) => void;
   removableComps?: Set<string>;

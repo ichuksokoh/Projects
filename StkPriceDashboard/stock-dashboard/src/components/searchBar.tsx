@@ -18,7 +18,9 @@ export default function SearchBar({ setResult }: { setResult: (data: StockSearch
       setLoading(true);
       try {
         const data = await symbolSearch(query);
-        setResults(data);
+        if (data && data.result && !loading) {
+          setResults(data);
+        }
       } catch (err) {
         console.error("Search failed:", err);
       } finally {

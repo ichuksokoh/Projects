@@ -128,7 +128,7 @@ function App() {
     setState(n);
   };  
 
-  const matches = ["https://asuracomic.net/*", 
+  const matches = ["https://asuracomic.net/*", "https://asurascans.com/*",
     "http://asuracomic.net/", "https://flamecomics.xyz/*", "http://flamecomics.xyz/*",
     "https://www.mangago.me/*", "https://manganato.com/*", "https://reaperscans.com/*",
       "https://chapmanganato.to/*", "https://www.mangakakalot.gg/manga/*",

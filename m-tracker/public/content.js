@@ -146,6 +146,7 @@ const getBestImage = async (manhwaTitle, pageImage) => {
 
 
 const getDomain = () => {
+    
     const hostname = window.location.href;
     let domain = "";
     if (hostname.includes('asura')) {
@@ -221,7 +222,7 @@ const getDomain = () => {
     tempDiv.innerHTML = html;
     let title = "";
     if (domain.includes('asura')) {
-        const titleElem = tempDiv.querySelector('span.cursor-pointer.pl-1')
+        const titleElem = tempDiv.querySelector('text-xl.lg\\:text-[32px].font-semibold.leading-tight')
         title = titleElem ? titleElem.textContent.trim() : "";
     }
     else if (domain.includes('flame')) {
@@ -283,6 +284,8 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
                 const existingChapters = existingManhwa?.chapters || [];
     
                 const updatedChapters = [...existingChapters];
+                console.log("Existing Chapters:", existingChapters);
+                console.log("New Chapters:", newChapters);
               
                 newChapters.forEach(newChapter => {
                     if (!existingChapters.some(existingChapter => existingChapter.chapter === newChapter.chapter)) {
@@ -313,7 +316,8 @@ const update =  (manhwaTitle, newChapters, Manhwa) => {
 
 
     const updateSite = async (domain, hostname) => {
-        if (domain.includes('asura') && domain.includes('series')) {
+        if (domain.includes('asura')) {
+        
             title = scrapeAsuraScans(update, getTitle, manhwaList);
         }
         else if (domain.includes('flame') && hostname.length > 24) {

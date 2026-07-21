@@ -10,6 +10,7 @@ let currentApp: ReturnType<typeof mount> | null = null
 let mountedForUrl: string | null = null // only set once we've actually acted on a URL
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
+console.log('Content scraped:', scrapeCurrentPage())
 // Update manhwa that is stored already
 async function updateExistingManhwa() {
   const url = window.location.href
@@ -17,7 +18,7 @@ async function updateExistingManhwa() {
 
   if (!scraped.title) return
 
-  const existingManhwa = await manhwaStore.getManhwaBySourceUrl(url)
+  const existingManhwa = await manhwaStore.getManhwaByTitleOnHost(scraped.title, url)
   if (!existingManhwa) return
   if (existingManhwa.chapters.length >= scraped.chapters.length) return // no new chapters to update
   
@@ -46,6 +47,7 @@ async function updateExistingManhwa() {
   if (onlyNewChps) {
     const updatedManhwa = {
       ...existingManhwa,
+      sourceUrl: scraped.sourceUrl ?? existingManhwa.sourceUrl,
       totalChapters: scraped.latestChapter ?? existingManhwa.totalChapters,
       chapters: scraped.chapters ?? existingManhwa.chapters,
       updatedAt: Date.now(),
@@ -77,7 +79,8 @@ async function evaluateAndMount() {
     return
   }
 
-  const manhwaExists = await manhwaStore.getManhwaBySourceUrl(url)
+  const scraped = scrapeCurrentPage()
+  const manhwaExists = await manhwaStore.getManhwaByTitleOnHost(scraped.title, url)
   if (manhwaExists) {
     console.log('Updating existing manhwa in store...')
     await updateExistingManhwa()

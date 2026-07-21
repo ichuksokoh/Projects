@@ -6,8 +6,10 @@
   }: { labels?: readonly string[]; selected?: string; onSelect?: (label: string) => void } = $props()
 
   let buttonEls: HTMLElement[] = $state([])
+  let containerEl = $state<HTMLElement | null>(null)
   let highlightLeft = $state(0)
   let highlightWidth = $state(0)
+  let fontScale = $state(1)
   let selectedIndex = $derived(labels.indexOf(selected))
 
   function select(label: string) {
@@ -22,6 +24,28 @@
     highlightWidth = el.offsetWidth
   }
 
+  // Measures whether any label is currently overflowing its own button
+  // at the current font size, and if so, shrinks the font just enough
+  // for the tightest-fitting label to stay on one line.
+  function updateFontScale() {
+    let tightestRatio = 1
+    for (const el of buttonEls) {
+      if (!el) continue
+      const span = el.querySelector('span')
+      if (!span) continue
+
+      const style = getComputedStyle(el)
+      const horizontalPadding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)
+      const availableWidth = el.clientWidth - horizontalPadding - 4
+
+      if (span.scrollWidth > availableWidth) {
+        const ratio = availableWidth / span.scrollWidth
+        if (ratio < tightestRatio) tightestRatio = ratio
+      }
+    }
+    fontScale = Math.max(0.7, tightestRatio)
+  }
+
   $effect(() => {
     selected // re-run whenever selection changes
     updateHighlightPosition()
@@ -29,7 +53,11 @@
 
   // keep it correct if the container ever resizes (window resize, sidepanel width change, etc.)
   $effect(() => {
-    const observer = new ResizeObserver(updateHighlightPosition)
+    const observer = new ResizeObserver(() => 
+  {
+      updateHighlightPosition()
+      updateFontScale()
+    })
     for (const el of buttonEls) {
       if (el) observer.observe(el)
     }
@@ -37,7 +65,7 @@
   })
 </script>
 
-<div class="status-bar">
+<div class="status-bar" bind:this={containerEl} style="--font-scale: {fontScale};">
   <div
     class="highlight"
     style="transform: translateX({highlightLeft}px); width: {highlightWidth}px;"
@@ -49,7 +77,7 @@
       class:is-active={i === selectedIndex}
       onclick={() => select(label)}
     >
-      {label}
+      <span>{label}</span>
     </button>
   {/each}
 </div>
@@ -61,7 +89,7 @@
     display: flex;
     background: #1e293b;
     border: 1px solid #334155;
-    border-radius: 10px;
+    border-radius: 50px;
     padding: 3px;
   }
 
@@ -69,20 +97,27 @@
     position: relative;
     z-index: 1;
     flex: 1;
+    min-width: 0;
     padding: 6px 4px;
-    font-size: 10px;
     text-align: center;
     background: none;
     border: none;
     color: #94a3b8;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 50px;
     transition: color 200ms ease;
+    overflow: hidden;
   }
 
-  .status-item.is-active {
-    color: #fff;
+  .status-item span {
+    display: inline-block;
+    font-size: calc(10px * var(--font-scale, 1));
+    white-space: nowrap;
+  }
+
+  .status-item.is-active span {
     font-weight: 600;
+    color: #fff;
   }
 
   .highlight {
@@ -92,7 +127,7 @@
     left: 0;
     background: rgba(37, 99, 235, 0.55);
     border: 1px solid rgba(37, 99, 235, 0.8);
-    border-radius: 8px;
+    border-radius: 50px;
     pointer-events: none;
     transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1), width 250ms cubic-bezier(0.16, 1, 0.3, 1);
   }

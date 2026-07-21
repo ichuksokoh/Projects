@@ -1,4 +1,5 @@
 import type { Manhwa } from '@/types'
+import { titleSimilarity } from './titleMatch'
 
 let list = $state<Manhwa[]>([])
 
@@ -20,8 +21,17 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 })
 
+function getHostname(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return ''
+  }
+}
+
+
+
 export const manhwaStore = {
-  // ready,
   get list() {
     return list
   },
@@ -47,7 +57,18 @@ export const manhwaStore = {
     list = []
     await persist()
   },
-  // manhwaInList(url: string) {
-  //   return list.some((m) => m.sourceUrl === url)
-  // }
+  async getManhwaByTitleOnHost(title: string, url: string, threshold = 0.85) {
+    const host = getHostname(url)
+    if (!host) return undefined
+
+    let best: { manhwa: Manhwa; score: number } | undefined
+    for (const m of list) {
+      if (getHostname(m.sourceUrl) !== host) continue
+      const score = titleSimilarity(title, m.title)
+      if (score >= threshold && (!best || score > best.score)) {
+        best = { manhwa: m, score }
+      }
+    }
+    return best?.manhwa
+  },
 }

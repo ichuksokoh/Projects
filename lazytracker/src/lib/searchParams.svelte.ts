@@ -1,6 +1,8 @@
 const KEY = 'searchQuery'
 const KEY2 = 'showFavoritesOnly'
 const KEY3 = 'statusFilter'
+const KEY4 = 'HiddenFilter'
+const KEY5 = 'HiddenManhwaCount'
 
 //Handles Persisting Search Query, Show Favorites Only, and Status Filter in Chrome Storage
 
@@ -58,6 +60,46 @@ export function onStatusFilterChange(callback: (status: string) => void) {
     if (area === 'session' && KEY3 in changes) {
       const value = changes[KEY3].newValue
       callback(typeof value === 'string' ? value : 'All')
+    }
+  })
+}
+
+export async function setHiddenFilter(hidden: boolean) {
+  await chrome.storage.session.set({ [KEY4]: hidden })
+}
+
+export async function getHiddenFilter(): Promise<boolean> {
+  const res = await chrome.storage.session.get(KEY4)
+  const value = res[KEY4]
+  return typeof value === 'boolean' ? value : false
+}
+
+export function onHiddenFilterChange(callback: (hidden: boolean) => void) {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'session' && KEY4 in changes) {
+      const value = changes[KEY4].newValue
+      callback(typeof value === 'boolean' ? value : false)
+    }
+  })
+}
+
+
+// Uses local storage instead of session storage because this is a preference that should persist across sessions
+export function setHiddenManhwaCount(count: boolean) {
+  chrome.storage.local.set({ [KEY5]: count })
+}
+
+export async function getHiddenManhwaCount(): Promise<boolean> {
+  const res = await chrome.storage.local.get(KEY5)
+  const value = res[KEY5]
+  return typeof value === 'boolean' ? value : false
+}
+
+export function onHiddenManhwaCountChange(callback: (count: boolean) => void) {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'session' && KEY5 in changes) {
+      const value = changes[KEY5].newValue
+      callback(typeof value === 'boolean' ? value : false)
     }
   })
 }

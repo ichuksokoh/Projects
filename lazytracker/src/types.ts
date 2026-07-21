@@ -25,6 +25,7 @@ export interface Manhwa {
   coverUrl?: string      // optional — you may not always capture one
   status: ReadStatus
   favorite?: boolean // optional — if you want to mark it as a favorite
+  hidden?: boolean // optional — if you want to hide it from the library view
   currentChapter: number
   totalChapters?: number // optional — often unknown/ongoing
   chapters: ScrapedChapter[]

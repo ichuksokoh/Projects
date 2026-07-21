@@ -28,6 +28,13 @@ export const adapters: Record<string, Adapter> = {
     const desc = box.cloneNode(true) as HTMLElement
     return { description: desc.textContent?.trim() || null }
   },
+  'rizzfables.com': (doc) => {
+    const box = doc.querySelector('div > [itemprop="image"]')
+    if (!box) return {}
+    const img = box.cloneNode(true) as HTMLElement
+    const actualImg = img?.querySelector('img')
+    return { coverUrl: actualImg?.getAttribute('src') || null }
+  }
   
 
 }

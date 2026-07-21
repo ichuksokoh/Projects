@@ -3,9 +3,26 @@
   import { retrieveCover, deleteCachedCover } from '@/lib/coverCache.svelte'
   import { manhwaStore } from '@/lib/manhwaStore.svelte'
   import AlertBox from '@/components/AlertBox.svelte'
+  import ProgressBar from '@/components/ProgressBar.svelte'
 
-  let { manhwa, onClick, maxWidth = '100%', maxHeight = '100%' } :
-    { manhwa: Manhwa, onClick: (manhwa: Manhwa) => void, maxWidth?: string, maxHeight?: string } = $props()
+  interface CardProps {
+    manhwa: Manhwa
+    onClick: (manhwa: Manhwa) => void
+    maxWidth?: string
+    maxHeight?: string
+    selectMode?: boolean
+    selected?: boolean
+    onToggleSelect?: (manhwa: Manhwa) => void
+  }
+
+  let { manhwa, 
+        onClick, 
+        maxWidth = '100%',
+        maxHeight = '100%',
+        selectMode = false,
+        selected = false,
+        onToggleSelect
+      } : CardProps = $props()
 
   const cover = retrieveCover(() => manhwa)
 
@@ -64,7 +81,13 @@
     // await deleteCachedCover(manhwa.id)
     // await manhwaStore.remove(manhwa.id)
   }
-
+    function handleCardClick() {
+    if (selectMode) {
+      onToggleSelect?.(manhwa)
+    } else {
+      onClick(manhwa)
+    }
+  }
 </script>
 <AlertBox
   bind:open={showDeleteConfirm}
@@ -80,7 +103,7 @@
   class="card"
   role="button"
   tabindex="0"
-  onclick={() => onClick(manhwa)}
+  onclick={() => handleCardClick()}
   onkeydown={(e) => e.key === 'Enter' && onClick(manhwa)}
   style="max-width: {maxWidth}; max-height: {maxHeight};"
 >
@@ -97,34 +120,37 @@
       <div class="cover-placeholder">?</div>
     {/if}
 
-    <div class="overlay-controls">
-      <button
-        class="favorite-toggle"
-        class:is-active={manhwa.favorite}
-        onclick={handleToggleFavorite}
-        aria-pressed={manhwa.favorite}
-        aria-label={manhwa.favorite ? 'Remove from favorites' : 'Add to favorites'}
-      >
-        <svg viewBox="0 0 24 24" fill={manhwa.favorite ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      </button>
-      <span class="status-badge" style="background: {badgeBg}ea; color: {badgeText};">
-        {manhwa.status}
-      </span>
-  
-      <button class="delete-btn" onclick={handleDelete} aria-label="Delete manhwa">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-    </div>
-    <div class="rating">
-      <span >{manhwa.rating?.toFixed(2)}</span>
-    </div>
+{#if selectMode}
+      <div class="select-overlay" class:is-selected={selected}>
+        <div class="select-check">
+          {#if selected}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          {/if}
+        </div>
+      </div>
+    {:else}
+      <div class="overlay-controls">
+        <button class="favorite-toggle" class:is-active={manhwa.favorite} onclick={handleToggleFavorite} aria-pressed={manhwa.favorite} aria-label={manhwa.favorite ? 'Remove from favorites' : 'Add to favorites'}>
+          <svg viewBox="0 0 24 24" fill={manhwa.favorite ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </button>
+        <span class="status-badge" style="background: {badgeBg}ea; color: {badgeText};">{manhwa.status}</span>
+        <button class="delete-btn" onclick={handleDelete} aria-label="Delete manhwa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="rating">
+        <span >{manhwa.rating?.toFixed(2)}</span>
+      </div>
+    {/if}
   </div>
-
+  <ProgressBar manhwa={manhwa} isCard={true}/>
   <div class="title-wrap" use:checkOverflow>
     <div class="marquee-content">
       <span class="title-main">{manhwa.title}</span>
@@ -315,5 +341,52 @@
     font-size: 10px;
     font-weight: 600;
     color: #818cf8;
+  }
+   .card.select-mode .cover-wrap {
+    transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease, opacity 150ms ease;
+  }
+
+  .card.select-mode:not(.is-selected) .cover-wrap {
+    opacity: 0.55;
+  }
+
+  .card.is-selected .cover-wrap {
+    box-shadow:
+      0 0 0 2px #818cf8,
+      0 4px 12px rgba(99, 102, 241, 0.35);
+  }
+
+  .select-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 6px;
+    background: rgba(15, 23, 42, 0.15);
+  }
+
+  .select-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1.5px solid rgba(148, 163, 184, 0.4);
+    border-radius: 999px;
+    color: #fff;
+    transition: background-color 150ms ease, border-color 150ms ease, transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .select-overlay.is-selected .select-check {
+    background: #6366f1;
+    border-color: #818cf8;
+    transform: scale(1.1);
+  }
+
+  .select-check svg {
+    width: 12px;
+    height: 12px;
   }
 </style>

@@ -7,7 +7,10 @@
   import Card from '@/components/Card.svelte'
   import StatusBar from '@/components/StatusBar.svelte'
   import FavoriteButton from '@/components/FavoriteButton.svelte';
-  import Button from '@/components/Button.svelte';
+  import HideButton from '@/components/HideButton.svelte'
+  import AlertBox from '@/components/AlertBox.svelte'
+  import { deleteCachedCover } from '@/lib/coverCache.svelte'
+
 
   let searchQuery = $state('')
   let debouncedQuery = $state('')    // updates after typing pauses, drives the filter
@@ -16,6 +19,7 @@
   const statusValues = ['All', 'Plan To Read', 'Reading', 'Completed', 'Dropped'] as const
   let showFavoritesOnly = $state(false)
   let hideManwhaCount = $state(false) // hide the total manhwa count in the popup view
+  let showHiddenOnly = $state(false) // show only hidden manhwa
 
   // Front-end Client side filtering of the manhwa list based on search query, status filter, and favorites filter
   let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -38,7 +42,8 @@
     const titleIncludes = a.title.toLowerCase().includes(debouncedQuery.toLowerCase())
     const statusMatches = status === 'All' || a.status === status
     const favoriteMatches = !showFavoritesOnly || a.favorite
-    return (titleSim >= 0.6 || titleIncludes) && statusMatches && favoriteMatches
+    const hiddenMatches = showHiddenOnly ? a.hidden : !a.hidden
+    return (titleSim >= 0.6 || titleIncludes) && statusMatches && favoriteMatches && hiddenMatches
   }
   let filtered = $derived(
     manhwaStore.list.filter((m) => compare(m))
@@ -55,6 +60,16 @@
     queries.setShowFavoritesOnly(showFavoritesOnly)
   }
 
+  function handleShowHiddenToggle() {
+    showHiddenOnly = !showHiddenOnly
+    queries.setHiddenFilter(showHiddenOnly)
+  }
+
+  function handleHideCounts() {
+    hideManwhaCount = !hideManwhaCount
+    queries.setHiddenManhwaCount(hideManwhaCount)
+  }
+
   // Handle persistance of search queries, show favorites only, and status filter in Chrome storage
   // hydration from storage now needs to set both variables together
   $effect(() => {
@@ -67,6 +82,12 @@
     })
     queries.getStatusFilter().then((s) => {
       status = s
+    })
+    queries.getHiddenFilter().then((h) => {
+      showHiddenOnly = h
+    })
+    queries.getHiddenManhwaCount().then((h) => {
+      hideManwhaCount = h
     })
   })
 
@@ -81,6 +102,14 @@
 
   queries.onStatusFilterChange((s) => {
     status = s
+  })
+
+  queries.onHiddenFilterChange((h) => {
+    showHiddenOnly = h
+  })
+
+  queries.onHiddenManhwaCountChange((h) => {
+    hideManwhaCount = h
   })
 
   //Clear Query button logic
@@ -101,9 +130,43 @@
     }
   }
 
+ let selectMode = $state(false)
+  let selectedIds = $state<Set<string>>(new Set())
+  let showBulkDeleteConfirm = $state(false)
 
+  function toggleSelectMode() {
+    selectMode = !selectMode
+    selectedIds = new Set()
+  }
 
+  function toggleSelect(manhwa: Manhwa) {
+    const next = new Set(selectedIds)
+    if (next.has(manhwa.id)) {
+      next.delete(manhwa.id)
+    } else {
+      next.add(manhwa.id)
+    }
+    selectedIds = next
+  }
 
+  async function bulkDelete() {
+    for (const id of selectedIds) {
+      await deleteCachedCover(id)
+      await manhwaStore.remove(id)
+    }
+    selectedIds = new Set()
+    selectMode = false
+  }
+
+  let allSelected = $derived(filtered.length > 0 && filtered.every((m) => selectedIds.has(m.id)))
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      selectedIds = new Set()
+    } else {
+      selectedIds = new Set(filtered.map((m) => m.id))
+    }
+  }
 </script>
 
 <div class="popup">
@@ -123,17 +186,16 @@
     {/if}
   </header>
   <nav class="status-nav">
-    <StatusBar
-      labels={statusValues}
-      selected={status}
-      onSelect={handleStatusSelect}
-    />
-    <FavoriteButton
-      favorite={showFavoritesOnly}
-      onToggle={handleShowFavoritesToggle}
-      forStatus={true}
-    />
-  </nav>
+  <StatusBar labels={statusValues} selected={status} onSelect={handleStatusSelect} />
+  <FavoriteButton favorite={showFavoritesOnly} onToggle={handleShowFavoritesToggle} forStatus={true} size={26}/>
+  <HideButton hidden={showHiddenOnly} onToggle={handleShowHiddenToggle} forStatus={true} size={26}/>
+  <button class="select-mode-toggle" class:is-active={selectMode} onclick={toggleSelectMode} aria-label="Select multiple">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 11 12 14 22 4" />
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+    </svg>
+  </button>
+</nav>
   <main class="grid-scroll">
   {#if isSearching}
     <p class="searching-state">
@@ -153,18 +215,44 @@
   {:else}
     <div class="grid">
       {#each filtered as manhwa (manhwa.id)}
-        <Card {manhwa} onClick={openSidePanel} />
+         <Card
+          {manhwa}
+          onClick={openSidePanel}
+          {selectMode}
+          selected={selectedIds.has(manhwa.id)}
+          onToggleSelect={toggleSelect}
+        />
       {/each}
     </div>
   {/if}
 </main>
+{#if selectMode}
+<footer class="bulk-bar">
+  <div class="bulk-left">
+    <button class="select-all-btn" onclick={toggleSelectAll}>
+      {allSelected ? 'Deselect all' : 'Select all'}
+    </button>
+    <span class="bulk-count">{selectedIds.size} selected</span>
+  </div>
+  <div class="bulk-actions">
+    <button class="bulk-cancel" onclick={toggleSelectMode}>Cancel</button>
+    <button
+      class="bulk-delete"
+      disabled={selectedIds.size === 0}
+      onclick={() => (showBulkDeleteConfirm = true)}
+    >
+      Delete
+    </button>
+  </div>
+</footer>
+{:else}
 <footer class="count-bar">
   <span class="count-text" class:is-hidden={hideManwhaCount}>
-    {manhwaStore.list.length} total · {filtered.length} shown
+    {manhwaStore.list.length} total · {filtered.length} shown · {manhwaStore.list.filter((m) => m.favorite).length} favorites · {manhwaStore.list.filter((m) => m.hidden).length} hidden
   </span>
   <button
     class="count-toggle"
-    onclick={() => (hideManwhaCount = !hideManwhaCount)}
+    onclick={handleHideCounts}
     aria-label={hideManwhaCount ? 'Show count' : 'Hide count'}
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -178,8 +266,18 @@
     </svg>
   </button>
 </footer>
+{/if}
 </div>
-
+<AlertBox
+  bind:open={showBulkDeleteConfirm}
+  title="Delete {selectedIds.size} manhwa?"
+  confirmLabel="Delete"
+  confirmColorFrom="#7f1d1d"
+  confirmColorTo="#450a0a"
+  onConfirm={bulkDelete}
+>
+  This will permanently remove {selectedIds.size} manhwa and their cached covers. This can't be undone.
+</AlertBox>
 <style>
   :global(body) {
     margin: 0;
@@ -425,4 +523,131 @@
   height: 13px;
 }
 
+.select-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
+}
+
+.select-mode-toggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+.select-mode-toggle:hover {
+  border-color: #475569;
+  color: #cbd5e1;
+}
+
+.select-mode-toggle.is-active {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #a5b4fc;
+}
+
+.bulk-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  border-top: 1px solid #334155;
+  background: rgba(99, 102, 241, 0.08);
+  animation: bar-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bulk-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #c7d2fe;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bulk-cancel,
+.bulk-delete {
+  appearance: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease, opacity 140ms ease;
+}
+
+.bulk-cancel {
+  background: none;
+  border: 1px solid #334155;
+  color: #94a3b8;
+}
+
+.bulk-cancel:hover {
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.bulk-delete {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, #7f1d1d, #450a0a);
+  color: #f8fafc;
+}
+
+.bulk-delete:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.bulk-delete:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.bulk-delete:active:not(:disabled),
+.bulk-cancel:active {
+  transform: scale(0.96);
+}
+
+@keyframes bar-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bulk-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.select-all-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #818cf8;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 150ms ease;
+}
+
+.select-all-btn:hover {
+  color: #a5b4fc;
+}
 </style>

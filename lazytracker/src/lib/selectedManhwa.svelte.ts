@@ -5,15 +5,6 @@ export async function setSelectedManhwa(id: string) {
 }
 
 export async function setSelectedManhwaBg(id: string) {
-  //   if (typeof chrome !== 'undefined' && chrome.storage?.session) {
-  //   // running in a trusted context (popup/sidepanel/background) — direct access works
-  //   try {
-  //     await chrome.storage.session.set({ selectedManhwaId: id })
-  //     return
-  //   } catch (error) {
-  //     console.error('Error setting selectedManhwaId in session storage:', error)
-  //   }
-  // }
   await chrome.runtime.sendMessage({ type: 'set-selected-manhwa', id })
 }
 

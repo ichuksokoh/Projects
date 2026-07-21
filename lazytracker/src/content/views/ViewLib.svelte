@@ -3,8 +3,22 @@
     import { manhwaStore } from '@/lib/manhwaStore.svelte'
 
     let added = $state(true)
+    let isSidePanelOpenAlready = $state(false)
     let error = $state<string | null>(null)
     const windowUrl = $derived(window.location.href)
+
+    async function checkSidePanelOpen() {
+        console.log('[viewlib] checking if side panel is already open')
+        const response = await chrome.runtime.sendMessage({ type: 'is-sidepanel-open' })
+        if (response.ok) {
+            isSidePanelOpenAlready = true
+        } else {
+            isSidePanelOpenAlready = false
+            console.error('[viewlib] failed to check side panel status', response.status)
+            error = 'Failed to check library status, please try again.'
+        }
+    }
+    checkSidePanelOpen()
 
     async function handleViewLib() {
         let manhwa = await manhwaStore.getManhwaBySourceUrl(windowUrl)
@@ -20,13 +34,15 @@
         if (success) {
             console.log('[viewlib] side panel opened successfully')
             added = false
+            isSidePanelOpenAlready = false
         } else {
             console.error('[viewlib] failed to open side panel')
             error = 'Failed to open library, please try again.'
+            isSidePanelOpenAlready = true
         }
     }
 </script>
-{#if added}
+{#if added && !isSidePanelOpenAlready}
   <div class="popup-container">
   <button class="toggle-button" onclick={handleViewLib}>
     <span>View In Library</span>

@@ -3,9 +3,10 @@
 
     interface ProgressBarProps {
         manhwa: Manhwa
+        isCard?: boolean
     }
 
-  let { manhwa }: ProgressBarProps = $props()
+  let { manhwa, isCard = false }: ProgressBarProps = $props()
   const round = (num: number, decimals: number) => {
     const factor = Math.pow(10, decimals)
     return Math.round(num * factor) / factor
@@ -27,6 +28,7 @@
 
 <div class="progress-wrap">
   <div class="progress-header">
+  {#if !isCard}
     <span class="progress-label">
       {#if total}
         {currentLabel} of {totalLabel}
@@ -37,9 +39,10 @@
     {#if total}
       <span class="progress-percent">{percent}%</span>
     {/if}
+  {/if}
   </div>
 
-  <div class="progress-track">
+  <div class="progress-track" class:card={isCard}>
     <div class="progress-fill" style="width: {percent}%"></div>
   </div>
 </div>
@@ -77,6 +80,10 @@
     border: 1px solid #334155;
     border-radius: 999px;
     overflow: hidden;
+  }
+
+  .progress-track.card {
+    height: 1.25px;
   }
 
   .progress-fill {

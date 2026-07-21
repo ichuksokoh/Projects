@@ -3,8 +3,9 @@
     favorite: boolean
     onToggle: () => void
     forStatus?: boolean
+    size?: number
   }
-  let { favorite = $bindable(false), onToggle, forStatus = false }: FavoriteButtonProps = $props()
+  let { favorite = $bindable(false), onToggle, forStatus = false, size = 34 }: FavoriteButtonProps = $props()
 
 
 </script>
@@ -14,6 +15,7 @@
   onclick={onToggle}
   aria-pressed={favorite}
   aria-label={favorite ? (forStatus ? 'Showing Favorites' : 'Remove from favorites') : (forStatus ? 'Show Favorites' : 'Add to favorites')}
+  style="--size: {size}px"
 >
   <svg viewBox="0 0 24 24" fill={favorite ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2">
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -25,9 +27,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 34px;
-    max-height: 34px;
-    height: 34px;
+    max-width: var(--size);
+    max-height: var(--size);
+    height: var(--size);
     width: 100%;
     background: #1e293b;
     border: 1px solid #334155;

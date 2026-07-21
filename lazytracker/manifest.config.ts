@@ -15,7 +15,6 @@ export default defineManifest({
     default_popup: 'src/popup/index.html',
   },
   content_scripts: [{
-    // matches: ['https://*/*'],
     matches: [
       '*://asurascans.com/*',
       '*://flamecomics.xyz/*',
@@ -23,6 +22,8 @@ export default defineManifest({
       '*://*.natomanga.com/*',
       '*://drakecomic.org/*',
       '*://*.mangago.me/*',
+      '*://rizzfables.com/*',
+      '<all_urls>',
     ],
     js: ['src/content/main.ts'],
   }],

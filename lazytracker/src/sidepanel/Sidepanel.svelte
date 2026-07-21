@@ -5,6 +5,7 @@
   import type { Manhwa } from '@/types'
   import Button from '@/components/Button.svelte';
   import FavoriteButton from '@/components/FavoriteButton.svelte';
+  import HideButton from '@/components/HideButton.svelte'
   import ProgressBar from '@/components/ProgressBar.svelte';
   import StatusBar from '@/components/StatusBar.svelte';
   import  ChapterDropdown  from '@/components/ChapterDropdown.svelte'
@@ -14,6 +15,14 @@
   import GoToBtn from '@/components/GoToBtn.svelte';
   import AlertBox from '@/components/AlertBox.svelte'
   
+  // tracks open/close status of the side panel, to avoid opening multiple instances of it
+  chrome.runtime.connect({ name: 'sidepanel-heartbeat' })
+  chrome.windows.getCurrent().then((win) => {
+  if (win.id === undefined) return
+    const port = chrome.runtime.connect({ name: 'sidepanel-heartbeat' })
+    port.postMessage({ windowId: win.id })
+  })
+
   // Handling of Selected Manhwa from Popup library view to Side Panel view
   let selectedId = $state<string | null>(null)
 
@@ -84,14 +93,6 @@
     }
   }
   
-  let currentChpLabel = $derived(
-    selectedManhwa?.chapters.find((c) => c.number === selectedManhwa.currentChapter)?.label ??
-    ` ${selectedManhwa?.chapters[0]?.label ?? 'N/A'}`
-  )
-  
-  let totalChpLabel = $derived(
-    selectedManhwa?.chapters[selectedManhwa.chapters.length - 1]?.label ?? 'N/A'
-  )
   
   // Function to toggle the description drawer open/closed
   function toggleDescription(next: boolean) {
@@ -125,6 +126,14 @@
 
 
   let showDeleteConfirm = $state(false)
+   async function toggleHidden() {
+    if (selectedManhwa) {
+      await manhwaStore.update(selectedManhwa.id, {
+        hidden: !selectedManhwa.hidden,
+        updatedAt: Date.now(),
+      })
+    }
+  }
 </script>
 <AlertBox
   bind:open={showDeleteConfirm}
@@ -143,7 +152,7 @@
     <path d="M10 14 L21 3" />
   </svg>
 {/snippet}
-<div>
+<!-- <div> -->
   <div class="manhwa_info">
     {#if selectedManhwa}
       <div class="title-row">
@@ -167,6 +176,7 @@
           <GoToBtn label="Read at" onClick={openManhwaUrl} icon={linkToSvg} />
           <ChapterDropdown manhwa={selectedManhwa} onSelect={handleChapterSelect} />
           <FavoriteButton favorite={selectedManhwa.favorite ?? false} onToggle={toggleFavorite} />
+          <HideButton hidden={selectedManhwa.hidden ?? false} onToggle={toggleHidden} />
         </div>
         {#if selectedManhwa.description}
           <DescriptionDrawer
@@ -184,14 +194,38 @@
       <p class="no-manhwa">No Manhwa Selected</p>
     {/if}
   </div>
-</div>
+<!-- </div> -->
 
 <style>
   .manhwa_info {
-    max-width: 350px;
-    max-height: 100%;
+    max-width: 100%;
+    /* max-height: 100%; */
+    height: 100vh;
     overflow-y: auto;
     padding: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* scrollbar-width: thin;
+    scrollbar-color: #475569 transparent; */
+  }
+  
+  .manhwa_info::-webkit-scrollbar {
+    width: 0px;
+  }
+
+  .manhwa_info::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .manhwa_info::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 999px;
+    width: 0px;
+  }
+
+  .manhwa_info::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #41439d, #5a63ad); 
   }
 
   .title-row {
@@ -209,10 +243,16 @@
     
   }
 
+  .cover-wrap {
+    max-width: 320px;
+  }
   .cover-wrap img {
     width: 100%;
+    max-width: 400px;
+    max-height: 550px;
     height: auto;
-    max-height: 475px;
+    border-radius: 8px;
+
   }
 
   .cover-placeholder {
@@ -230,6 +270,8 @@
     flex-direction: column;
     gap: 10px;
     margin: 14px 0;
+    padding:0 4px;
+    max-width: 450px;
   }
   .controls-row {
     display: flex;

@@ -24,10 +24,12 @@
     return Math.min(MAX, Math.max(MIN, Math.round(stepped * 100) / 100))
   }
 
-  function commit(value: number) {
+  function commit(value: number, { live = false } = {}) {
     const clamped = clampAndStep(value)
     rating = clamped
-    onSelect?.(clamped)
+    if (!live) {
+      onSelect?.(clamped)
+    }
   }
 
   function handleInputChange(e: Event) {
@@ -50,16 +52,17 @@
   function handlePointerDown(e: PointerEvent) {
     dragging = true
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-    commit(valueFromClientX(e.clientX))
+    commit(valueFromClientX(e.clientX), { live: true })
   }
 
   function handlePointerMove(e: PointerEvent) {
     if (!dragging) return
-    commit(valueFromClientX(e.clientX))
+    commit(valueFromClientX(e.clientX), { live: true })
   }
 
-  function handlePointerUp() {
+  function handlePointerUp(e: PointerEvent) {
     dragging = false
+    onSelect?.(rating!) // commit the final value exactly once, now that dragging has stopped
   }
 </script>
 
@@ -86,16 +89,19 @@
   <button
     bind:this={trackEl}
     class="rating-track"
+    class:is-dragging={dragging}
     onpointerdown={handlePointerDown}
     onpointermove={handlePointerMove}
     onpointerup={handlePointerUp}
     onpointercancel={handlePointerUp}
     aria-label="Rating"
   >
-    {#if hasSelection}
-      <div class="rating-fill" style="width: {percent}%"></div>
-      <div class="rating-thumb" class:is-dragging={dragging} style="left: {percent}%"></div>
-    {/if}
+    <div class="rating-track-inner" class:is-dragging={dragging}>
+      {#if hasSelection}
+        <div class="rating-fill" style="width: {percent}%"></div>
+        <div class="rating-thumb" class:is-dragging={dragging} style="left: {percent}%"></div>
+      {/if}
+    </div>
   </button>
 </div>
 
@@ -179,6 +185,10 @@
     transition: width 120ms ease;
   }
 
+  .rating-track.is-dragging .rating-fill {
+    transition: none;
+  }
+
   .rating-thumb {
     position: absolute;
     top: 50%;
@@ -193,6 +203,7 @@
   }
 
   .rating-thumb.is-dragging {
+    transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
     transform: translate(-50%, -50%) scale(1.25);
   }
 </style>

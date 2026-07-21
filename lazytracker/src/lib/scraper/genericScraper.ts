@@ -124,11 +124,18 @@ function extractDescription(doc: Document, title: string): string | null {
   return raw.trim()
 }
 
+function extractImage(doc: Document): string | null {
+  const box = doc.querySelector('div > [itemprop="image"]')
+  if (!box) return null
+  const img = box.cloneNode(true) as HTMLElement
+  const actualImg = img?.querySelector('img')
+  return actualImg?.getAttribute('src') || null
+}
 export function scrapeGeneric(doc: Document, url: string): Omit<ScrapedManhwa, 'chapters'> {
   const title = extractTitle(doc)
   return {
     title,
-    coverUrl: getMeta(doc, 'og:image'),
+    coverUrl: extractImage(doc) || getMeta(doc, 'og:image') || null,
     description: extractDescription(doc, title),
     latestChapter: extractLatestChapter(doc, url),
     sourceUrl: url,
